@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { CategoryService } from './category.service';
+import { AppConstant } from '../shared/app-constant';
 
 @Component({
   selector: 'app-category',
@@ -6,10 +8,17 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./category.page.scss'],
 })
 export class CategoryPage implements OnInit {
+  categories = [];
 
-  constructor() { }
+  constructor(private categorySvc: CategoryService) { 
 
-  ngOnInit() {
+  }
+
+  async ngOnInit() {
+    this.categories = await this.categorySvc.getCategoryList();
+    if(AppConstant.DEBUG) {
+      console.log('CategoryPage: ngOnInit: categories', this.categories);
+    }
   }
 
 }

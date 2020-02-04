@@ -21,7 +21,10 @@ const routes: Routes = [
   },
   {
     path: 'category',
-    loadChildren: () => import('./modules/category/category.module').then( m => m.CategoryPageModule)
+    loadChildren: () => import('./modules/category/category.module').then( m => m.CategoryPageModule),
+    resolve: {
+      startupResolve: StartupResolver
+    }
   }
 ];
 

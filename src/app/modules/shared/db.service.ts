@@ -94,13 +94,20 @@ export class DbService {
         });
     }
 
-    getAll<T>(store: string): Promise<T> {
+    getAll<T>(store: string): Promise<Array<T>> {
         return new Promise((resolve, reject) => {
             let sql = `SELECT * FROM ${store} `;
 
-            this._db.transaction(async (tx) => {           
+            this._db.transaction(async (tx) => {    
+                const data = [];
+       
                 const res = await this._executeSql<any>(tx, sql);
-                resolve(res);
+                if(res.rows.length) {
+                    for(let i=0; i< res.rows.length; i++) {
+                        data.push(res.rows.item(i));
+                    }
+                }
+                resolve(data);
             }, (error) => reject(error));
         });
     }
