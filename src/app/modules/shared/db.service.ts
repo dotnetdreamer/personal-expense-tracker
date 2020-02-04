@@ -61,38 +61,47 @@ export class DbService {
 
     put(store, data): Promise<{ rowsAffected, insertId }> {
         return new Promise((resolve, reject) => {
-            this._db.transaction(async (tx) => {
-                let sql = `INSERT INTO ${store} `;
+            let sql = `INSERT INTO ${store} `;
 
-                //columns
-                sql += `(`;
-                for(let prop in data) {
-                    if(data.hasOwnProperty(prop)) {
-                        sql += `${prop},`;
-                    }
+            //columns
+            sql += `(`;
+            for(let prop in data) {
+                if(data.hasOwnProperty(prop)) {
+                    sql += `${prop},`;
                 }
-                //remove extra ',' at the end
-                sql = sql.substr(0, sql.length - 1);
-                sql += `)`;
+            }
+            //remove extra ',' at the end
+            sql = sql.substr(0, sql.length - 1);
+            sql += `)`;
 
-                //values
-                const values = [];
-                sql += ` VALUES (`;
-                for(let prop in data) {
-                    sql += `?,`;
-                    values.push(data[prop]);
-                }
-                sql = sql.substr(0, sql.length - 1);
-                sql += `)`;
+            //values
+            const values = [];
+            sql += ` VALUES (`;
+            for(let prop in data) {
+                sql += `?,`;
+                values.push(data[prop]);
+            }
+            sql = sql.substr(0, sql.length - 1);
+            sql += `)`;
 
-                if(AppConstant.DEBUG) {
-                    console.log('DbService: put: sql:', sql);
-                }                
+            if(AppConstant.DEBUG) {
+                console.log('DbService: put: sql:', sql);
+            }     
+            this._db.transaction(async (tx) => {           
                 const res = await this._executeSql<{ rowsAffected, insertId }>(tx, sql, values);
                 resolve(res);
-            }
-            , (error) => reject(error)
-            );
+            }, (error) => reject(error));
+        });
+    }
+
+    getAll<T>(store: string): Promise<T> {
+        return new Promise((resolve, reject) => {
+            let sql = `SELECT * FROM ${store} `;
+
+            this._db.transaction(async (tx) => {           
+                const res = await this._executeSql<any>(tx, sql);
+                resolve(res);
+            }, (error) => reject(error));
         });
     }
 

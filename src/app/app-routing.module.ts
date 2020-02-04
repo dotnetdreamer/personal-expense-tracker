@@ -5,7 +5,7 @@ import { StartupResolver } from './modules/shared/startup.resolve';
 const routes: Routes = [
   {
     path: '',
-    redirectTo: 'home',
+    redirectTo: 'category',
     pathMatch: 'full'
   },
   {
@@ -18,6 +18,10 @@ const routes: Routes = [
   {
     path: 'list',
     loadChildren: () => import('./list/list.module').then(m => m.ListPageModule)
+  },
+  {
+    path: 'category',
+    loadChildren: () => import('./modules/category/category.module').then( m => m.CategoryPageModule)
   }
 ];
 
