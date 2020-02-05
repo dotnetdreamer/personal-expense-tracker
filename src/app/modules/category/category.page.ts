@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { AlertController } from '@ionic/angular';
 
 import { CategoryService } from './category.service';
 import { AppConstant } from '../shared/app-constant';
@@ -12,7 +13,8 @@ import { HelperService } from '../shared/helper.service';
 export class CategoryPage implements OnInit {
   categories = [];
 
-  constructor(private categorySvc: CategoryService
+  constructor(private alertCtrl: AlertController
+    , private categorySvc: CategoryService
     , private helperSvc: HelperService) { 
 
   }
@@ -23,11 +25,7 @@ export class CategoryPage implements OnInit {
 
   async onCategoryAddClick() {
     try {
-      await this.categorySvc.put({
-        name: 'Testing'
-      });
-
-      await this.getCategories();
+      await this._presentAddModal();
     } catch (e) {
       if(AppConstant.DEBUG) {
         console.log('CategoryPage: onCategoryAddClick: error', e);
@@ -41,6 +39,47 @@ export class CategoryPage implements OnInit {
     if(AppConstant.DEBUG) {
       console.log('CategoryPage: ngOnInit: categories', this.categories);
     }
+  }
+
+  private async _presentAddModal() {
+    const alert = await this.alertCtrl.create({
+      header: 'Prompt!',
+      inputs: [
+        {
+          name: 'categoryName',
+          type: 'text',
+          placeholder: ''
+        }
+      ],
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          cssClass: 'secondary',
+          handler: () => {
+          }
+        }, {
+          text: 'Ok',
+          handler: async (data) => {
+            if(!data.categoryName) {
+              return;
+            }
+
+            if(!data.categoryName.trim().length) {
+              return;
+            }
+
+            await this.categorySvc.put({
+              name: data.categoryName
+            });   
+
+            await this.getCategories();
+          }
+        }
+      ]
+    });
+
+    await alert.present();
   }
 
 }
