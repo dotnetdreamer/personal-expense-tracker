@@ -22,7 +22,7 @@ export class StartupResolver implements Resolve<any> {
             }
         });
         //db
-        this.dbSvc.initializeDb();
+        // this.dbSvc.initializeDb();
     }
 
     resolve(route: ActivatedRouteSnapshot, rState: RouterStateSnapshot): Observable<any> {

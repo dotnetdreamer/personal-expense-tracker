@@ -11,7 +11,17 @@ export class SchemaService {
         stores: [
             {
                 name: this._category,
-                columns: [{ name: 'id', isPrimaryKey: true, type: 'INTEGER' }, { name: 'name', type: 'TEXT' }],
+                columns: [{ 
+                    name: 'id', 
+                    isPrimaryKey: true, 
+                    type: 'INTEGER' 
+                }, { 
+                    name: 'name', 
+                    type: 'TEXT' 
+                }, {
+                    name: 'createdOn', 
+                    type: 'TEXT'  
+                }],
                 autoIncrement: true
             }
             // , {

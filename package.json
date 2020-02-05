@@ -26,6 +26,7 @@
     "cordova-android": "8.1.0",
     "cordova-sqlite-storage": "^4.0.0",
     "core-js": "^2.5.4",
+    "moment": "^2.24.0",
     "rxjs": "~6.5.1",
     "tslib": "^1.9.0",
     "zone.js": "~0.9.1"

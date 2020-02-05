@@ -20,6 +20,8 @@ export class DbService {
                 this._db = !this.platform.is('cordova') ?
                     (<any>window).openDatabase(this.dbName, '1.0', 'Data', 2*1024*1024, () => this._dbSuccess(), (err) => this._dbError(err)) :
                     (<any>window).sqlitePlugin.openDatabase({ name: this.dbName, location: 'default' }, () => this._dbSuccess(), (err) => this._dbError(err));
+
+                this.initializeDb();
             });
     }
 
@@ -30,8 +32,8 @@ export class DbService {
             });
         }); 
     }
-
-    initializeDb() {
+ 
+    initializeDb() {   
         const delay = 50;
         //workaround: don't proceed unless db is initialized...wait everytime 50ms
         const _self = this;
