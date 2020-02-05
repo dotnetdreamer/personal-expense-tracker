@@ -1,9 +1,11 @@
 import { Injectable, Injector } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
+import { Platform } from '@ionic/angular';
 
 import { AppConstant } from './app-constant';
-import { DbService } from './db.service';
-import { SchemaService } from './schema.service';
+import { DbService } from './db/db-base.service';
+import { DbSqlService } from './db/db-sql.service';
+import { SchemaService } from './db/schema.service';
 import { AppSettingService } from './app-setting.service';
 import { AppInjector } from './app-injector';
 import { HelperService } from './helper.service';
@@ -14,6 +16,7 @@ import { LocalizationService } from './localization.service';
 })
 export class BaseService {
     protected http: HttpClient;
+    protected platform: Platform;
     protected dbService: DbService;
     protected schemaService: SchemaService;
     protected appSettingService: AppSettingService;
@@ -24,11 +27,17 @@ export class BaseService {
         const injector = AppInjector.getInjector();
 
         this.http = injector.get(HttpClient);
-        this.dbService = injector.get(DbService);
+        this.platform = injector.get(Platform);
         this.schemaService = injector.get(SchemaService);
         this.appSettingService = injector.get(AppSettingService);
         this.helperSvc = injector.get(HelperService);
         this.localizationSvc = injector.get(LocalizationService);
+
+        if(this.platform.is('cordova')) {
+            this.dbService = injector.get(DbSqlService);
+        } else {
+            this.dbService = injector.get(DbSqlService);
+        }
     }
 
     private async prepareHeaders(ignoreContentType?) {

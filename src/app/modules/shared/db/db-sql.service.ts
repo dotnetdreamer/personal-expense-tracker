@@ -1,15 +1,17 @@
 import { Injectable } from '@angular/core';
 
-import { SchemaService, ITableOptions } from './schema.service';
-import { AppConstant } from "./app-constant";
-import { EventPublisher } from './event-publisher';
 import { Platform } from '@ionic/angular';
+
+import { SchemaService, ITableOptions } from './schema.service';
+import { AppConstant } from "../app-constant";
+import { EventPublisher } from '../event-publisher';
+import { DbService } from './db-base.service';
 
 @Injectable({
     providedIn: 'root'
 })
-export class DbService {
-    private dbName: string = AppConstant.DB_NAME;
+export class DbSqlService implements DbService {
+    private _dbName: string = AppConstant.DB_NAME;
     private _db: any;
     private _isDbInitialized = false;
 
@@ -18,8 +20,8 @@ export class DbService {
             setTimeout(async () => {
                 // await this._deleteDatabase();
                 this._db = !this.platform.is('cordova') ?
-                    (<any>window).openDatabase(this.dbName, '1.0', 'Data', 2*1024*1024, () => this._dbSuccess(), (err) => this._dbError(err)) :
-                    (<any>window).sqlitePlugin.openDatabase({ name: this.dbName, location: 'default' }, () => this._dbSuccess(), (err) => this._dbError(err));
+                    (<any>window).openDatabase(this._dbName, '1.0', 'Data', 2*1024*1024, () => this._dbSuccess(), (err) => this._dbError(err)) :
+                    (<any>window).sqlitePlugin.openDatabase({ name: this._dbName, location: 'default' }, () => this._dbSuccess(), (err) => this._dbError(err));
 
                 this.initializeDb();
             });
@@ -160,7 +162,7 @@ export class DbService {
 
     private _deleteDatabase() {
         return new Promise((resolve, reject) => {
-            (<any>window).sqlitePlugin.deleteDatabase({name: this.dbName, location: 'default'}, resolve, reject);
+            (<any>window).sqlitePlugin.deleteDatabase({name: this._dbName, location: 'default'}, resolve, reject);
         });
     }
 

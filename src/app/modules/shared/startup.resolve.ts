@@ -1,11 +1,14 @@
 import { Injectable } from '@angular/core';
 import { Resolve, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 
+import { Platform } from '@ionic/angular';
 import { Observable} from "rxjs";
 
 import { AppConstant } from './app-constant';
-import { DbService } from './db.service';
 import { EventPublisher } from './event-publisher';
+import { DbService } from './db/db-base.service';
+import { AppInjector } from './app-injector';
+import { DbSqlService } from './db/db-sql.service';
 
 @Injectable({
     providedIn: 'root'
@@ -13,8 +16,16 @@ import { EventPublisher } from './event-publisher';
 export class StartupResolver implements Resolve<any> {
     private _isDbReady = false;
 
-    constructor(private eventPub: EventPublisher
-        , private dbSvc: DbService) {
+    constructor(private platform: Platform
+        , private eventPub: EventPublisher) {
+        const injector = AppInjector.getInjector();
+
+        let dbService: DbService;
+        if(this.platform.is('cordova')) {
+            dbService = injector.get(DbSqlService);
+        } else {
+            dbService = injector.get(DbSqlService);
+        }
         this.eventPub.$sub(AppConstant.EVENT_DB_INITIALIZED, () => {
             this._isDbReady = true;
             if(AppConstant.DEBUG) {
@@ -22,7 +33,7 @@ export class StartupResolver implements Resolve<any> {
             }
         });
         //db
-        // this.dbSvc.initializeDb();
+        // dbService.initializeDb();
     }
 
     resolve(route: ActivatedRouteSnapshot, rState: RouterStateSnapshot): Observable<any> {
