@@ -10,6 +10,7 @@ import { AppSettingService } from './app-setting.service';
 import { AppInjector } from './app-injector';
 import { HelperService } from './helper.service';
 import { LocalizationService } from './localization.service';
+import { DbWebService } from './db/db-web.service'; 
 
 @Injectable({
     providedIn: 'root'
@@ -36,7 +37,7 @@ export class BaseService {
         if(this.platform.is('cordova')) {
             this.dbService = injector.get(DbSqlService);
         } else {
-            this.dbService = injector.get(DbSqlService);
+            this.dbService = injector.get(DbWebService);
         }
     }
 

@@ -21,8 +21,7 @@ export class SchemaService {
                 }, {
                     name: 'createdOn', 
                     type: 'TEXT'  
-                }],
-                autoIncrement: true
+                }]
             }
             // , {
             //     name: this._setting,

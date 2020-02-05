@@ -9,6 +9,7 @@ import { EventPublisher } from './event-publisher';
 import { DbService } from './db/db-base.service';
 import { AppInjector } from './app-injector';
 import { DbSqlService } from './db/db-sql.service';
+import { DbWebService } from './db/db-web.service';
 
 @Injectable({
     providedIn: 'root'
@@ -24,7 +25,7 @@ export class StartupResolver implements Resolve<any> {
         if(this.platform.is('cordova')) {
             dbService = injector.get(DbSqlService);
         } else {
-            dbService = injector.get(DbSqlService);
+            dbService = injector.get(DbWebService);
         }
         this.eventPub.$sub(AppConstant.EVENT_DB_INITIALIZED, () => {
             this._isDbReady = true;
@@ -33,6 +34,7 @@ export class StartupResolver implements Resolve<any> {
             }
         });
         //db
+        //already called in consturction of dbService...
         // dbService.initializeDb();
     }
 
