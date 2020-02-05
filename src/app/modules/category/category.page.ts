@@ -4,6 +4,7 @@ import { AlertController } from '@ionic/angular';
 import { CategoryService } from './category.service';
 import { AppConstant } from '../shared/app-constant';
 import { HelperService } from '../shared/helper.service';
+import { LocalizationService } from '../shared/localization.service';
 
 @Component({
   selector: 'app-category',
@@ -14,7 +15,7 @@ export class CategoryPage implements OnInit {
   categories = [];
 
   constructor(private alertCtrl: AlertController
-    , private categorySvc: CategoryService
+    , private categorySvc: CategoryService, private localizationSvc: LocalizationService
     , private helperSvc: HelperService) { 
 
   }
@@ -42,8 +43,9 @@ export class CategoryPage implements OnInit {
   }
 
   private async _presentAddModal() {
+    const catNameTitle = await this.localizationSvc.getResource('category.title');
     const alert = await this.alertCtrl.create({
-      header: 'Prompt!',
+      header: catNameTitle,
       inputs: [
         {
           name: 'categoryName',

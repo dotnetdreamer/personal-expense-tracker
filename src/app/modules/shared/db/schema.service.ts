@@ -22,16 +22,22 @@ export class SchemaService {
                     name: 'createdOn', 
                     type: 'TEXT'  
                 }]
+            }, {
+                name: this._setting,
+                columns: [{ 
+                    name: 'key', 
+                    isPrimaryKey: true, 
+                    type: 'TEXT' 
+                }, {
+                    name: 'value', 
+                    type: 'TEXT'  
+                }],              
+                // autoIncrement: false
             }
-            // , {
-            //     name: this._setting,
-            //     columns: ['key', 'value'],
-            //     autoIncrement: false
-            // }
         ]
     };
     tables = {
-        // setting: this._setting,
+        setting: this._setting,
         category: this._category
     };
 

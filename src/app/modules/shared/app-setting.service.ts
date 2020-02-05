@@ -7,6 +7,7 @@ import { DbSqlService } from './db/db-sql.service';
 import { SchemaService } from './db/schema.service';
 import { AppConstant } from './app-constant';
 import { AppInjector } from './app-injector';
+import { DbWebService } from './db/db-web.service';
 
 @Injectable({
     providedIn: 'root'
@@ -25,12 +26,49 @@ export class AppSettingService {
         if(this.platform.is('cordova')) {
             this.dbService = injector.get(DbSqlService);
         } else {
-            this.dbService = injector.get(DbSqlService);
+            this.dbService = injector.get(DbWebService);
         }
         this.schemaService = injector.get(SchemaService);
     }
 
+    putWorkingLanguage(lang) {
+        return this.dbService.put(this.schemaService.tables.setting, {
+            key: AppConstant.KEY_WORKING_LANGUAGE,
+            value: lang
+        }).then(() => {
+            AppSettingService.settingCache.set(AppConstant.KEY_WORKING_LANGUAGE, lang);
+        });
+    }
+
     getWorkingLanguage() {
-        return new Promise((resolve, reject) => resolve('en'));
+        return this.get<string>(AppConstant.KEY_WORKING_LANGUAGE);
+    }
+
+    get<T>(key: string): Promise<T> {
+        if(AppSettingService.settingCache.has(key)) {
+            return new Promise((resolve, reject) => {
+                let settingCacheMap = AppSettingService.settingCache.get(key);
+                resolve(settingCacheMap);
+            });
+        }
+        else {
+            return this.dbService.get<any>(this.schemaService.tables.setting, key)
+                .then(setting => {
+                    if (setting && setting.value) {
+                        AppSettingService.settingCache.set(key, setting.value);
+                        return setting.value;
+                    }
+                    return null;
+            });
+        }
+    }
+
+    put(key: string, values) {
+        return this.dbService.put(this.schemaService.tables.setting, {
+            key: key,
+            value: values
+        }).then(() => {
+            AppSettingService.settingCache.set(key, values);
+        });
     }
 }

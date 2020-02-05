@@ -17,7 +17,7 @@ export class DbSqlService implements DbService {
 
     constructor(private platform: Platform
         , private eventPub: EventPublisher, private schemaSvc: SchemaService) {
-            setTimeout(async () => {
+            this.platform.ready().then(async () => {
                 // await this._deleteDatabase();
                 this._db = !this.platform.is('cordova') ?
                     (<any>window).openDatabase(this._dbName, '1.0', 'Data', 2*1024*1024, () => this._dbSuccess(), (err) => this._dbError(err)) :
@@ -98,6 +98,28 @@ export class DbSqlService implements DbService {
         });
     }
 
+    get<T>(store: string, key: any): Promise<T> {
+        return new Promise((resolve, reject) => {
+            //get primary key field form schema
+            const table:any = this.schemaSvc.schema.stores.filter(s => s.name === store)[0];
+            const pk = (table.columns.filter(c => c.isPrimaryKey)[0]).name;
+
+            let sql = `SELECT * FROM ${store} WHERE ${pk} = '${key}'`;
+
+            this._db.transaction(async (tx) => {    
+                const data = [];
+       
+                const res = await this._executeSql<any>(tx, sql);
+                if(res.rows.length) {
+                    for(let i=0; i< res.rows.length; i++) {
+                        data.push(res.rows.item(i));
+                    }
+                }
+                // resolve(data);
+            }, (error) => reject(error));
+        });
+    }
+
     getAll<T>(store: string): Promise<Array<T>> {
         return new Promise((resolve, reject) => {
             let sql = `SELECT * FROM ${store} `;
@@ -127,7 +149,7 @@ export class DbSqlService implements DbService {
                     sql += `(`;
 
                     for(let col of schema.columns) {
-                        sql += `${col.name}${col.type ? ' ' + col.type : ''}${col.isPrimaryKey ? ' PRIMARY KEY' : ''},`;
+                        sql += `${col.name}${col.type ? ' ' + col.type : ''}${col['isPrimaryKey'] ? ' PRIMARY KEY' : ''},`;
                     }
 
                     //remove extra ',' at the end
