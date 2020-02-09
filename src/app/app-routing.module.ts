@@ -5,12 +5,12 @@ import { StartupResolver } from './modules/shared/startup.resolve';
 const routes: Routes = [
   {
     path: '',
-    redirectTo: 'category',
+    redirectTo: 'home',
     pathMatch: 'full'
   },
   {
     path: 'home',
-    loadChildren: () => import('./home/home.module').then(m => m.HomePageModule),
+    loadChildren: () => import('./modules/home/home.module').then(m => m.HomePageModule),
     resolve: {
       startupResolve: StartupResolver
     }
@@ -22,6 +22,13 @@ const routes: Routes = [
   {
     path: 'category',
     loadChildren: () => import('./modules/category/category.module').then( m => m.CategoryPageModule),
+    resolve: {
+      startupResolve: StartupResolver
+    }
+  },
+  {
+    path: 'expense',
+    loadChildren: () => import('./modules/expense/expense.common.module').then( m => m.ExpenseCommonModule),
     resolve: {
       startupResolve: StartupResolver
     }
