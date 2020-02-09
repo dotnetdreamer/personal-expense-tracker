@@ -6,6 +6,7 @@ import { Injectable } from '@angular/core';
 export class SchemaService {
     private _setting = "setting";
     private _category = "category";
+    private _expense = "expense";
 
     schema = {
         stores: [
@@ -17,6 +18,25 @@ export class SchemaService {
                     type: 'INTEGER' 
                 }, { 
                     name: 'name', 
+                    type: 'TEXT' 
+                }, {
+                    name: 'createdOn', 
+                    type: 'TEXT'  
+                }]
+            }, {
+                name: this._expense,
+                columns: [{ 
+                    name: 'id', 
+                    isPrimaryKey: true, 
+                    type: 'INTEGER' 
+                }, { 
+                    name: 'title', 
+                    type: 'TEXT' 
+                }, { 
+                    name: 'amount', 
+                    type: 'TEXT' 
+                }, { 
+                    name: 'description', 
                     type: 'TEXT' 
                 }, {
                     name: 'createdOn', 
@@ -38,7 +58,8 @@ export class SchemaService {
     };
     tables = {
         setting: this._setting,
-        category: this._category
+        category: this._category,
+        expense: this._expense
     };
 
     constructor() {
