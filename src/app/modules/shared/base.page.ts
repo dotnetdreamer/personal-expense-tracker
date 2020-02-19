@@ -1,17 +1,23 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, NavigationExtras, ActivatedRoute } from '@angular/router';
 import { AppInjector } from './app-injector';
+import { HelperService } from './helper.service';
+import { LocalizationService } from './localization.service';
 
 @Component({
     template: 'NO UI TO BE FOUND HERE!',
 })
 export class BasePage {
     protected router: Router;
+    protected helperSvc: HelperService;
+    protected localizationSvc: LocalizationService;
 
     constructor() {
         const injector = AppInjector.getInjector();
 
         this.router = injector.get(Router);
+        this.helperSvc = injector.get(HelperService);
+        this.localizationSvc = injector.get(LocalizationService);
     }
 
     async navigate(args: { path, params?, extras?: NavigationExtras }) {

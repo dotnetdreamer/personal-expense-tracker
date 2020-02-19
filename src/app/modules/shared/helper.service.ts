@@ -24,7 +24,7 @@ export class HelperService {
 
     presentToast(message, autoHide = true) {
         return new Promise(async (resolve, reject)=> {
-            let closeBtnTxt = await this.localizationService.getResource('label.common.dismiss');            
+            let closeBtnTxt = await this.localizationService.getResource('common.dismiss');            
             const toast = await this.toastCtrl.create({
                 message: message,
                 duration: autoHide ? 5000 : null,
@@ -40,7 +40,7 @@ export class HelperService {
     }
 
     async presentToastGenericError(autoHide = false) {
-        const msg = await this.localizationService.getResource('label.common.genericerror');
+        const msg = await this.localizationService.getResource('common.genericerror');
         return this.presentToast(msg, autoHide);
     }
 
@@ -61,7 +61,7 @@ export class HelperService {
     }
 
     async presentInfoDialog(message, title?, okButtonCallback?) {
-        let okTxt = await this.localizationService.getResource('label.common.ok');
+        let okTxt = await this.localizationService.getResource('common.ok');
         const alert = await this.alertCtrl.create({
             message: message,
             header: title,
@@ -81,9 +81,9 @@ export class HelperService {
     }
 
     async presentConfirmDialog(workingLanguage?, message?) {
-        let yesPromise = this.localizationService.getResource('label.common.yes', workingLanguage);
-        let noPromise = this.localizationService.getResource('label.common.no', workingLanguage);
-        let genericMsg = message || this.localizationService.getResource('label.common.areyousure', workingLanguage);
+        let yesPromise = this.localizationService.getResource('common.yes', workingLanguage);
+        let noPromise = this.localizationService.getResource('common.no', workingLanguage);
+        let genericMsg = message || this.localizationService.getResource('common.areyousure', workingLanguage);
 
         
         let buttonTexts = await Promise.all([yesPromise, noPromise, genericMsg]);
@@ -117,16 +117,16 @@ export class HelperService {
             const promises: Array<Promise<any>> = [];
 
             if(!header) {
-                const ausPro = this.localizationService.getResource('label.common.areyousure');
+                const ausPro = this.localizationService.getResource('common.areyousure');
                 promises.push(ausPro);
             }
             
             let buttons = [];
             let txts;
             if(isDeleteDialog) {
-                const canPro = this.localizationService.getResource('label.common.cancel');
+                const canPro = this.localizationService.getResource('common.cancel');
                 promises.push(canPro);
-                const delPro = this.localizationService.getResource('label.common.delete');
+                const delPro = this.localizationService.getResource('common.delete');
                 promises.push(delPro);
                 txts = await Promise.all(promises);
                 
@@ -147,9 +147,9 @@ export class HelperService {
                     }
                 });
             } else {
-                const canPro = this.localizationService.getResource('label.common.yes');
+                const canPro = this.localizationService.getResource('common.yes');
                 promises.push(canPro);
-                const delPro = this.localizationService.getResource('label.common.no');
+                const delPro = this.localizationService.getResource('common.no');
                 promises.push(delPro);
                 txts = await Promise.all(promises);
 
@@ -289,10 +289,10 @@ export class HelperService {
     private handleLocationError(error) {
         return new Promise(async (resolve, reject) => {
             let msg = null;
-            let title = await this.localizationService.getResource('label.geolocation.error');
+            let title = await this.localizationService.getResource('geolocation.error');
             if (error) {
                 if (error.PERMISSION_DENIED) {
-                    msg = await this.localizationService.getResource('label.geolocation.permissiondenied');
+                    msg = await this.localizationService.getResource('geolocation.permissiondenied');
                 }
             }
             await this.presentToast(title);

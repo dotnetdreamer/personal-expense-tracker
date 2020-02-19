@@ -5,6 +5,10 @@ const routes: Routes = [
     {
         path: 'expense-create-or-update',
         loadChildren: () => import('./expense-create-or-update/expense-create-or-update.module').then( m => m.ExpenseCreateOrUpdatePageModule)
+    },
+    {
+      path: 'expense-listing',
+      loadChildren: () => import('./expense-listing/expense-listing.module').then( m => m.ExpenseListingPageModule)
     }
 ];
 

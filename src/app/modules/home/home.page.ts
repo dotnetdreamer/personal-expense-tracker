@@ -13,7 +13,4 @@ export class HomePage extends BasePage {
     super();
   }
 
-  async onAddClick() {
-    await this.navigate({ path: '/expense/expense-create-or-update'})
-  }
 }

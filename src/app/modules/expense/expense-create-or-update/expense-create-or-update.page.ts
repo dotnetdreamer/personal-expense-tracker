@@ -1,9 +1,13 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Location } from '@angular/common';
 
 import { BasePage } from '../../shared/base.page';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+
 import { AppConstant } from '../../shared/app-constant';
 import { ExpenseService } from '../expense.service';
+import { HelperService } from '../../shared/helper.service';
+import { LocalizationService } from '../../shared/localization.service';
 
 @Component({
   selector: 'app-expense-create-or-update',
@@ -14,7 +18,7 @@ import { ExpenseService } from '../expense.service';
 export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit {
   formGroup: FormGroup;
 
-  constructor(private formBuilder: FormBuilder
+  constructor(private formBuilder: FormBuilder, private location: Location
     , private expenseSvc: ExpenseService) {
     super();
 
@@ -40,6 +44,11 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit {
       categoryId: args.categoryId,
       description: args.description,
     });
+    
+    const msg = await this.localizationSvc.getResource('common.success');
+    await this.helperSvc.presentToast(msg);
+
+    await this.location.back();
   }
 
   private _preFill() {

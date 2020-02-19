@@ -1,0 +1,27 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>expense-listing</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-list>
+    <ion-item *ngFor="let expense of expenses">
+      <!-- <ion-avatar slot="start">
+        <img src="./avatar-ben.png">
+      </ion-avatar> -->
+      <ion-label>
+        <h2>{{expense.description}}</h2>
+        <p>These aren't the droids you're looking for...</p>
+      </ion-label>
+      <ion-label>
+        <h3>{{expense.amount}}</h3>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button (click)="onAddClick()">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+</ion-content>

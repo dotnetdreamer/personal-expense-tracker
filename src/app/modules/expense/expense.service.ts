@@ -16,7 +16,7 @@ export class ExpenseService extends BaseService {
 
 
     getExpenseList() {
-        return this.dbService.getAll<Array<IExpense>>(this.schemaService.tables.expense);
+        return this.dbService.getAll<IExpense[]>(this.schemaService.tables.expense);
     }
 
     put(expense: IExpense) {

@@ -1,5 +1,8 @@
 {
-    "common": { },
+    "common": {
+        "success": "Success",
+        "dismiss": "Dismiss"
+    },
     "category": {
         "title": "Category"
     }

@@ -120,7 +120,7 @@ export class DbSqlService implements DbService {
         });
     }
 
-    getAll<T>(store: string): Promise<Array<T>> {
+    getAll<T>(store: string): Promise<T> {
         return new Promise((resolve, reject) => {
             let sql = `SELECT * FROM ${store} `;
 
@@ -133,7 +133,7 @@ export class DbSqlService implements DbService {
                         data.push(res.rows.item(i));
                     }
                 }
-                resolve(data);
+                resolve(<any>data);
             }, (error) => reject(error));
         });
     }

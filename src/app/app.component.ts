@@ -38,7 +38,7 @@ export class AppComponent {
       this.statusBar.styleDefault();
 
       const wk = await this.appSettingSvc.getWorkingLanguage();
-      console.log('wk', wk);
+
       await this.appSettingSvc.putWorkingLanguage('en');
       this.splashScreen.hide();
     });
