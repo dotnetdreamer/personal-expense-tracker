@@ -29,9 +29,9 @@ export class SchemaService {
                     name: 'id', 
                     isPrimaryKey: true, 
                     type: 'INTEGER' 
-                }, { 
-                    name: 'title', 
-                    type: 'TEXT' 
+                }, {
+                    name: 'categoryId', 
+                    type: 'INTEGER' 
                 }, { 
                     name: 'amount', 
                     type: 'TEXT' 

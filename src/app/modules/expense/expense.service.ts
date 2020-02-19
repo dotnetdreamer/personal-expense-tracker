@@ -25,10 +25,9 @@ export class ExpenseService extends BaseService {
         }
 
         return this.dbService.put(this.schemaService.tables.expense, {
-            title: expense.title,
+            description: expense.description,
             amount: expense.amount,
             categoryId: expense.categoryId,
-            description: expense.description,
             createdOn: expense.createdOn
         });
     }
