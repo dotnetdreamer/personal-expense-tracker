@@ -3,5 +3,5 @@ export interface IExpense {
     categoryId: number
     description: string
     amount: string
-    createdOn?: string
+    createdOn: string
 }

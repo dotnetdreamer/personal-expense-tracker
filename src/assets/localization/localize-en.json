@@ -5,5 +5,8 @@
     },
     "category": {
         "title": "Category"
+    },
+    "expense": {
+        "date": "Date"
     }
 }

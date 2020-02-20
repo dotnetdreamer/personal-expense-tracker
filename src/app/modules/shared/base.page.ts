@@ -3,6 +3,7 @@ import { Router, NavigationExtras, ActivatedRoute } from '@angular/router';
 import { AppInjector } from './app-injector';
 import { HelperService } from './helper.service';
 import { LocalizationService } from './localization.service';
+import { EventPublisher } from './event-publisher';
 
 @Component({
     template: 'NO UI TO BE FOUND HERE!',
@@ -11,6 +12,7 @@ export class BasePage {
     protected router: Router;
     protected helperSvc: HelperService;
     protected localizationSvc: LocalizationService;
+    protected eventPub: EventPublisher;
 
     constructor() {
         const injector = AppInjector.getInjector();
@@ -18,6 +20,7 @@ export class BasePage {
         this.router = injector.get(Router);
         this.helperSvc = injector.get(HelperService);
         this.localizationSvc = injector.get(LocalizationService);
+        this.eventPub = injector.get(EventPublisher);
     }
 
     async navigate(args: { path, params?, extras?: NavigationExtras }) {

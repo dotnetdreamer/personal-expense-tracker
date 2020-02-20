@@ -3,9 +3,10 @@ import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { BasePage } from '../../shared/base.page';
 import { ExpenseService } from '../expense.service';
 import { IExpense } from '../expense.model';
+import { AppConstant } from '../../shared/app-constant';
 
 @Component({
-  selector: 'app-expense-listing',
+  selector: 'page-expense-listing',
   templateUrl: './expense-listing.page.html',
   styleUrls: ['./expense-listing.page.scss'],
   encapsulation: ViewEncapsulation.None
@@ -15,6 +16,8 @@ export class ExpenseListingPage extends BasePage implements OnInit {
 
   constructor(private expenseSvc: ExpenseService) { 
     super();
+
+    this._subscribeToEvents();
   }
 
   async ngOnInit() {
@@ -29,5 +32,11 @@ export class ExpenseListingPage extends BasePage implements OnInit {
 
   private async _getExpenses() {
     this.expenses = await this.expenseSvc.getExpenseList();
+  }
+
+  private _subscribeToEvents() {
+    this.eventPub.$sub(AppConstant.EVENT_EXPENSE_CREATED_OR_UPDATED, async (expense: IExpense) => {
+      await this._getExpenses();
+    });
   }
 }

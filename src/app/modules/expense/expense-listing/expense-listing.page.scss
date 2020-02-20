@@ -1,0 +1,22 @@
+page-expense-listing {
+    .expenses {
+        .expense-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-left: var(--ion-padding, 16px);
+            padding-right: var(--ion-padding, 16px);
+            min-height: 60px;
+            
+            .item-category-description {
+                .item-description {
+
+                }
+            }
+
+            .item-amount {
+
+            }
+        }
+    }
+}

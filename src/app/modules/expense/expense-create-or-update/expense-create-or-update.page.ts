@@ -6,8 +6,8 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 
 import { AppConstant } from '../../shared/app-constant';
 import { ExpenseService } from '../expense.service';
-import { HelperService } from '../../shared/helper.service';
-import { LocalizationService } from '../../shared/localization.service';
+
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-expense-create-or-update',
@@ -22,10 +22,12 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit {
     , private expenseSvc: ExpenseService) {
     super();
 
+    const cDate = moment().format(AppConstant.DEFAULT_DATE_FORMAT);
     this.formGroup = this.formBuilder.group({
       categoryId: ['', Validators.required],
       description: ['', Validators.required],
-      amount:['', Validators.required]
+      amount:['', Validators.required],
+      date: [cDate, Validators.required]
     });
   }
 
@@ -39,11 +41,18 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit {
 
 
   async onSaveClick(args) {
-    await this.expenseSvc.put({
+    const exp = {
       amount: args.amount,
       categoryId: args.categoryId,
       description: args.description,
-    });
+      createdOn: args.date
+    };
+    await this.expenseSvc.put(exp);
+    if(AppConstant.DEBUG) {
+      console.log('ExpenseCreateOrUpdatePage: onSaveClick: exp',exp)
+    }
+    
+    this.eventPub.$pub(AppConstant.EVENT_EXPENSE_CREATED_OR_UPDATED, exp);
     
     const msg = await this.localizationSvc.getResource('common.success');
     await this.helperSvc.presentToast(msg);

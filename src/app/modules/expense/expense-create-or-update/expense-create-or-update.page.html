@@ -24,3 +24,9 @@
     </ion-fab-button>
   </ion-fab>
 </ion-content>
+<ion-footer>
+  <form [formGroup]="formGroup">
+    <ion-icon name="calendar-outline"></ion-icon>
+    <ion-datetime formControlName="date" display-format="YYYY-MM-DD"></ion-datetime>
+  </form>
+</ion-footer>

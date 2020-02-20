@@ -5,20 +5,14 @@
 </ion-header>
 
 <ion-content>
-  <ion-list>
-    <ion-item *ngFor="let expense of expenses">
-      <!-- <ion-avatar slot="start">
-        <img src="./avatar-ben.png">
-      </ion-avatar> -->
-      <ion-label>
-        <h2>{{expense.description}}</h2>
-        <p>These aren't the droids you're looking for...</p>
-      </ion-label>
-      <ion-label>
-        <h3>{{expense.amount}}</h3>
-      </ion-label>
-    </ion-item>
-  </ion-list>
+  <div class="expenses">
+    <div class="expense-item" *ngFor="let expense of expenses">
+      <div class="item-category-description">
+        <div class="item-description">{{expense.description}}</div>
+      </div>
+      <div class="item-amount">{{expense.amount}}</div>
+    </div>
+  </div>
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
     <ion-fab-button (click)="onAddClick()">
       <ion-icon name="add"></ion-icon>
