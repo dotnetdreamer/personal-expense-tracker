@@ -38,6 +38,9 @@ export class SchemaService {
                 }, { 
                     name: 'description', 
                     type: 'TEXT' 
+                }, { 
+                    name: 'notes', 
+                    type: 'TEXT' 
                 }, {
                     name: 'createdOn', 
                     type: 'TEXT'  

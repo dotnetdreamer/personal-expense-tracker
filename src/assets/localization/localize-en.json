@@ -1,12 +1,15 @@
 {
     "common": {
         "success": "Success",
-        "dismiss": "Dismiss"
+        "dismiss": "Dismiss",
+        "ok": "OK",
+        "cancel": "Cancel"
     },
     "category": {
         "title": "Category"
     },
     "expense": {
-        "date": "Date"
+        "date": "Date",
+        "notes": "Notes"
     }
 }

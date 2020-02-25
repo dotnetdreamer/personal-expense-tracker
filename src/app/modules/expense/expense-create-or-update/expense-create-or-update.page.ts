@@ -3,11 +3,12 @@ import { Location } from '@angular/common';
 
 import { BasePage } from '../../shared/base.page';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-
-import { AppConstant } from '../../shared/app-constant';
 import { ExpenseService } from '../expense.service';
 
+import { AppConstant } from '../../shared/app-constant';
+
 import * as moment from 'moment';
+import { AlertController } from '@ionic/angular';
 
 @Component({
   selector: 'page-expense-create-or-update',
@@ -19,6 +20,7 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit {
   formGroup: FormGroup;
 
   constructor(private formBuilder: FormBuilder, private location: Location
+    , private alertCtrl: AlertController
     , private expenseSvc: ExpenseService) {
     super();
 
@@ -26,6 +28,7 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit {
     this.formGroup = this.formBuilder.group({
       categoryId: ['', Validators.required],
       description: ['', Validators.required],
+      notes: [''],
       amount:['', Validators.required],
       date: [cDate, Validators.required]
     });
@@ -45,6 +48,7 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit {
       amount: args.amount,
       categoryId: args.categoryId,
       description: args.description,
+      notes: args.notes,
       createdOn: args.date
     };
     await this.expenseSvc.put(exp);
@@ -58,6 +62,44 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit {
     await this.helperSvc.presentToast(msg);
 
     await this.location.back();
+  }
+
+  async onNotesClicked() {
+    const resources = await Promise.all([this.localizationSvc.getResource('expense.notes')
+      , this.localizationSvc.getResource('common.cancel')
+      , this.localizationSvc.getResource('common.ok')]);
+
+    const alert = await this.alertCtrl.create({
+      header: resources[0],
+      inputs: [
+        {
+          name: 'notes',
+          type: 'textarea',
+          placeholder: resources[0]
+        }
+      ],
+      buttons: [
+        {
+          text: resources[1],
+          role: 'cancel',
+          // cssClass: 'secondary',
+          // handler: () => {
+          //   console.log('Confirm Cancel');
+          // }
+        }, {
+          text: resources[2],
+          // handler: () => {
+          //   console.log('Confirm Ok');
+          // }
+        }
+      ]
+    });
+    await alert.present();
+    const { data } = await alert.onDidDismiss();
+    if(data.values) {
+      const noteVal = data.values.notes || '';
+      this.f.notes.setValue(noteVal);
+    }
   }
 
   private _preFill() {

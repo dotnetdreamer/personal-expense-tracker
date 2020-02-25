@@ -63,6 +63,7 @@ export class ExpenseService extends BaseService {
             description: expense.description,
             amount: expense.amount,
             categoryId: expense.categoryId,
+            notes: expense.notes,
             createdOn: expense.createdOn
         });
     }

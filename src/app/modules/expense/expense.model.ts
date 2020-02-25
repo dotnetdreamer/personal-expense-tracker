@@ -3,5 +3,6 @@ export interface IExpense {
     categoryId: number
     description: string
     amount: string
+    notes?: string
     createdOn: string
 }
