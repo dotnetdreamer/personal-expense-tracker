@@ -11,7 +11,7 @@ import { IonTabs } from '@ionic/angular';
   encapsulation: ViewEncapsulation.None
 })
 export class HomePage extends BasePage {
-  @ViewChild('homeTabs', { static: false }) homeTabs : IonTabs;
+  @ViewChild('homeTabs') homeTabs : IonTabs;
 
   selectedTab = 'dashboard';
   constructor() {
