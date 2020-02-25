@@ -26,7 +26,23 @@
 </ion-content>
 <ion-footer>
   <form [formGroup]="formGroup">
-    <ion-icon name="calendar-outline"></ion-icon>
-    <ion-datetime formControlName="date" display-format="YYYY-MM-DD"></ion-datetime>
+    <ion-list>
+      <ion-item lines="none">
+        <ion-icon name="calendar-outline"></ion-icon>
+        <ion-datetime formControlName="date" display-format="YYYY-MM-DD"></ion-datetime>
+      </ion-item>
+    </ion-list>
+    <ion-list>
+      <ion-item lines="none">
+        <ion-button fill="clear">
+          <ion-icon slot="icon-only" name="reader-outline"></ion-icon>        
+        </ion-button>
+      </ion-item>
+      <ion-item lines="none">
+        <ion-button fill="clear">
+          <ion-icon slot="icon-only" name="receipt-outline"></ion-icon>
+        </ion-button>
+      </ion-item>
+    </ion-list>
   </form>
 </ion-footer>

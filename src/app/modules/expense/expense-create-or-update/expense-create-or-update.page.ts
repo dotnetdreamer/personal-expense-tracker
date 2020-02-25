@@ -10,7 +10,7 @@ import { ExpenseService } from '../expense.service';
 import * as moment from 'moment';
 
 @Component({
-  selector: 'app-expense-create-or-update',
+  selector: 'page-expense-create-or-update',
   templateUrl: './expense-create-or-update.page.html',
   styleUrls: ['./expense-create-or-update.page.scss'],
   encapsulation: ViewEncapsulation.None
