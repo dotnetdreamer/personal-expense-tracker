@@ -25,7 +25,7 @@
   </ion-fab>
 </ion-content>
 <ion-footer>
-  <form [formGroup]="formGroup">
+  <form class="custom-form" [formGroup]="formGroup">
     <ion-list>
       <ion-item lines="none">
         <ion-icon name="calendar-outline"></ion-icon>
@@ -40,7 +40,10 @@
       </ion-item>
       <ion-item lines="none">
         <ion-button fill="clear">
-          <ion-icon slot="icon-only" name="receipt-outline"></ion-icon>
+          <div class="file-input-container">
+            <input type="file" accept="*" (change)="onAttachmentChanged($event)" />
+            <ion-icon slot="icon-only" name="receipt-outline"></ion-icon>
+          </div>
         </ion-button>
       </ion-item>
     </ion-list>

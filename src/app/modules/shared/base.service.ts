@@ -11,6 +11,7 @@ import { AppInjector } from './app-injector';
 import { HelperService } from './helper.service';
 import { LocalizationService } from './localization.service';
 import { DbWebService } from './db/db-web.service'; 
+import { Observable } from 'rxjs';
 
 @Injectable({
     providedIn: 'root'
@@ -41,7 +42,7 @@ export class BaseService {
         }
     }
 
-    private async prepareHeaders(ignoreContentType?) {
+    protected async prepareHeaders(ignoreContentType?) {
         let headers = new HttpHeaders();
         if(!ignoreContentType) {
             headers = headers.append('Content-Type', 'application/x-www-form-urlencoded;charset=utf-8');            
@@ -49,8 +50,11 @@ export class BaseService {
         return headers;
     }
 
-    private handleError(errorObj, errorHandler?) {
-        console.log(errorObj);
+    protected async handleError(errorObj: HttpErrorResponse, errorHandler?, 
+        request?: Observable<any>, resolve?, reject?) {
+        if(AppConstant.DEBUG) {
+            console.log('BaseService: handleError', errorObj);
+        }
         // let error = errorObj.error;
         if(!errorHandler) {
             // switch(errorObj.status) {

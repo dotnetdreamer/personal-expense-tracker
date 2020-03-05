@@ -1,14 +1,16 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { Location } from '@angular/common';
 
-import { BasePage } from '../../shared/base.page';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { ExpenseService } from '../expense.service';
-
-import { AppConstant } from '../../shared/app-constant';
-
-import * as moment from 'moment';
 import { AlertController } from '@ionic/angular';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import * as moment from 'moment';
+
+import { BasePage } from '../../shared/base.page';
+import { ExpenseService } from '../expense.service';
+import { AppConstant } from '../../shared/app-constant';
+import { MediaUploaderService } from '../../shared/media/media-uploader.service';
+import { MediaDeviceHelper } from '../../shared/media/media-device-helper';
+import { MediaReturnFileType, MediaFileType } from '../../shared/media/media.model';
 
 @Component({
   selector: 'page-expense-create-or-update',
@@ -19,9 +21,12 @@ import { AlertController } from '@ionic/angular';
 export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit {
   formGroup: FormGroup;
 
+  private _attachments = [];
   constructor(private formBuilder: FormBuilder, private location: Location
     , private alertCtrl: AlertController
-    , private expenseSvc: ExpenseService) {
+    , private expenseSvc: ExpenseService, private mediaUploaderSvc: MediaUploaderService
+    , private mediaDeviceHelper: MediaDeviceHelper
+    ) {
     super();
 
     const cDate = moment().format(AppConstant.DEFAULT_DATE_FORMAT);
@@ -62,6 +67,43 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit {
     await this.helperSvc.presentToast(msg);
 
     await this.location.back();
+  }
+
+  // async onAttachmentClicked() {
+  //   try {
+  //     const result = await this.mediaDeviceHelper.presentMediaOptionsDialog({
+  //       returnFileType: MediaReturnFileType.FILE_URI_OR_NATIVE_URI,
+  //       mediaType: MediaFileType.Picture,
+  //       validateFormatAndSize: false,
+  //       displayRemoveLink: false,
+  //       removeLinkCallback: async () => {
+  //         const result = await this.helperSvc.presentConfirmDialog();
+  //         if(!result) {
+  //           return;
+  //         }
+  //       }
+  //     });   
+
+  //     if(AppConstant.DEBUG) {
+  //       console.log('ExpenseCreateOrUpdatePage: onAttachmentClicked: result: ', result)
+  //     }
+  //   } catch (e) {
+  //     if(e.permissionDenied) {
+  //       let msg = await this.localizationSvc.getResource('common.permissiondenied');
+  //       await this.helperSvc.presentToast(msg);
+  //     }
+  //   }
+  // }
+
+  async onAttachmentChanged($event) {
+    if($event.srcElement.files[0] != undefined){
+      this._attachments.push({
+        file: $event.srcElement.files[0],
+      });
+    }
+    if(AppConstant.DEBUG) {
+      console.log('onAttachmentChanged: _attachments', this._attachments);
+    }
   }
 
   async onNotesClicked() {
