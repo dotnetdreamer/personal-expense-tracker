@@ -43,7 +43,7 @@ export class ExpenseService extends BaseService {
                 if((args.term && v.description.toLowerCase().startsWith(args.term))) {
                     results.push(v);
                 }
-                // req.done();
+                req.done();
                 // idx++;
                 // console.log(idx);
             }, iter);
@@ -78,6 +78,9 @@ export class ExpenseService extends BaseService {
             //The following also takes seconds and milliseconds into account and is a bit shorter.
             return b.valueOf() - a.valueOf();
         });
+
+        //then by id
+        expenses.sort((a, b) => b.id - a.id);
 
         return expenses;
     }

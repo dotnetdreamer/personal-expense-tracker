@@ -99,6 +99,8 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit {
     if(data.values) {
       const noteVal = data.values.notes || '';
       this.f.notes.setValue(noteVal);
+    } else {
+      this.f.notes.setValue('');
     }
   }
 
