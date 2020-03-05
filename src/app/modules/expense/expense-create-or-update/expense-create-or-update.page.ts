@@ -11,6 +11,7 @@ import { AppConstant } from '../../shared/app-constant';
 import { MediaUploaderService } from '../../shared/media/media-uploader.service';
 import { MediaDeviceHelper } from '../../shared/media/media-device-helper';
 import { MediaReturnFileType, MediaFileType } from '../../shared/media/media.model';
+import { IExpense } from '../expense.model';
 
 @Component({
   selector: 'page-expense-create-or-update',
@@ -21,7 +22,6 @@ import { MediaReturnFileType, MediaFileType } from '../../shared/media/media.mod
 export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit {
   formGroup: FormGroup;
 
-  private _attachments = [];
   constructor(private formBuilder: FormBuilder, private location: Location
     , private alertCtrl: AlertController
     , private expenseSvc: ExpenseService, private mediaUploaderSvc: MediaUploaderService
@@ -34,6 +34,7 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit {
       categoryId: ['', Validators.required],
       description: ['', Validators.required],
       notes: [''],
+      attachment: [''],
       amount:['', Validators.required],
       date: [cDate, Validators.required]
     });
@@ -49,18 +50,19 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit {
 
 
   async onSaveClick(args) {
-    const exp = {
+    const exp: IExpense = {
       amount: args.amount,
       categoryId: args.categoryId,
       description: args.description,
       notes: args.notes,
+      attachment: args.attachment,
       createdOn: args.date
     };
-    await this.expenseSvc.put(exp);
     if(AppConstant.DEBUG) {
       console.log('ExpenseCreateOrUpdatePage: onSaveClick: exp',exp)
     }
-    
+
+    await this.expenseSvc.put(exp);
     this.eventPub.$pub(AppConstant.EVENT_EXPENSE_CREATED_OR_UPDATED, exp);
     
     const msg = await this.localizationSvc.getResource('common.success');
@@ -69,40 +71,46 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit {
     await this.location.back();
   }
 
-  // async onAttachmentClicked() {
-  //   try {
-  //     const result = await this.mediaDeviceHelper.presentMediaOptionsDialog({
-  //       returnFileType: MediaReturnFileType.FILE_URI_OR_NATIVE_URI,
-  //       mediaType: MediaFileType.Picture,
-  //       validateFormatAndSize: false,
-  //       displayRemoveLink: false,
-  //       removeLinkCallback: async () => {
-  //         const result = await this.helperSvc.presentConfirmDialog();
-  //         if(!result) {
-  //           return;
-  //         }
-  //       }
-  //     });   
+  async onAttachmentClicked() {
+    try {
+      const result = await this.mediaDeviceHelper.presentMediaOptionsDialog({
+        returnFileType: MediaReturnFileType.FILE_URI_OR_NATIVE_URI,
+        mediaType: MediaFileType.Picture,
+        validateFormatAndSize: false,
+        displayRemoveLink: false,
+        removeLinkCallback: async () => {
+          const result = await this.helperSvc.presentConfirmDialog();
+          if(!result) {
+            return;
+          }
+        }
+      });   
 
-  //     if(AppConstant.DEBUG) {
-  //       console.log('ExpenseCreateOrUpdatePage: onAttachmentClicked: result: ', result)
-  //     }
-  //   } catch (e) {
-  //     if(e.permissionDenied) {
-  //       let msg = await this.localizationSvc.getResource('common.permissiondenied');
-  //       await this.helperSvc.presentToast(msg);
-  //     }
-  //   }
-  // }
+      if(AppConstant.DEBUG) {
+        console.log('ExpenseCreateOrUpdatePage: onAttachmentClicked: result: ', result)
+      }
+    } catch (e) {
+      if(e.permissionDenied) {
+        let msg = await this.localizationSvc.getResource('common.permissiondenied');
+        await this.helperSvc.presentToast(msg);
+      }
+    }
+  }
 
   async onAttachmentChanged($event) {
-    if($event.srcElement.files[0] != undefined){
-      this._attachments.push({
-        file: $event.srcElement.files[0],
-      });
+    const file = $event.srcElement.files[0];
+    if(file != undefined){
+      let reader = new FileReader();
+      reader.onload = (e) => {
+        // let blob = new Blob([e.target.result], { type: file.type });
+        this.f.attachment.setValue(e.target.result);
+      };
+      reader.readAsArrayBuffer(file);
+    } else {
+      this.f.attachment.setValue(null);
     }
     if(AppConstant.DEBUG) {
-      console.log('onAttachmentChanged: _attachments', this._attachments);
+      console.log('onAttachmentChanged: attachment', this.f.attachment.value);
     }
   }
 
@@ -147,9 +155,11 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit {
   }
 
   private _preFill() {
+    const rand = this.helperSvc.getRandomNumber();
+
     this.f.categoryId.setValue(1);
-    this.f.description.setValue('Testing description');
-    this.f.amount.setValue(20);
+    this.f.description.setValue(`Testing description: ${rand}`);
+    this.f.amount.setValue(rand);
   }
 
 }

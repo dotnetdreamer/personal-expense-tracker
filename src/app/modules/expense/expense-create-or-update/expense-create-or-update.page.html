@@ -39,11 +39,9 @@
         </ion-button>
       </ion-item>
       <ion-item lines="none">
-        <ion-button fill="clear">
-          <div class="file-input-container">
-            <input type="file" accept="*" (change)="onAttachmentChanged($event)" />
-            <ion-icon slot="icon-only" name="receipt-outline"></ion-icon>
-          </div>
+        <ion-button fill="clear" (click)="onAttachmentClicked($event)">
+            <!-- <input type="file" accept="*" (change)="onAttachmentChanged($event)" /> -->
+          <ion-icon slot="icon-only" name="receipt-outline"></ion-icon>
         </ion-button>
       </ion-item>
     </ion-list>

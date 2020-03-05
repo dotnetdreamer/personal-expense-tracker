@@ -64,6 +64,7 @@ export class ExpenseService extends BaseService {
             amount: expense.amount,
             categoryId: expense.categoryId,
             notes: expense.notes,
+            attachment: expense.attachment,
             createdOn: expense.createdOn
         });
     }

@@ -4,5 +4,6 @@ export interface IExpense {
     description: string
     amount: string
     notes?: string
+    attachment?
     createdOn: string
 }

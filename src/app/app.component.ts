@@ -1,14 +1,16 @@
-import { Component } from '@angular/core';
+import { Component, ViewEncapsulation } from '@angular/core';
 
 import { Platform } from '@ionic/angular';
 import { SplashScreen } from '@ionic-native/splash-screen/ngx';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
 import { AppSettingService } from './modules/shared/app-setting.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
-  styleUrls: ['app.component.scss']
+  styleUrls: ['app.component.scss'],
+  encapsulation: ViewEncapsulation.None
 })
 export class AppComponent {
   public appPages = [
@@ -24,8 +26,8 @@ export class AppComponent {
     }
   ];
 
-  constructor(
-    private platform: Platform,
+  constructor( private router: Router
+    , private platform: Platform,
     private splashScreen: SplashScreen,
     private statusBar: StatusBar
     , private appSettingSvc: AppSettingService
@@ -40,10 +42,20 @@ export class AppComponent {
       const wk = await this.appSettingSvc.getWorkingLanguage();
 
       await this.appSettingSvc.putWorkingLanguage('en');
+
+      await this._navigateTo('/expense/expense-create-or-update');
       this.splashScreen.hide();
     });
   }
 
   private async subscribeEvents() {
+  }
+
+  private async _navigateTo(path, args?, replaceUrl = false) {
+    if(!args) {
+      await this.router.navigate([path], { replaceUrl: replaceUrl });
+    } else {
+      await this.router.navigate([path, args], { replaceUrl: replaceUrl });
+    }
   }
 }

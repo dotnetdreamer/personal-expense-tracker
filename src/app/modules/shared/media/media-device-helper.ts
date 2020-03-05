@@ -44,14 +44,14 @@ export class MediaDeviceHelper {
             const btns = [{
                 text: resources[1],
                 icon: 'camera',
-                cssClass: 'camera-gallery',
+                cssClass: 'camera',
                 handler: () => {
                     actionSheet.dismiss('camera');
                 }
             }, {
                 text: resources[2],
-                icon: 'ios-camera-gallery',
-                cssClass: 'pictures-gallery',
+                icon: 'image-outline',
+                cssClass: 'gallery',
                 handler: () => {
                     actionSheet.dismiss('gallery');
                 }
