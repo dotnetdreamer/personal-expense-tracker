@@ -68,7 +68,12 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit {
     const msg = await this.localizationSvc.getResource('common.success');
     await this.helperSvc.presentToast(msg);
 
-    await this.location.back();
+    // if (window.history.length > 1) {
+      await this.location.back();
+    // } 
+    // else {
+    //   await this.navigate({ path: '/expense/expense-listing', extras: { replaceUrl: true }});
+    // }
   }
 
   async onAttachmentClicked() {

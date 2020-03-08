@@ -19,20 +19,23 @@ export class StartupResolver implements Resolve<any> {
 
     constructor(private platform: Platform
         , private eventPub: EventPublisher) {
-        const injector = AppInjector.getInjector();
+        //subscribe first...
++        this.eventPub.$sub(AppConstant.EVENT_DB_INITIALIZED, () => {
+            this._isDbReady = true;
+            if(AppConstant.DEBUG) {
+                console.log('Event received: EVENT_DB_INITIALIZED');
+            }
+        });
 
+        const injector = AppInjector.getInjector();
+        
         let dbService: DbService;
         if(this.platform.is('cordova')) {
             dbService = injector.get(DbSqlService);
         } else {
             dbService = injector.get(DbWebService);
         }
-        this.eventPub.$sub(AppConstant.EVENT_DB_INITIALIZED, () => {
-            this._isDbReady = true;
-            if(AppConstant.DEBUG) {
-                console.log('Event received: EVENT_DB_INITIALIZED');
-            }
-        });
+
         //db
         //already called in consturction of dbService...
         // dbService.initializeDb();
