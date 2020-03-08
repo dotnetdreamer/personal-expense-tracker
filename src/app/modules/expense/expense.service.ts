@@ -5,6 +5,7 @@ import * as moment from 'moment';
 import { BaseService } from '../shared/base.service';
 import { IExpense } from './expense.model';
 import { AppConstant } from '../shared/app-constant';
+import { CategoryService } from '../category/category.service';
 
 declare const ydn: any;
 
@@ -12,7 +13,7 @@ declare const ydn: any;
     providedIn: 'root'
 })
 export class ExpenseService extends BaseService {
-    constructor() {
+    constructor(private categorySvc: CategoryService) {
         super();
     }
 
@@ -23,6 +24,7 @@ export class ExpenseService extends BaseService {
             if(!args) {
                 results = await this.dbService.getAll<IExpense[]>(this.schemaService.tables.expense);
                 //sor by desc
+                results = await this._map(results);
                 results = this._sort(results);
 
                 resolve(results);
@@ -47,7 +49,8 @@ export class ExpenseService extends BaseService {
                 // idx++;
                 // console.log(idx);
             }, iter);
-            req.always(() => {
+            req.always(async () => {
+                results = await this._map(results);
                 results = this._sort(results);
                 resolve(results);
             });
@@ -69,6 +72,17 @@ export class ExpenseService extends BaseService {
         });
     }
 
+    private async _map(expenses: Array<IExpense>) {
+        const promises = [];
+        for(let exp of expenses) {
+            const expPromise = this.categorySvc.getCategoryById(exp.categoryId)
+            .then(e => exp.category = e);
+            promises.push(exp);
+        }
+        const exMapeed = await Promise.all(promises);
+        return exMapeed;
+    }
+
     private _sort(expenses: Array<IExpense>) {
         expenses.sort((aDate: IExpense, bDate: IExpense) => {
             // Turn your strings into dates, and then subtract them
@@ -82,7 +96,6 @@ export class ExpenseService extends BaseService {
 
         //then by id
         expenses.sort((a, b) => b.id - a.id);
-
         return expenses;
     }
 }

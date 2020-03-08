@@ -19,6 +19,10 @@ export class CategoryService extends BaseService {
         return this.dbService.getAll<Array<ICategory>>(this.schemaService.tables.category);
     }
 
+    getCategoryById(categoryId) {
+        return this.dbService.get<ICategory>(this.schemaService.tables.category, categoryId);
+    }
+
     put(category: ICategory) {
         if(!category.createdOn) {
             category.createdOn = moment().format(AppConstant.DEFAULT_DATETIME_FORMAT);

@@ -43,7 +43,8 @@ export class AppComponent {
 
       await this.appSettingSvc.putWorkingLanguage('en');
 
-      await this._navigateTo('/expense/expense-create-or-update');
+      // await this._navigateTo('/expense/expense-create-or-update');
+      await this._navigateTo('/expense/expense-listing');
       this.splashScreen.hide();
     });
   }

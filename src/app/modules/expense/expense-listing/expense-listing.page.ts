@@ -32,6 +32,9 @@ export class ExpenseListingPage extends BasePage implements OnInit {
 
   private async _getExpenses() {
     this.expenses = await this.expenseSvc.getExpenseList();
+    if(AppConstant.DEBUG) {
+      console.log('ExpenseListingPage: _getExpenses: expenses', this.expenses);
+    }
   }
 
   private _subscribeToEvents() {
