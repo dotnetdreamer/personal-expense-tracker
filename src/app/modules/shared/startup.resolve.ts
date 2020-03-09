@@ -19,6 +19,9 @@ export class StartupResolver implements Resolve<any> {
 
     constructor(private platform: Platform
         , private eventPub: EventPublisher) {
+        //StartupResolver is initialized after db service sometimes
+        //we make sure this variable exist before we fire db init event in db services
+        (<any>window).startupResolved = true;
         //subscribe first...
 +        this.eventPub.$sub(AppConstant.EVENT_DB_INITIALIZED, () => {
             this._isDbReady = true;

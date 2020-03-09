@@ -40,7 +40,7 @@ export class DbWebService implements DbService {
         const delay = 50;
         //workaround: don't proceed unless db is initialized...wait everytime 50ms
         const _self = this;
-        let timerId = setTimeout(async function request() { 
+        let timerId = setTimeout(function request() { 
             if (!_self._isDbInitialized) {
                 //retry
                 timerId = setTimeout(request, delay);
@@ -54,10 +54,20 @@ export class DbWebService implements DbService {
                 }
 
                 //wait abit anet let startup.resolve to be initialized. Otherwise event won't be catched up
-                setTimeout(() => {
-                    // heavy database operations should start from this...
-                    _self.eventPublisher.$pub(AppConstant.EVENT_DB_INITIALIZED);
-                }); 
+                //startupResolved is set inside db services
+                let startupId = setTimeout(function startupCheck() {
+                    if((<any>window).startupResolved) {
+                        //clear timeout
+                        clearTimeout(startupId);
+                        startupId = null;
+
+                        // heavy database operations should start from this...
+                        _self.eventPublisher.$pub(AppConstant.EVENT_DB_INITIALIZED);
+                    } else {
+                        //retry
+                        startupId = setTimeout(startupCheck, delay);
+                    }
+                }, delay);
             }
         }, delay);
     }
