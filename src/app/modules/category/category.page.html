@@ -5,9 +5,13 @@
 </ion-header>
 
 <ion-content>
+  <ion-searchbar debounce="500" (ionInput)="onIonSearchInput($event)"></ion-searchbar>
   <ion-list>
-    <ion-item *ngFor="let category of categories">
-      <ion-label>{{ category.name }}</ion-label>
+    <ion-item-divider *ngFor="let item of gorupedItems | keyvalue">
+      <ion-label>{{ item.key }}</ion-label>
+    </ion-item-divider>
+    <ion-item *ngFor="let cat of categories">
+      <ion-label>{{ cat.name }}</ion-label>
     </ion-item>
   </ion-list>
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">

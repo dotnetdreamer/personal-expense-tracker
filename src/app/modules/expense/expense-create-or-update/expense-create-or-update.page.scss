@@ -1,5 +1,19 @@
 page-expense-create-or-update {
     ion-content {
+        .container {
+            display: flex;
+            align-items: center;
+
+            > ion-select {
+                margin-right: 10px;
+                height: 100px;
+                width: 160px;
+            }
+
+            > ion-list {
+                width: 100%;
+            }
+        }
     }
     ion-footer {
         form {

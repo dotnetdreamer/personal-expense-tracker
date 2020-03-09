@@ -45,6 +45,7 @@ export class CategoryService extends BaseService {
 
         return this.dbService.put(this.schemaService.tables.category, {
             name: category.name,
+            groupName: category.groupName,
             createdOn: category.createdOn
         });
     }

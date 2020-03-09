@@ -5,6 +5,7 @@ import { CategoryService } from './category.service';
 import { AppConstant } from '../shared/app-constant';
 import { HelperService } from '../shared/helper.service';
 import { LocalizationService } from '../shared/localization.service';
+import { ICategory } from './category.model';
 
 @Component({
   selector: 'app-category',
@@ -12,7 +13,10 @@ import { LocalizationService } from '../shared/localization.service';
   styleUrls: ['./category.page.scss'],
 })
 export class CategoryPage implements OnInit {
-  categories = [];
+  categories: ICategory[] = [];
+  gorupedItems: Map<string, ICategory[]>;
+
+  private _orignalCategories: ICategory[] = [];
 
   constructor(private alertCtrl: AlertController
     , private categorySvc: CategoryService, private localizationSvc: LocalizationService
@@ -21,7 +25,7 @@ export class CategoryPage implements OnInit {
   }
 
   async ngOnInit() {
-    await this.getCategories();
+    await this._getCategories();
   }
 
   async onCategoryAddClick() {
@@ -35,10 +39,28 @@ export class CategoryPage implements OnInit {
     }
   }
 
-  private async getCategories() {
-    this.categories = await this.categorySvc.getCategoryList();
+  async onIonSearchInput(args: CustomEvent) {
+    let { data } = args.detail;
+    
+    if(data && data.length) {
+      const filtered = this._orignalCategories.filter(c => c.name.toLowerCase().includes(data.toLowerCase()));
+      await this._getCategories(filtered);
+    } else {
+      await this._getCategories();
+    }
+  }
+
+  private async _getCategories(categoryList?) {
+    if(!categoryList) {
+      this._orignalCategories = await this.categorySvc.getCategoryList();
+      this.categories = this._orignalCategories;
+    } else {
+      this.categories = categoryList;
+    }
+
+    this.gorupedItems = this.categories.groupBy<ICategory>(c => c.groupName);
     if(AppConstant.DEBUG) {
-      console.log('CategoryPage: ngOnInit: categories', this.categories);
+      console.log('CategoryPage: ngOnInit: gorupedItems', this.gorupedItems);
     }
   }
 
@@ -76,7 +98,7 @@ export class CategoryPage implements OnInit {
               groupName: ''
             });   
 
-            await this.getCategories();
+            await this._getCategories();
           }
         }
       ]
