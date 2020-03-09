@@ -14,7 +14,7 @@
         <ion-select-option [value]="cat.id" *ngFor="let cat of categories">
           <ion-icon name="close"></ion-icon>{{cat.name}}</ion-select-option>
       </ion-select> -->
-      <ion-button (click)="onCategoryClicked($event)">
+      <ion-button fill="clear" (click)="onCategoryClicked($event)">
         <ion-icon name="clipboard-outline"></ion-icon>
       </ion-button>
       <ion-list>

@@ -9,7 +9,7 @@
     <div class="expense-item" *ngFor="let expense of expenses">
       <div class="item-category-description">
         <div class="item-description">{{expense.description}}</div>
-        <div class="item-description">{{expense.category.name}}</div>
+        <div class="item-description">{{expense.category?.name}}</div>
       </div>
       <div class="item-amount">{{expense.amount}}</div>
     </div>
