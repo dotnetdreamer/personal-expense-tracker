@@ -12,6 +12,8 @@ import { MediaUploaderService } from '../../shared/media/media-uploader.service'
 import { MediaDeviceHelper } from '../../shared/media/media-device-helper';
 import { MediaReturnFileType, MediaFileType } from '../../shared/media/media.model';
 import { IExpense } from '../expense.model';
+import { ICategory } from '../../category/category.model';
+import { CategoryService } from '../../category/category.service';
 
 @Component({
   selector: 'page-expense-create-or-update',
@@ -21,11 +23,12 @@ import { IExpense } from '../expense.model';
 })
 export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit {
   formGroup: FormGroup;
+  categories: ICategory[];
 
   constructor(private formBuilder: FormBuilder, private location: Location
     , private alertCtrl: AlertController
     , private expenseSvc: ExpenseService, private mediaUploaderSvc: MediaUploaderService
-    , private mediaDeviceHelper: MediaDeviceHelper
+    , private mediaDeviceHelper: MediaDeviceHelper, private categorySvc: CategoryService
     ) {
     super();
 
@@ -42,7 +45,9 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit {
 
   get f() { return this.formGroup.controls; }
 
-  ngOnInit() {
+  async ngOnInit() {
+    await this._getCategoryList();
+
     if(AppConstant.DEBUG) {
       this._preFill();
     }
@@ -159,10 +164,16 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit {
     }
   }
 
+  private async _getCategoryList() {
+    this.categories = await this.categorySvc.getCategoryList();
+  }
+
   private _preFill() {
     const rand = this.helperSvc.getRandomNumber();
 
-    this.f.categoryId.setValue(1);
+    if(this.categories.length) {
+      this.f.categoryId.setValue(this.categories[0].id);
+    }
     this.f.description.setValue(`Testing description: ${rand}`);
     this.f.amount.setValue(rand);
   }

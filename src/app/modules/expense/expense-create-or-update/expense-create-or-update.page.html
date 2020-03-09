@@ -11,6 +11,11 @@
   <form class="custom-form" [formGroup]="formGroup">
     <ion-list>
       <ion-item>
+        <ion-select formControlName="categoryId" placeholder="{{'category.title' | localizedresource | async}}">
+          <ion-select-option [value]="cat.id" *ngFor="let cat of categories">{{cat.name}}</ion-select-option>
+        </ion-select>
+      </ion-item>
+      <ion-item>
         <ion-input formControlName="description" placeholder="{{'expense.description' | localizedresource | async}}"></ion-input>
       </ion-item>
       <ion-item>
