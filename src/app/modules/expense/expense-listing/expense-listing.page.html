@@ -6,7 +6,7 @@
 
 <ion-content>
   <div class="expenses">
-    <div class="expense-item" *ngFor="let expense of expenses">
+    <div class="expense-item" *ngFor="let expense of expenses" (click)="onExpenseItemClicked(expense)">
       <div class="item-category-description">
         <div class="item-description">{{expense.description}}</div>
         <div class="item-description">{{expense.category?.name}}</div>

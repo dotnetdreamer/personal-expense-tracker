@@ -16,7 +16,11 @@ const routes: Routes = [
       resolve: {
         startupResolve: StartupResolver
       }
-    }
+    },
+    {
+      path: 'expense-detail',
+      loadChildren: () => import('./expense-detail/expense-detail.module').then( m => m.ExpenseDetailPageModule)
+    }  
 ];
 
 @NgModule({

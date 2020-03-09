@@ -8,6 +8,10 @@ page-expense-create-or-update {
                 margin-right: 10px;
                 height: 100px;
                 width: 110px;
+
+                ion-icon {
+                    font-size: 40px;
+                }
             }
 
             > ion-list {

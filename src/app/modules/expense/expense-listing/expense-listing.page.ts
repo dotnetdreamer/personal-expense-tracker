@@ -29,6 +29,10 @@ export class ExpenseListingPage extends BasePage implements OnInit {
     await this.navigate({ path: '/expense/expense-create-or-update'})
   }
 
+  async onExpenseItemClicked(expense: IExpense) {
+    await this.navigate({ path: '/expense/expense-detail', params: { id: expense.id }});
+  }
+
 
   private async _getExpenses() {
     this.expenses = await this.expenseSvc.getExpenseList();

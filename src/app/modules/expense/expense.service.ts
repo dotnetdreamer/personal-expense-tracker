@@ -57,6 +57,10 @@ export class ExpenseService extends BaseService {
         });
     }
 
+    getById(id) {
+        return this.dbService.get<IExpense>(this.schemaService.tables.expense, id);
+    }
+
     put(expense: IExpense) {
         if(!expense.createdOn) {
             expense.createdOn = moment().format(AppConstant.DEFAULT_DATE_FORMAT);
