@@ -14,6 +14,21 @@ export class CategoryService extends BaseService {
         super();
     }
 
+    async populate() {
+        const categories: ICategory[] = [
+            { groupName: '', name: 'General' },
+            //Entertainment
+            { groupName: 'Entertainment', name: 'Games' },
+            { groupName: 'Entertainment', name: 'Movies' },
+            { groupName: 'Entertainment', name: 'Music' },
+            { groupName: 'Entertainment', name: 'Other' },
+            { groupName: 'Entertainment', name: 'Sports' },
+            //Food and Drink
+            { groupName: 'Food and Drink', name: 'Dinning Out' },
+        ];
+        
+        await this.putAll(categories);
+    }
 
     getCategoryList() {
         return this.dbService.getAll<Array<ICategory>>(this.schemaService.tables.category);
@@ -32,5 +47,14 @@ export class CategoryService extends BaseService {
             name: category.name,
             createdOn: category.createdOn
         });
+    }
+
+    async putAll(categories: ICategory[]) {
+        const promises = [];
+        categories.forEach(cat => {
+            promises.push(this.put(cat));
+        });
+
+        await Promise.all(promises);
     }
 }

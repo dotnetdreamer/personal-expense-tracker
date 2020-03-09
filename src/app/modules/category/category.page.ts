@@ -72,7 +72,8 @@ export class CategoryPage implements OnInit {
             }
 
             await this.categorySvc.put({
-              name: data.categoryName
+              name: data.categoryName,
+              groupName: ''
             });   
 
             await this.getCategories();
