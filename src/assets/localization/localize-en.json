@@ -6,7 +6,9 @@
         "cancel": "Cancel"
     },
     "category": {
-        "title": "Category"
+        "title": "Category",
+        "name": "Name",
+        "groupName": "Group Name"
     },
     "expense": {
         "date": "Date",

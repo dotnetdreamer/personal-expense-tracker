@@ -1,16 +1,22 @@
 <ion-header>
   <ion-toolbar>
     <ion-title>{{'category.title' | localizedresource | async}}</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button *ngIf="!isOpenedAsModal"></ion-back-button>
+      <ion-button (click)="onCloseModalClicked()" *ngIf="isOpenedAsModal">
+        <ion-icon name="close" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
   <ion-searchbar debounce="500" (ionInput)="onIonSearchInput($event)"></ion-searchbar>
-  <ion-list>
-    <ion-item-divider *ngFor="let item of gorupedItems | keyvalue">
+  <ion-list *ngFor="let item of gorupedItems | keyvalue">
+    <ion-item-divider>
       <ion-label>{{ item.key }}</ion-label>
     </ion-item-divider>
-    <ion-item *ngFor="let cat of categories">
+    <ion-item *ngFor="let cat of item.value" (click)="onCategoryClicked(cat)">
       <ion-label>{{ cat.name }}</ion-label>
     </ion-item>
   </ion-list>

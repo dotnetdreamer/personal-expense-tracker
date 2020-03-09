@@ -1,7 +1,7 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation, OnDestroy } from '@angular/core';
 import { Location } from '@angular/common';
 
-import { AlertController } from '@ionic/angular';
+import { AlertController, ModalController } from '@ionic/angular';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import * as moment from 'moment';
 
@@ -14,6 +14,8 @@ import { MediaReturnFileType, MediaFileType } from '../../shared/media/media.mod
 import { IExpense } from '../expense.model';
 import { ICategory } from '../../category/category.model';
 import { CategoryService } from '../../category/category.service';
+import { Subscription } from 'rxjs';
+import { CategoryPage } from '../../category/category.page';
 
 @Component({
   selector: 'page-expense-create-or-update',
@@ -24,11 +26,13 @@ import { CategoryService } from '../../category/category.service';
 export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit {
   formGroup: FormGroup;
   categories: ICategory[];
+  selectedCategory: ICategory;
 
   constructor(private formBuilder: FormBuilder, private location: Location
     , private alertCtrl: AlertController
     , private expenseSvc: ExpenseService, private mediaUploaderSvc: MediaUploaderService
     , private mediaDeviceHelper: MediaDeviceHelper, private categorySvc: CategoryService
+    , private modalCtrl: ModalController
     ) {
     super();
 
@@ -38,7 +42,7 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit {
       description: ['', Validators.required],
       notes: [''],
       attachment: [''],
-      amount:['', Validators.required],
+      amount:['', Validators.required], 
       date: [cDate, Validators.required]
     });
   }
@@ -52,7 +56,6 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit {
       this._preFill();
     }
   }
-
 
   async onSaveClick(args) {
     const exp: IExpense = {
@@ -161,6 +164,24 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit {
       this.f.notes.setValue(noteVal);
     } else {
       this.f.notes.setValue('');
+    }
+  }
+
+  async onCategoryClicked(args) {
+    const modal = await this.modalCtrl.create({
+      component: CategoryPage,
+      componentProps: {
+        isOpenedAsModal: true
+      }
+    });
+    await modal.present();
+    
+    const { data } = await modal.onDidDismiss();
+    if(data) {
+      this.selectedCategory = data;
+      this.f.categoryId.setValue(this.selectedCategory.id);
+    } else {
+      this.f.categoryId.setValue('');
     }
   }
 
