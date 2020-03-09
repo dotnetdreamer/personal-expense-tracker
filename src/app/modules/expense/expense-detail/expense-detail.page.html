@@ -1,11 +1,20 @@
 <ion-header>
   <ion-toolbar>
     <ion-title>{{ expense?.description }}</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
   <div class="container">
-
+    <div class="info">
+      <div class="category">{{ expense?.category?.name }}</div>
+      <div class="description-date">
+        <div class="description">{{ expense?.description }}</div>
+        <div class="date">{{ expense?.createdOn }}</div>
+      </div>
+    </div>
   </div>
 </ion-content>
