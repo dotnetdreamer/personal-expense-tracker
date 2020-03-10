@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation, ViewChild, ElementRef } from '@angular/core';
 import { BasePage } from '../../shared/base.page';
 import { ActivatedRoute } from '@angular/router';
 import { AppConstant } from '../../shared/app-constant';
@@ -12,6 +12,8 @@ import { IExpense } from '../expense.model';
   encapsulation: ViewEncapsulation.None
 })
 export class ExpenseDetailPage extends BasePage implements OnInit {
+  @ViewChild('attachment') attachmentElementRef: ElementRef;
+  
   expense: IExpense;
 
   constructor(private activatedRoute: ActivatedRoute
@@ -35,6 +37,31 @@ export class ExpenseDetailPage extends BasePage implements OnInit {
     if(AppConstant.DEBUG) {
       console.log('ExpenseDetailPage: ngOnInit: expense', this.expense);
     }
+
+    //read attachment
+    this._readAttachment(this.expense.attachment);
+  }
+
+  private _readAttachment(arrayBuffer) {
+    if(!arrayBuffer) {
+      return;
+    }
+
+
+    const bytes = new Uint8Array(arrayBuffer);
+    const blob = new Blob([bytes.buffer]);
+
+    //to be used following for any type of file
+    // const url = URL.createObjectURL(blob);
+    // window.open(url, 'Name','resizable=1');
+
+    //to be used following for image
+    const image = this.attachmentElementRef.nativeElement;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      image.src = e.target.result;
+    };
+    reader.readAsDataURL(blob);
   }
 
 }
