@@ -44,14 +44,15 @@ export class AppComponent {
       const wk = await this.appSettingSvc.getWorkingLanguage();
       if(!wk) {
         await this.appSettingSvc.putWorkingLanguage('en');
+        //populate categories
+        await this.categorySvc.populate();
       }
 
-      //populate categories
-      await this.categorySvc.populate();
 
       // await this._navigateTo('/expense/expense-create-or-update');
-      // await this._navigateTo('/expense/expense-listing');
-      await this._navigateTo('/home');
+      await this._navigateTo('/expense/expense-listing');
+      // await this._navigateTo('/category');
+      // await this._navigateTo('/home');
       this.splashScreen.hide();
     });
   }
