@@ -1,6 +1,7 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Query, Body, Post } from '@nestjs/common';
 
 import { CategoryService } from './category.service';
+import { ICategory } from './category.model';
 
 @Controller('category')
 export class CategoryController {
@@ -11,7 +12,9 @@ export class CategoryController {
     return this.categorySvc.findAll();
   }
 
-  test() {
-    // this.categorySvc.
+  @Post('post')
+  async post(@Body() args: ICategory) {
+    const result = await this.categorySvc.save(args);
+    return result;
   }
 }

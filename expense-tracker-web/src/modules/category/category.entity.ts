@@ -1,16 +1,15 @@
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity()
-export class Category {
-  @PrimaryGeneratedColumn()
-  id: number;
+import { BaseEntity } from '../base.entity';
 
+@Entity()
+export class Category extends BaseEntity {
   @Column()
   name: string;
-
-//   @Column()
-//   lastName: string;
-
-//   @Column({ default: true })
-//   isActive: boolean;
+  @Column()
+  groupName: string
+  @Column({ nullable: true })
+  icon?: string
+  @Column()
+  createdOn: string
 }

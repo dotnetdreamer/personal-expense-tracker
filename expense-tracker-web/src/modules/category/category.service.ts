@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { Category } from './category.entity';
+import { ICategory } from './category.model';
 
 @Injectable()
 export class CategoryService {
@@ -20,8 +21,8 @@ export class CategoryService {
     return this.categoryRepo.findOne(id);
   }
 
-  create(category) {
-    return this.categoryRepo.create(category);
+  save(category: ICategory) {
+    return this.categoryRepo.save<ICategory>(category);
   }
 
   remove(id: string) {
