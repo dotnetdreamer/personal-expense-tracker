@@ -63,7 +63,7 @@ export class DbSqlService implements DbService {
         return this._db;
     } 
 
-    put(store, data): Promise<{ rowsAffected, insertId }> {
+    putLocal(store, data): Promise<{ rowsAffected, insertId }> {
         return new Promise((resolve, reject) => {
             let sql = `INSERT INTO ${store} `;
 
@@ -135,6 +135,15 @@ export class DbSqlService implements DbService {
                 }
                 resolve(<any>data);
             }, (error) => reject(error));
+        });
+    }
+
+    remove(store, key): Promise<any> {
+        return new Promise((resolve, reject) => {
+            // this.db.remove(store, key).done(key => {
+            //     resolve(key);
+            // });
+            throw 'remove not impleted in db-sql yet';
         });
     }
 

@@ -32,7 +32,7 @@ export class AppSettingService {
     }
 
     putWorkingLanguage(lang) {
-        return this.dbService.put(this.schemaService.tables.setting, {
+        return this.dbService.putLocal(this.schemaService.tables.setting, {
             key: AppConstant.KEY_WORKING_LANGUAGE,
             value: lang
         }).then(() => {
@@ -64,7 +64,7 @@ export class AppSettingService {
     }
 
     put(key: string, values) {
-        return this.dbService.put(this.schemaService.tables.setting, {
+        return this.dbService.putLocal(this.schemaService.tables.setting, {
             key: key,
             value: values
         }).then(() => {

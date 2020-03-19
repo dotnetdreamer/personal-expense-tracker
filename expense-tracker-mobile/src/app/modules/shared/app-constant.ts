@@ -11,6 +11,7 @@ export class AppConstant {
     public static readonly DEFAULT_TIME_FORMAT = "HH:mm";
     
     public static readonly EVENT_DB_INITIALIZED = "event:dbInitialized"; 
+    public static readonly EVENT_CATEGORY_CREATED_OR_UPDATED = "event:categoryCreatedOrUpdated"; 
     public static readonly EVENT_EXPENSE_CREATED_OR_UPDATED = "event:expenseCreatedOrUpdated"; 
 
     public static readonly KEY_WORKING_LANGUAGE = "key:workingLanguage";

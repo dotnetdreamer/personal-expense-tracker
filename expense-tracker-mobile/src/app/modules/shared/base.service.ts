@@ -11,7 +11,6 @@ import { AppInjector } from './app-injector';
 import { HelperService } from './helper.service';
 import { LocalizationService } from './localization.service';
 import { DbWebService } from './db/db-web.service'; 
-import { Observable } from 'rxjs';
 
 @Injectable({
     providedIn: 'root'
@@ -42,36 +41,118 @@ export class BaseService {
         }
     }
 
-    protected async prepareHeaders(ignoreContentType?) {
+    protected getData<T>(args: HttpParams): Promise<T> {
+        let headers: any = this.prepareHeaders(args); 
+
+        args.body = args.body || {};  
+        if(!args.overrideUrl) {
+            let newUrl = `${AppConstant.BASE_API_URL + args.url}`;
+
+            for(let prop in args.body) {
+                if(args.body.hasOwnProperty(prop)) {
+                    if(newUrl.includes('?')) {
+                        newUrl += '&';
+                    } else {
+                        newUrl += '?';
+                    }
+                    newUrl += `${prop}=${args.body[prop]}`;
+                }
+            }   
+            args.url = newUrl;
+        }
+        
+        return new Promise((resolve, reject) => {
+            this.http.get<T>(args.url, {
+                headers: headers
+            })
+            .subscribe(result => {
+                resolve(<T>result);
+            }, error => {
+                this.handleError(error, args);
+                if(args.errorCallback) {
+                    resolve();
+                } else {
+                    reject(error);
+                }
+            });
+        });
+    }
+
+    protected postData<T>(args: HttpParams): Promise<T> {
+        let headers: HttpHeaders = this.prepareHeaders(args);
+
+        let newUrl;
+        if(!args.overrideUrl) {
+            newUrl = `${AppConstant.BASE_API_URL + args.url}`;
+        } else {
+            newUrl = args.url;
+        }
+
+        // let data;
+        // for(let prop in args.body) {
+        //     if(args.body.hasOwnProperty(prop)) {
+        //         if(data) {
+        //             data += '&';
+        //         } else {
+        //             //initialize
+        //             data = '';
+        //         }
+        //         data += `${prop}=${args.body[prop]}`;
+        //     }
+        // }   
+        // args.body = data || {};   
+        args.url = newUrl;
+
+        return new Promise((resolve, reject) => {
+            this.http.post<T>(args.url, args.body, {
+                headers: headers
+            })
+            .subscribe(result => {
+                resolve(<T>result);
+            }, error => {
+                this.handleError(error, args);
+                if(args.errorCallback) {
+                    resolve();
+                } else {
+                    reject(error);
+                }
+            });
+        });
+    }
+
+    protected handleError(e: HttpErrorResponse, args: HttpParams) {
+        if(AppConstant.DEBUG) {
+            console.log('BaseService: handleError', e);
+        }
+        if(!args.errorCallback) {
+            let msg;
+            //the error might be thrown by e.g a plugin wasn't install properly. In that case text() will not be available
+            if(e.message) {
+                msg = e.message;            
+            } else {
+                msg = e.error.toString();
+            }
+            // setTimeout(async () => {
+            //     await this.helperSvc.alert(msg);
+            // });
+        } else {
+            args.errorCallback(e, args);
+        }
+    }
+    
+    private prepareHeaders(args: HttpParams) {
         let headers = new HttpHeaders();
-        if(!ignoreContentType) {
-            headers = headers.append('Content-Type', 'application/x-www-form-urlencoded;charset=utf-8');            
+        if(!args.ignoreContentType) {
+            headers = headers.append('Content-Type', 'application/json;charset=utf-8');            
         }
         return headers;
     }
+}
 
-    protected async handleError(errorObj: HttpErrorResponse, errorHandler?, 
-        request?: Observable<any>, resolve?, reject?) {
-        if(AppConstant.DEBUG) {
-            console.log('BaseService: handleError', errorObj);
-        }
-        // let error = errorObj.error;
-        if(!errorHandler) {
-            // switch(errorObj.status) {
-            //     case 401:
-
-            //     break;
-            // }
-            //the error might be thrown by e.g a plugin wasn't install properly. In that case text() will not be available
-            let errorText = null;    
-            if((<HttpErrorResponse>errorObj).message) {
-                errorText = (<HttpErrorResponse>errorObj).message;            
-            }
-            //let the caller handle the message
-            // console.log(errorText);
-            this.helperSvc.presentToast(errorText);          
-        } else {
-            errorHandler(errorObj);
-        }
-    }
+export class HttpParams {
+    url: string
+    body?: any
+    errorCallback?
+    ignoreContentType?: boolean
+    overrideUrl?: boolean
 }

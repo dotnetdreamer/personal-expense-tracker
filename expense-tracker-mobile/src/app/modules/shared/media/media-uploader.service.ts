@@ -122,22 +122,22 @@ export class MediaUploaderService extends BaseService {
 
     private _uploadFile(url?: string, body?: any, errorHandler?: any): Promise<string> {
         return new Promise(async (resolve, reject) => {
-            let headers = await this.prepareHeaders();
-            headers = headers.delete('Content-Type');
-            // headers = headers.append('Content-Type', 'multipart/form-data');
+            // let headers = await this.prepareHeaders();
+            // headers = headers.delete('Content-Type');
+            // // headers = headers.append('Content-Type', 'multipart/form-data');
 
-            body = body || {};   
-            url = AppConstant.BASE_API_URL + url;                
+            // body = body || {};   
+            // url = AppConstant.BASE_API_URL + url;                
           
-            const request = this.http.post<any>(url, body, {
-                headers: headers
-            });
+            // const request = this.http.post<any>(url, body, {
+            //     headers: headers
+            // });
 
-            request.subscribe(result => {
-                resolve(result);
-            }, async error => {
-                await this.handleError(error, errorHandler, request, resolve, reject);
-            });
+            // request.subscribe(result => {
+            //     resolve(result);
+            // }, async error => {
+            //     // await this.handleError(error, errorHandler, request, resolve, reject);
+            // });
         });
     }
 }

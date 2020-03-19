@@ -5,13 +5,120 @@ import * as moment from 'moment';
 import { BaseService } from '../shared/base.service';
 import { ICategory } from './category.model';
 import { AppConstant } from '../shared/app-constant';
+import { EventPublisher } from '../shared/event-publisher';
+
+declare const ydn: any;
 
 @Injectable({
     providedIn: 'root'
 })
 export class CategoryService extends BaseService {
-    constructor() {
+    private readonly BASE_URL = "category";
+
+    constructor(private eventPub: EventPublisher) {
         super();
+    }
+
+    
+    pull() {
+        return new Promise(async (resolve, reject) => {
+            // const products = await this.getTodayProducts();
+            // if(products.length) {
+            //     //remove all first
+            //     await this.removeAll();
+            //     //now add
+            //     await this.putAllLocal(products, true, true);
+            // }
+            resolve();
+        });
+    }
+
+    push() {
+        return new Promise(async (resolve, reject) => {
+            const unSycedLocal = await this.getUnSyncedLocal();
+            if(AppConstant.DEBUG) {
+                console.log('CategoryService: sync: unSycedLocal items length', unSycedLocal.length);
+            }
+
+            if(!unSycedLocal.length) {
+                resolve();
+                return;
+            }
+
+            //server returns array of dictionary objects, each key in dict is the localdb id
+            //we map the localids and update its serverid locally
+            const items = await this.postData<any[]>({
+                url: `${this.BASE_URL}/sync`,
+                body: unSycedLocal
+            });
+
+            //something bad happend or in case of update, we don't need to update server ids
+            if(items == null) {
+                resolve();
+                return;
+            }
+
+            
+            try {
+                const promises = [];
+                // const removePromises = [];
+                //mark it
+                for (let item of unSycedLocal) {
+                    if (item.markedForAdd || item.markedForUpdate) {
+                        // if(item.markedForAdd) {
+                        //     item.markedForAdd = false;
+                        // } else if(item.markedForUpdate) {
+                        //     item.markedForUpdate = false;
+                        // }
+
+                        //update server id as well...
+                        const cp = items.filter(p => p[item.id])[0];
+                        if(!cp) {
+                            throw `Local item mapping not found for: ${JSON.stringify(cp)}`;
+                        }
+
+                        //removed old items whose ids are changed e.g in adding senario
+                        //we remove the item immedialty as it causes issue when we run update promise down
+                        await this.remove(item.id);
+
+                        const pItem: ICategory = cp[item.id];
+                        promises.push(this.putLocal(pItem, true, true));
+                    }
+                    // else if (visitor.markedForDelete) {
+                    //     const promise = this.removeLocal(visitor.id);
+                    //     promises.push(promise);
+                    // }
+                }
+
+                //now make updates
+                await Promise.all(promises);
+                if(AppConstant.DEBUG) {
+                    console.log('CategoryService: sync: complete');
+                }
+                this.eventPub.$pub(AppConstant.EVENT_CATEGORY_CREATED_OR_UPDATED);
+                resolve();
+            } catch (e) {
+                reject(e);
+            }
+        });
+    }
+
+    getUnSyncedLocal(): Promise<Array<ICategory>> {
+        return new Promise(async (resolve, reject) => {
+            const db = this.dbService.Db;
+            const iter = new ydn.db.ValueIterator(this.schemaService.tables.category);
+
+            const unSynced = [];
+            let req = db.open(x => {
+                let v: ICategory = x.getValue();
+                if (v.markedForAdd || v.markedForUpdate || v.markedForDelete) {
+                    unSynced.push(v);
+                }
+            }, iter);
+            req.always(() => {
+                resolve(unSynced);
+            });
+        });
     }
 
     async populate() {
@@ -27,35 +134,61 @@ export class CategoryService extends BaseService {
             { groupName: 'Food and Drink', name: 'Dinning Out' },
         ];
         
-        await this.putAll(categories);
+        await this.putAllLocal(categories, true, true);
     }
 
-    getCategoryList() {
+    getCategoryListLocal() {
         return this.dbService.getAll<Array<ICategory>>(this.schemaService.tables.category);
     }
 
-    getCategoryById(categoryId) {
+    getCategoryByIdLocal(categoryId) {
         return this.dbService.get<ICategory>(this.schemaService.tables.category, categoryId);
     }
 
-    put(category: ICategory) {
-        if(!category.createdOn) {
-            category.createdOn = moment().format(AppConstant.DEFAULT_DATETIME_FORMAT);
+    putLocal(item: ICategory, ignoreFiringEvent?: boolean, ignoreDefaults?: boolean) {
+        //defaults
+        if(!ignoreDefaults) {
+            if(typeof item.markedForAdd === 'undefined' 
+                && typeof item.markedForUpdate === 'undefined' && typeof item.markedForDelete === 'undefined') {
+                item.markedForAdd = true;
+            }
+            if(item.markedForAdd) {
+                item.createdOn = moment().format(AppConstant.DEFAULT_DATETIME_FORMAT);
+            } else if(item.markedForUpdate) {
+                item.updatedOn = moment().format(AppConstant.DEFAULT_DATETIME_FORMAT);
+            }
+            //added item can't be marked for update...
+            if(item.markedForAdd && item.markedForUpdate) {
+                item.markedForUpdate = false;
+            }
         }
 
-        return this.dbService.put(this.schemaService.tables.category, {
-            name: category.name,
-            groupName: category.groupName,
-            createdOn: category.createdOn
+        return this.dbService.putLocal(this.schemaService.tables.category, item).then((affectedRows) => {
+            if(!ignoreFiringEvent) {
+                this.eventPub.$pub(AppConstant.EVENT_CATEGORY_CREATED_OR_UPDATED, item);
+            }
+            return affectedRows;
+        });
+    }
+    
+    putAllLocal(categories: ICategory[], ignoreFiringEvent?: boolean, ignoreDefaults?: boolean) {
+        return new Promise(async (resolve, reject) => {
+            const promises = [];
+
+            for(let cat of categories) {
+                promises.push(this.putLocal(cat, ignoreFiringEvent, ignoreDefaults));
+            }
+
+            await Promise.all(promises);
+            resolve();
         });
     }
 
-    async putAll(categories: ICategory[]) {
-        const promises = [];
-        categories.forEach(cat => {
-            promises.push(this.put(cat));
-        });
-
-        await Promise.all(promises);
+    remove(id) {
+        return this.dbService.remove(this.schemaService.tables.category, id);
     }
+
+    // removeAll() {
+    //     return this.dbService.removeAll(this.schemaService.tables.category);
+    // }
 }

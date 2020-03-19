@@ -186,7 +186,7 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit {
   }
 
   private async _getCategoryList() {
-    this.categories = await this.categorySvc.getCategoryList();
+    this.categories = await this.categorySvc.getCategoryListLocal();
   }
 
   private _preFill() {

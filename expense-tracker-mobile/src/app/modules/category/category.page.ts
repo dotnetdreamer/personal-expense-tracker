@@ -3,11 +3,10 @@ import { AlertController, ModalController } from '@ionic/angular';
 
 import { CategoryService } from './category.service';
 import { AppConstant } from '../shared/app-constant';
-import { HelperService } from '../shared/helper.service';
-import { LocalizationService } from '../shared/localization.service';
 import { ICategory } from './category.model';
-import { EventPublisher } from '../shared/event-publisher';
 import { BasePage } from '../shared/base.page';
+import { SyncConstant } from '../shared/sync/sync-constant';
+import { SyncEntity } from '../shared/sync/sync.model';
 
 @Component({
   selector: 'app-category',
@@ -66,7 +65,7 @@ export class CategoryPage extends BasePage implements OnInit {
 
   private async _getCategories(categoryList?) {
     if(!categoryList) {
-      this._orignalCategories = await this.categorySvc.getCategoryList();
+      this._orignalCategories = await this.categorySvc.getCategoryListLocal();
       this.categories = this._orignalCategories;
     } else {
       this.categories = categoryList;
@@ -116,11 +115,12 @@ export class CategoryPage extends BasePage implements OnInit {
               return;
             }
 
-            await this.categorySvc.put({
+            await this.categorySvc.putLocal({
               name: data.categoryName,
               groupName: data.groupName,
             });   
 
+            this.eventPub.$pub(SyncConstant.EVENT_SYNC_DATA_PUSH, SyncEntity.Category);
             await this._getCategories();
           }
         }

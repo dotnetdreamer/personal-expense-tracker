@@ -76,7 +76,7 @@ export class DbWebService implements DbService {
         return this.db;
     } 
 
-    put(store, data): Promise<{ rowsAffected, insertId }> {
+    putLocal(store, data): Promise<{ rowsAffected, insertId }> {
         // const opts:YdnDbFilter = data;
         return new Promise((resolve, reject) => {
             // if (opts.key) {

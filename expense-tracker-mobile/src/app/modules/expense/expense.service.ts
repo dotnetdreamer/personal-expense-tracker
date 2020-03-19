@@ -66,7 +66,7 @@ export class ExpenseService extends BaseService {
             expense.createdOn = moment().format(AppConstant.DEFAULT_DATE_FORMAT);
         }
 
-        return this.dbService.put(this.schemaService.tables.expense, {
+        return this.dbService.putLocal(this.schemaService.tables.expense, {
             description: expense.description,
             amount: expense.amount,
             categoryId: expense.categoryId,
@@ -79,7 +79,7 @@ export class ExpenseService extends BaseService {
     private async _map(expenses: Array<IExpense>) {
         const promises = [];
         for(let exp of expenses) {
-            const expPromise = this.categorySvc.getCategoryById(exp.categoryId)
+            const expPromise = this.categorySvc.getCategoryByIdLocal(exp.categoryId)
             .then(e => exp.category = e);
             promises.push(exp);
         }
