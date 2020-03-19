@@ -11,7 +11,7 @@ import { CategoryModule } from './modules/category/category.module';
   imports: [
     TypeOrmModule.forRoot({
       type: 'sqlite',
-      database: 'expense-tracker',
+      database: 'expense-tracker.db',
       entities: [Category],
       synchronize: true,
     }),
