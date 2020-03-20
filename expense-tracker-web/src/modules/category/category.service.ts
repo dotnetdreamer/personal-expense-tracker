@@ -17,13 +17,17 @@ export class CategoryService {
     return this.categoryRepo.find();
   }
 
-  findOne(id: string): Promise<Category> {
+  findOne(id): Promise<Category> {
     return this.categoryRepo.findOne(id);
   }
 
   save(category: ICategory) {
     return this.categoryRepo.save<ICategory>(category);
   }
+
+  // update(category: ICategory) {
+  //   this.categoryRepo.update(category);
+  // }
 
   remove(id: string) {
     return this.categoryRepo.delete(id);

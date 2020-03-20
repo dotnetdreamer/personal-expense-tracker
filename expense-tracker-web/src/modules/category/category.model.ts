@@ -4,4 +4,7 @@ export interface ICategory {
     icon?: string
     id?: number
     createdOn: string
+    markedForAdd: boolean
+    markedForUpdate: boolean
+    markedForDelete: boolean
 }

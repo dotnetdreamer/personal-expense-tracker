@@ -2,8 +2,8 @@
 export class AppConstant {
     public static readonly DEBUG = true;
 
-    public static readonly BASE_URL = "";
-    public static readonly BASE_API_URL = `${AppConstant.BASE_URL}api/ApiMobile/`;
+    public static readonly BASE_URL = "http://localhost:3000/";
+    public static readonly BASE_API_URL = `${AppConstant.BASE_URL}`;
     public static readonly DB_NAME = "et.db";
 
     public static readonly DEFAULT_DATETIME_FORMAT = "YYYY-MM-DD HH:mm:ss";

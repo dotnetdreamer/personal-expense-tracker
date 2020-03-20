@@ -87,12 +87,12 @@ export class CategoryPage extends BasePage implements OnInit {
       header: catNameTitle,
       inputs: [
         {
-          name: 'groupName',
+          name: 'categoryName',
           type: 'text',
           placeholder: resources[1]
         },
         {
-          name: 'categoryName',
+          name: 'groupName',
           type: 'text',
           placeholder: resources[2]
         }

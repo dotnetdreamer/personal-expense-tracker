@@ -1,4 +1,5 @@
-import { Controller, Get, Query, Body, Post } from '@nestjs/common';
+import { Controller, Get, Query, Body, Post, UseInterceptors, ClassSerializerInterceptor } from '@nestjs/common';
+
 
 import { CategoryService } from './category.service';
 import { ICategory } from './category.model';
@@ -7,14 +8,40 @@ import { ICategory } from './category.model';
 export class CategoryController {
   constructor(private readonly categorySvc: CategoryService) {}
 
+  @UseInterceptors(ClassSerializerInterceptor)
   @Get('getAll')
   getAll() {
     return this.categorySvc.findAll();
   }
 
-  @Post('post')
-  async post(@Body() args: ICategory) {
-    const result = await this.categorySvc.save(args);
-    return result;
+  @UseInterceptors(ClassSerializerInterceptor)
+  @Post('sync')
+  async sync(@Body() models: ICategory[]) {
+    //local id and mapping server record
+    let items: Array<Map<number, ICategory>> = [];
+
+    for (let model of models)
+    {
+      if (model.markedForAdd) {
+        const item = await this.categorySvc.save(model);
+        delete item.markedForUpdate;
+        delete item.markedForDelete;
+        delete item.markedForAdd;
+
+        const itemMap: Map<number, ICategory> = new Map();
+        itemMap.set(model.id, item);
+
+        items.push(itemMap);
+      } else if(model.markedForUpdate) {
+        var cat = await this.categorySvc.findOne(model.id);
+        if(!cat) {
+          continue;
+        }
+
+        // this.categorySvc.up
+      }
+    }
+
+    return items;
   }
 }
