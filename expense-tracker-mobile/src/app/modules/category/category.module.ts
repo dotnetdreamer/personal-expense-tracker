@@ -5,6 +5,7 @@ import { CategoryPageRoutingModule } from './category-routing.module';
 import { CategoryPage } from './category.page';
 import { PipesModule } from 'src/app/pipes/pipes.module';
 import { ComponentsWithOutFormsModule } from 'src/app/components/components-without-forms.module';
+import { CategoryOptionsPopover } from './category-option.popover';
 
 @NgModule({
   imports: [
@@ -12,6 +13,6 @@ import { ComponentsWithOutFormsModule } from 'src/app/components/components-with
     PipesModule,
     CategoryPageRoutingModule
   ],
-  declarations: [CategoryPage]
+  declarations: [CategoryPage, CategoryOptionsPopover]
 })
 export class CategoryPageModule {}

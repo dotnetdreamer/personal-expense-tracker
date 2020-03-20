@@ -4,7 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { Category } from './category.entity';
-import { ICategory } from './category.model';
+import { ICategoryParams } from './category.model';
 
 @Injectable()
 export class CategoryService {
@@ -21,15 +21,15 @@ export class CategoryService {
     return this.categoryRepo.findOne(id);
   }
 
-  save(category: ICategory) {
-    return this.categoryRepo.save<ICategory>(category);
+  save(category: ICategoryParams) {
+    let newOrUpdated: any = Object.assign({}, category);
+    if(typeof newOrUpdated.isDeleted === 'undefined') {
+      newOrUpdated.isDeleted = false;
+    }
+    return this.categoryRepo.save<Category>(newOrUpdated);
   }
 
-  // update(category: ICategory) {
-  //   this.categoryRepo.update(category);
-  // }
-
-  remove(id: string) {
+  remove(id) {
     return this.categoryRepo.delete(id);
   }
 }

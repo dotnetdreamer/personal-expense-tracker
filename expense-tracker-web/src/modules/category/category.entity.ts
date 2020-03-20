@@ -6,10 +6,19 @@ import { BaseEntity } from '../base.entity';
 export class Category extends BaseEntity {
   @Column()
   name: string;
+  
   @Column()
   groupName: string
+
   @Column({ nullable: true })
   icon?: string
+
+  @Column()
+  isDeleted: boolean
+
   @Column()
   createdOn: string
+
+  @Column({ nullable: true })
+  updatedOn: string
 }

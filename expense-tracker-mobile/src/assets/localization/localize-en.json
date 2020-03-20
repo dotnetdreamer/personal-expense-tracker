@@ -3,7 +3,12 @@
         "success": "Success",
         "dismiss": "Dismiss",
         "ok": "OK",
-        "cancel": "Cancel"
+        "edit": "Edit",
+        "delete": "Delete",
+        "cancel": "Cancel",
+        "yes": "Yes",
+        "no": "No",
+        "areyousure": "Are you sure ?"
     },
     "category": {
         "title": "Category",

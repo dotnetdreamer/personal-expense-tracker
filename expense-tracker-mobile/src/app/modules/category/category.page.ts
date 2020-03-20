@@ -1,5 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { AlertController, ModalController } from '@ionic/angular';
+import { AlertController, ModalController, PopoverController } from '@ionic/angular';
 
 import { CategoryService } from './category.service';
 import { AppConstant } from '../shared/app-constant';
@@ -7,6 +7,7 @@ import { ICategory } from './category.model';
 import { BasePage } from '../shared/base.page';
 import { SyncConstant } from '../shared/sync/sync-constant';
 import { SyncEntity } from '../shared/sync/sync.model';
+import { CategoryOptionsPopover } from './category-option.popover';
 
 @Component({
   selector: 'app-category',
@@ -22,6 +23,7 @@ export class CategoryPage extends BasePage implements OnInit {
   private _orignalCategories: ICategory[] = [];
 
   constructor(private alertCtrl: AlertController, private modalCtrl: ModalController
+    , private popoverCtrl: PopoverController
     , private categorySvc: CategoryService) { 
       super();
   }
@@ -42,7 +44,7 @@ export class CategoryPage extends BasePage implements OnInit {
 
   async onCategoryAddClick() {
     try {
-      await this._presentAddModal();
+      await this._presentAddOrUpdateModal();
     } catch (e) {
       if(AppConstant.DEBUG) {
         console.log('CategoryPage: onCategoryAddClick: error', e);
@@ -63,6 +65,28 @@ export class CategoryPage extends BasePage implements OnInit {
     }
   }
 
+  async onMoreOptionsButtonClicked(ev, category: ICategory) {
+    const popover = await this.popoverCtrl.create({
+      component: CategoryOptionsPopover,
+      event: ev
+      // backdropDismiss
+    });
+    await popover.present();
+    const { data } = await popover.onDidDismiss();
+    if(data == 'edit') {
+      await this._presentAddOrUpdateModal(category);
+    } else if(data == 'delete') {
+      const res = await this.helperSvc.presentConfirmDialog();
+      if(res) {
+        category.markedForDelete = true;
+        await this.categorySvc.putLocal(category);  
+
+        this.eventPub.$pub(SyncConstant.EVENT_SYNC_DATA_PUSH, SyncEntity.Category);
+        await this._getCategories();
+      }
+    }
+  }
+
   private async _getCategories(categoryList?) {
     if(!categoryList) {
       this._orignalCategories = await this.categorySvc.getCategoryListLocal();
@@ -77,7 +101,7 @@ export class CategoryPage extends BasePage implements OnInit {
     }
   }
 
-  private async _presentAddModal() {
+  private async _presentAddOrUpdateModal(category?: ICategory) {
     const resources = await Promise.all([this.localizationSvc.getResource('category.title')
       , this.localizationSvc.getResource('category.name')
       , this.localizationSvc.getResource('category.groupName')]);
@@ -89,11 +113,13 @@ export class CategoryPage extends BasePage implements OnInit {
         {
           name: 'categoryName',
           type: 'text',
+          value: category?.name,
           placeholder: resources[1]
         },
         {
           name: 'groupName',
           type: 'text',
+          value: category?.groupName,
           placeholder: resources[2]
         }
       ],
@@ -115,10 +141,15 @@ export class CategoryPage extends BasePage implements OnInit {
               return;
             }
 
-            await this.categorySvc.putLocal({
+            const cat: ICategory = {
               name: data.categoryName,
-              groupName: data.groupName,
-            });   
+              groupName: data.groupName
+            };
+            if(category) {
+              cat.id = category.id;
+              cat.markedForUpdate = true;
+            }
+            await this.categorySvc.putLocal(cat);   
 
             this.eventPub.$pub(SyncConstant.EVENT_SYNC_DATA_PUSH, SyncEntity.Category);
             await this._getCategories();

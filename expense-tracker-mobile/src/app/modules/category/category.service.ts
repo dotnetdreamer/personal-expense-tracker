@@ -51,7 +51,7 @@ export class CategoryService extends BaseService {
                 url: `${this.BASE_URL}/sync`,
                 body: unSycedLocal
             });
-
+            
             //something bad happend or in case of update, we don't need to update server ids
             if(items == null) {
                 resolve();
@@ -65,16 +65,10 @@ export class CategoryService extends BaseService {
                 //mark it
                 for (let item of unSycedLocal) {
                     if (item.markedForAdd || item.markedForUpdate) {
-                        // if(item.markedForAdd) {
-                        //     item.markedForAdd = false;
-                        // } else if(item.markedForUpdate) {
-                        //     item.markedForUpdate = false;
-                        // }
-
                         //update server id as well...
                         const cp = items.filter(p => p[item.id])[0];
                         if(!cp) {
-                            throw `Local item mapping not found for: ${JSON.stringify(cp)}`;
+                            throw `Local item mapping not found for: ${item.id}`;
                         }
 
                         //removed old items whose ids are changed e.g in adding senario
@@ -83,11 +77,10 @@ export class CategoryService extends BaseService {
 
                         const pItem: ICategory = cp[item.id];
                         promises.push(this.putLocal(pItem, true, true));
+                    } else if (item.markedForDelete) {
+                        const promise = this.remove(item.id);
+                        promises.push(promise);
                     }
-                    // else if (visitor.markedForDelete) {
-                    //     const promise = this.removeLocal(visitor.id);
-                    //     promises.push(promise);
-                    // }
                 }
 
                 //now make updates
@@ -137,8 +130,22 @@ export class CategoryService extends BaseService {
         await this.putAllLocal(categories, true, true);
     }
 
-    getCategoryListLocal() {
-        return this.dbService.getAll<Array<ICategory>>(this.schemaService.tables.category);
+    getCategoryListLocal(): Promise<ICategory[]> {
+        return new Promise(async (resolve, reject) => {
+            const db = this.dbService.Db;
+            const iter = new ydn.db.ValueIterator(this.schemaService.tables.category);
+
+            const items = [];
+            let req = db.open(x => {
+                let v: ICategory = x.getValue();
+                if (!v.markedForDelete) {
+                    items.push(v);
+                }
+            }, iter);
+            req.always(() => {
+                resolve(items);
+            });
+        });
     }
 
     getCategoryByIdLocal(categoryId) {
@@ -154,11 +161,11 @@ export class CategoryService extends BaseService {
             }
             if(item.markedForAdd) {
                 item.createdOn = moment().format(AppConstant.DEFAULT_DATETIME_FORMAT);
-            } else if(item.markedForUpdate) {
+            } else if(item.markedForUpdate || item.markedForDelete) {
                 item.updatedOn = moment().format(AppConstant.DEFAULT_DATETIME_FORMAT);
             }
-            //added item can't be marked for update...
-            if(item.markedForAdd && item.markedForUpdate) {
+            //added item can't be marked for update or delete...
+            if((item.markedForAdd && item.markedForUpdate) || (item.markedForAdd && item.markedForDelete)) {
                 item.markedForUpdate = false;
             }
         }
