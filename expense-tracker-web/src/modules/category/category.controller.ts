@@ -33,12 +33,16 @@ export class CategoryController {
 
         items.push(itemMap);
       } else if(model.markedForUpdate) {
-        var cat = await this.categorySvc.findOne(model.id);
-        if(!cat) {
+        const toUpdate = await this.categorySvc.findOne(model.id);
+        if(!toUpdate) {
           continue;
         }
 
-        // this.categorySvc.up
+        //no need to update
+        delete toUpdate.createdOn;
+    
+        let updated = Object.assign(toUpdate, model);
+        await this.categorySvc.save(updated);
       }
     }
 
