@@ -27,7 +27,11 @@ export class CategoryController {
       let returnedCategory: any;
 
       if (model.markedForAdd) {
-        const item = await this.categorySvc.save(model);
+        //generate new one..ignore id from client
+        let toAdd = Object.assign({}, model);
+        delete toAdd.id;
+
+        const item = await this.categorySvc.save(toAdd);
         returnedCategory = item;        
         
         delete returnedCategory.markedForAdd;
