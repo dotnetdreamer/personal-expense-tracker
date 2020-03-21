@@ -18,19 +18,6 @@ import { AppConstant } from './modules/shared/app-constant';
   encapsulation: ViewEncapsulation.None
 })
 export class AppComponent {
-  public appPages = [
-    {
-      title: 'Home',
-      url: '/home',
-      icon: 'home'
-    },
-    {
-      title: 'List',
-      url: '/list',
-      icon: 'list'
-    }
-  ];
-
   constructor( private router: Router
     , private platform: Platform,
     private splashScreen: SplashScreen,
@@ -61,8 +48,8 @@ export class AppComponent {
 
       // await this._navigateTo('/expense/expense-create-or-update');
       // await this._navigateTo('/expense/expense-listing');
-      await this._navigateTo('/category');
-      // await this._navigateTo('/home');
+      // await this._navigateTo('/category');
+      await this._navigateTo('/home');
     });
   }
 

@@ -16,7 +16,11 @@
         "groupName": "Group Name"
     },
     "expense": {
+        "description": "Description",
         "date": "Date",
         "notes": "Notes"
+    },
+    "home": {
+        "title": "Home"
     }
 }

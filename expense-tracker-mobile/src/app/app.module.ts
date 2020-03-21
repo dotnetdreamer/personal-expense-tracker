@@ -14,6 +14,7 @@ import { StatusBar } from '@ionic-native/status-bar/ngx';
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 import { AppInjector } from './modules/shared/app-injector';
+import { PipesModule } from './pipes/pipes.module';
 
 
 @NgModule({
@@ -22,6 +23,7 @@ import { AppInjector } from './modules/shared/app-injector';
   imports: [
     BrowserModule,
     HttpClientModule,
+    PipesModule,
     IonicModule.forRoot(),
     AppRoutingModule
   ],
