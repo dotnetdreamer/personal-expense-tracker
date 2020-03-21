@@ -23,8 +23,8 @@ export class Expense extends BaseEntity {
   isDeleted: boolean
 
   @Column()
-  createdOn: string
+  createdOn: Date
 
   @Column({ nullable: true })
-  updatedOn: string
+  updatedOn: Date
 }

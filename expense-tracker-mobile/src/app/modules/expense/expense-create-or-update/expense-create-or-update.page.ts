@@ -54,9 +54,9 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit {
   async ngOnInit() {
     await this._getCategoryList();
 
-    if(AppConstant.DEBUG) {
-      this._preFill();
-    }
+    // if(AppConstant.DEBUG) {
+    //   this._preFill();
+    // }
   }
 
   async onSaveClick(args) {

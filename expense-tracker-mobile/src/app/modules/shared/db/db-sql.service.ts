@@ -147,6 +147,12 @@ export class DbSqlService implements DbService {
         });
     }
 
+    removeAll(store) {
+        return new Promise((resolve, reject) => {
+            throw 'removeAll not impleted in db-sql yet';
+        });
+    }
+
     private _prepareTables() {
         return new Promise((resolve, reject) => {
             this._db.transaction(async (transaction) => {

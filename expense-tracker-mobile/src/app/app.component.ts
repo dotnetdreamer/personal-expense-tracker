@@ -53,6 +53,9 @@ export class AppComponent {
         await this.appSettingSvc.putWorkingLanguage('en');
         //populate categories
         await this.categorySvc.populate();
+
+        //sync
+        await this.syncHelperSvc.pull();
       }
 
 
@@ -60,7 +63,6 @@ export class AppComponent {
       // await this._navigateTo('/expense/expense-listing');
       await this._navigateTo('/category');
       // await this._navigateTo('/home');
-      this.splashScreen.hide();
     });
   }
 
@@ -79,6 +81,15 @@ export class AppComponent {
       // setTimeout(() => {
       //   this.isSyncing = false;
       // }, 1000);
+    });
+
+    this.eventPub.$sub(AppConstant.EVENT_SYNC_INIT_COMPLETE, async () => {
+      if(AppConstant.DEBUG) {
+        console.log('AppComponent:Event received: EVENT_SYNC_INIT_COMPLETE');
+      }
+      try {
+        this.splashScreen.hide();
+      } catch(e) { }
     });
   }
 

@@ -6,4 +6,6 @@ export class DbService {
     getAll<T>(store: string): Promise<T> { return; }
 
     remove(store, id): Promise<any>{ return; }
+
+    removeAll(store): Promise<any>{ return; }
 }

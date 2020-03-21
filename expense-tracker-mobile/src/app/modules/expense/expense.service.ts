@@ -19,6 +19,19 @@ export class ExpenseService extends BaseService {
         super();
     }
 
+    pull() {
+        return new Promise(async (resolve, reject) => {
+            const items = await this.getExpenses();
+            if(items.length) {
+                //remove all first
+                await this.removeAll();
+                //now add
+                await this.putAllLocal(items, true, true);
+            }
+            resolve();
+        });
+    }
+
     push() {
         return new Promise(async (resolve, reject) => {
             const unSycedLocal = await this.getUnSyncedLocal();
@@ -100,7 +113,13 @@ export class ExpenseService extends BaseService {
         });
     }
 
-    getExpenseList(args?: { term?, fromDate?, toDate? }): Promise<IExpense[]> {
+    getExpenses() {
+        return this.getData<IExpense[]>({
+            url: `${this.BASE_URL}/getAll`
+        });
+    }
+
+    getExpenseListLocal(args?: { term?, fromDate?, toDate? }): Promise<IExpense[]> {
         return new Promise(async (resolve, reject) => {
             let results = [];
             if(!args) {
@@ -139,7 +158,7 @@ export class ExpenseService extends BaseService {
         });
     }
 
-    getById(id) {
+    getByIdLocal(id) {
         return this.dbService.get<IExpense>(this.schemaService.tables.expense, id);
     }
 
@@ -179,13 +198,26 @@ export class ExpenseService extends BaseService {
         // });
     }
 
+    putAllLocal(expenses: IExpense[], ignoreFiringEvent?: boolean, ignoreDefaults?: boolean) {
+        return new Promise(async (resolve, reject) => {
+            const promises = [];
+
+            for(let exp of expenses) {
+                promises.push(this.putLocal(exp, ignoreFiringEvent, ignoreDefaults));
+            }
+
+            await Promise.all(promises);
+            resolve();
+        });
+    }
+
     remove(id) {
         return this.dbService.remove(this.schemaService.tables.expense, id);
     }
 
-    // removeAll() {
-    //     return this.dbService.removeAll(this.schemaService.tables.expense);
-    // }
+    removeAll() {
+        return this.dbService.removeAll(this.schemaService.tables.expense);
+    }
 
     private async _map(expenses: Array<IExpense>) {
         const promises = [];

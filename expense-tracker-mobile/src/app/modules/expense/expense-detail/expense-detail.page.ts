@@ -33,7 +33,7 @@ export class ExpenseDetailPage extends BasePage implements OnInit {
   }
 
   private async _getExpese(id) {
-    this.expense = await this.expenseSvc.getById(id);
+    this.expense = await this.expenseSvc.getByIdLocal(id);
     if(AppConstant.DEBUG) {
       console.log('ExpenseDetailPage: ngOnInit: expense', this.expense);
     }
