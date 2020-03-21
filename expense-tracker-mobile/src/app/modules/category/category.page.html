@@ -19,7 +19,8 @@
     <ion-item *ngFor="let cat of item.value" (click)="onCategoryClicked(cat)">
       <ion-icon slot="start" [name]="cat.icon"></ion-icon>
       <ion-label>{{ cat.name }}</ion-label>
-      <ion-button fill="clear" slot="end" (click)="onMoreOptionsButtonClicked($event, cat)">
+      <ion-button fill="clear" slot="end" 
+        (click)="onMoreOptionsButtonClicked($event, cat)" *ngIf="!isOpenedAsModal">
         <ion-icon slot="icon-only" name="ellipsis-vertical-outline"></ion-icon>
       </ion-button>
     </ion-item>
