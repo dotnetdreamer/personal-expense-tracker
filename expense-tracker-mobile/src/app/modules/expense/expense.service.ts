@@ -13,10 +13,92 @@ declare const ydn: any;
     providedIn: 'root'
 })
 export class ExpenseService extends BaseService {
+    private readonly BASE_URL = "expense";
+
     constructor(private categorySvc: CategoryService) {
         super();
     }
 
+    push() {
+        return new Promise(async (resolve, reject) => {
+            const unSycedLocal = await this.getUnSyncedLocal();
+            if(AppConstant.DEBUG) {
+                console.log('ExpenseService: sync: unSycedLocal items length', unSycedLocal.length);
+            }
+
+            if(!unSycedLocal.length) {
+                resolve();
+                return;
+            }
+
+            //server returns array of dictionary objects, each key in dict is the localdb id
+            //we map the localids and update its serverid locally
+            const items = await this.postData<any[]>({
+                url: `${this.BASE_URL}/sync`,
+                body: unSycedLocal
+            });
+            
+            //something bad happend or in case of update, we don't need to update server ids
+            if(items == null) {
+                resolve();
+                return;
+            }
+
+            
+            try {
+                const promises = [];
+                // const removePromises = [];
+                //mark it
+                for (let item of unSycedLocal) {
+                    if (item.markedForAdd || item.markedForUpdate) {
+                        //update server id as well...
+                        const cp = items.filter(p => p[item.id])[0];
+                        if(!cp) {
+                            throw `Local item mapping not found for: ${item.id}`;
+                        }
+
+                        //removed old items whose ids are changed e.g in adding senario
+                        //we remove the item immedialty as it causes issue when we run update promise down
+                        await this.remove(item.id);
+
+                        const pItem: IExpense = cp[item.id];
+                        promises.push(this.putLocal(pItem, true, true));
+                    } else if (item.markedForDelete) {
+                        const promise = this.remove(item.id);
+                        promises.push(promise);
+                    }
+                }
+
+                //now make updates
+                await Promise.all(promises);
+                if(AppConstant.DEBUG) {
+                    console.log('ExpenseService: sync: complete');
+                }
+                // this.eventPub.$pub(AppConstant.EVENT_EXPENSE_CREATED_OR_UPDATED);
+                resolve();
+            } catch (e) {
+                reject(e);
+            }
+        });
+    }
+
+    getUnSyncedLocal(): Promise<Array<IExpense>> {
+        return new Promise(async (resolve, reject) => {
+            const db = this.dbService.Db;
+            const iter = new ydn.db.ValueIterator(this.schemaService.tables.expense);
+
+            const unSynced = [];
+            let req = db.open(x => {
+                let v: IExpense = x.getValue();
+                if (v.markedForAdd || v.markedForUpdate || v.markedForDelete) {
+                    unSynced.push(v);
+                }
+            }, iter);
+            req.always(() => {
+                resolve(unSynced);
+            });
+        });
+    }
 
     getExpenseList(args?: { term?, fromDate?, toDate? }): Promise<IExpense[]> {
         return new Promise(async (resolve, reject) => {
@@ -61,20 +143,49 @@ export class ExpenseService extends BaseService {
         return this.dbService.get<IExpense>(this.schemaService.tables.expense, id);
     }
 
-    put(expense: IExpense) {
-        if(!expense.createdOn) {
-            expense.createdOn = moment().format(AppConstant.DEFAULT_DATE_FORMAT);
+    putLocal(item: IExpense, ignoreFiringEvent?: boolean, ignoreDefaults?: boolean) {
+         //defaults
+         if(!ignoreDefaults) {
+            if(typeof item.markedForAdd === 'undefined' 
+                && typeof item.markedForUpdate === 'undefined' && typeof item.markedForDelete === 'undefined') {
+                item.markedForAdd = true;
+            }
+            if(item.markedForAdd) {
+                item.createdOn = moment().format(AppConstant.DEFAULT_DATETIME_FORMAT);
+            } else if(item.markedForUpdate || item.markedForDelete) {
+                item.updatedOn = moment().format(AppConstant.DEFAULT_DATETIME_FORMAT);
+            }
+            //added item can't be marked for update or delete...
+            if((item.markedForAdd && item.markedForUpdate) || (item.markedForAdd && item.markedForDelete)) {
+                item.markedForUpdate = false;
+            }
         }
 
-        return this.dbService.putLocal(this.schemaService.tables.expense, {
-            description: expense.description,
-            amount: expense.amount,
-            categoryId: expense.categoryId,
-            notes: expense.notes,
-            attachment: expense.attachment,
-            createdOn: expense.createdOn
+        return this.dbService.putLocal(this.schemaService.tables.expense, item)
+        .then((affectedRows) => {
+            if(!ignoreFiringEvent) {
+                this.eventPub.$pub(AppConstant.EVENT_EXPENSE_CREATED_OR_UPDATED, item);
+            }
+            return affectedRows;
         });
+
+        // return this.dbService.putLocal(this.schemaService.tables.expense, {
+        //     description: item.description,
+        //     amount: item.amount,
+        //     categoryId: item.categoryId,
+        //     notes: item.notes,
+        //     attachment: item.attachment,
+        //     createdOn: item.createdOn
+        // });
     }
+
+    remove(id) {
+        return this.dbService.remove(this.schemaService.tables.expense, id);
+    }
+
+    // removeAll() {
+    //     return this.dbService.removeAll(this.schemaService.tables.expense);
+    // }
 
     private async _map(expenses: Array<IExpense>) {
         const promises = [];

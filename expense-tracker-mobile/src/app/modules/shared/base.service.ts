@@ -11,6 +11,7 @@ import { AppInjector } from './app-injector';
 import { HelperService } from './helper.service';
 import { LocalizationService } from './localization.service';
 import { DbWebService } from './db/db-web.service'; 
+import { EventPublisher } from './event-publisher';
 
 @Injectable({
     providedIn: 'root'
@@ -23,6 +24,7 @@ export class BaseService {
     protected appSettingService: AppSettingService;
     protected helperSvc: HelperService;
     protected localizationSvc: LocalizationService;
+    protected eventPub: EventPublisher;
 
     constructor() {
         const injector = AppInjector.getInjector();
@@ -33,6 +35,7 @@ export class BaseService {
         this.appSettingService = injector.get(AppSettingService);
         this.helperSvc = injector.get(HelperService);
         this.localizationSvc = injector.get(LocalizationService);
+        this.eventPub = injector.get(EventPublisher);
 
         if(this.platform.is('cordova')) {
             this.dbService = injector.get(DbSqlService);

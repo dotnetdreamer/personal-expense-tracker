@@ -16,6 +16,8 @@ import { ICategory } from '../../category/category.model';
 import { CategoryService } from '../../category/category.service';
 import { Subscription } from 'rxjs';
 import { CategoryPage } from '../../category/category.page';
+import { SyncConstant } from '../../shared/sync/sync-constant';
+import { SyncEntity } from '../../shared/sync/sync.model';
 
 @Component({
   selector: 'page-expense-create-or-update',
@@ -66,13 +68,20 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit {
       attachment: args.attachment,
       createdOn: args.date
     };
+    //TODO: add update logic here
+    // if(category) {
+    //   cat.id = category.id;
+    //   cat.markedForUpdate = true;
+    // }
     if(AppConstant.DEBUG) {
-      console.log('ExpenseCreateOrUpdatePage: onSaveClick: exp',exp)
+      console.log('ExpenseCreateOrUpdatePage: onSaveClick: exp', exp)
     }
 
-    await this.expenseSvc.put(exp);
+    await this.expenseSvc.putLocal(exp);
+
     this.eventPub.$pub(AppConstant.EVENT_EXPENSE_CREATED_OR_UPDATED, exp);
-    
+    this.eventPub.$pub(SyncConstant.EVENT_SYNC_DATA_PUSH, SyncEntity.Expense);
+
     const msg = await this.localizationSvc.getResource('common.success');
     await this.helperSvc.presentToast(msg);
 

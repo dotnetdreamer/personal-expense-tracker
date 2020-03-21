@@ -8,5 +8,9 @@ export interface IExpense {
     amount: string
     notes?: string
     attachment?
-    createdOn: string
+    createdOn?: string
+    updatedOn?: string
+    markedForAdd?: boolean
+    markedForUpdate?: boolean
+    markedForDelete?: boolean
 }

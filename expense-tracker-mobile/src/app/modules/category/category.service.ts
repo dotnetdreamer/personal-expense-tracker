@@ -5,7 +5,6 @@ import * as moment from 'moment';
 import { BaseService } from '../shared/base.service';
 import { ICategory } from './category.model';
 import { AppConstant } from '../shared/app-constant';
-import { EventPublisher } from '../shared/event-publisher';
 
 declare const ydn: any;
 
@@ -15,7 +14,7 @@ declare const ydn: any;
 export class CategoryService extends BaseService {
     private readonly BASE_URL = "category";
 
-    constructor(private eventPub: EventPublisher) {
+    constructor() {
         super();
     }
 
@@ -88,7 +87,7 @@ export class CategoryService extends BaseService {
                 if(AppConstant.DEBUG) {
                     console.log('CategoryService: sync: complete');
                 }
-                this.eventPub.$pub(AppConstant.EVENT_CATEGORY_CREATED_OR_UPDATED);
+                // this.eventPub.$pub(AppConstant.EVENT_CATEGORY_CREATED_OR_UPDATED);
                 resolve();
             } catch (e) {
                 reject(e);

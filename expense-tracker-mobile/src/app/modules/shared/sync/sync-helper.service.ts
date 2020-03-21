@@ -4,6 +4,7 @@ import { SyncEntity } from './sync.model';
 import { CategoryService } from '../../category/category.service';
 import { EventPublisher } from '../event-publisher';
 import { SyncConstant } from './sync-constant';
+import { ExpenseService } from '../../expense/expense.service';
 
 
 @Injectable({
@@ -11,7 +12,7 @@ import { SyncConstant } from './sync-constant';
 })
 export class SyncHelperService {
     constructor(private eventPub: EventPublisher
-        , private categorySvc: CategoryService) {
+        , private categorySvc: CategoryService, private expenseSvc: ExpenseService) {
     }
     
     push(table?: SyncEntity) {
@@ -22,12 +23,17 @@ export class SyncHelperService {
                     case SyncEntity.Category:
                         promises.push(this.categorySvc.push());
                     break;
+                    case SyncEntity.Expense:
+                        promises.push(this.expenseSvc.push());
+                    break;
                     default:
                     break;
                 }
             } else {   //sync all
                 //category
                 promises.push(this.categorySvc.push());
+                //expense
+                promises.push(this.expenseSvc.push());
             }
             
             if(!promises.length) {
