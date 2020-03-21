@@ -115,15 +115,15 @@ export class CategoryService extends BaseService {
 
     async populate() {
         const categories: ICategory[] = [
-            { groupName: '', name: 'General' },
+            { groupName: '', name: 'General', icon: 'newspaper-outline' },
             //Entertainment
-            { groupName: 'Entertainment', name: 'Games' },
-            { groupName: 'Entertainment', name: 'Movies' },
-            { groupName: 'Entertainment', name: 'Music' },
-            { groupName: 'Entertainment', name: 'Other' },
-            { groupName: 'Entertainment', name: 'Sports' },
+            { groupName: 'Entertainment', name: 'Games', icon: 'game-controller-outline' },
+            { groupName: 'Entertainment', name: 'Movies', icon: 'videocam-outline' },
+            { groupName: 'Entertainment', name: 'Music', icon: 'musical-notes-outline' },
+            { groupName: 'Entertainment', name: 'Other', icon: 'newspaper-outline' },
+            { groupName: 'Entertainment', name: 'Sports', icon: 'football-outline' },
             //Food and Drink
-            { groupName: 'Food and Drink', name: 'Dinning Out' },
+            { groupName: 'Food and Drink', name: 'Dinning Out', icon: 'restaurant-outline' },
         ];
         
         await this.putAllLocal(categories, true, true);
