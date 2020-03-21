@@ -179,6 +179,7 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit {
   async onCategoryClicked(args) {
     const modal = await this.modalCtrl.create({
       component: CategoryPage,
+      backdropDismiss: false,
       componentProps: {
         isOpenedAsModal: true
       }

@@ -65,11 +65,13 @@ export class CategoryPage extends BasePage implements OnInit {
     }
   }
 
-  async onMoreOptionsButtonClicked(ev, category: ICategory) {
+  async onMoreOptionsButtonClicked(ev: CustomEvent, category: ICategory) {
+    ev.stopImmediatePropagation();
+
     const popover = await this.popoverCtrl.create({
       component: CategoryOptionsPopover,
-      event: ev
-      // backdropDismiss
+      event: ev,
+      backdropDismiss: true
     });
     await popover.present();
     const { data } = await popover.onDidDismiss();
