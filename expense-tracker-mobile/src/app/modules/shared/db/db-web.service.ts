@@ -53,21 +53,8 @@ export class DbWebService implements DbService {
                     console.log('Event firing: EVENT_DB_INITIALIZED');
                 }
 
-                //wait abit anet let startup.resolve to be initialized. Otherwise event won't be catched up
-                //startupResolved is set inside db services
-                let startupId = setTimeout(function startupCheck() {
-                    if((<any>window).startupResolved) {
-                        //clear timeout
-                        clearTimeout(startupId);
-                        startupId = null;
-
-                        // heavy database operations should start from this...
-                        _self.eventPublisher.$pub(AppConstant.EVENT_DB_INITIALIZED);
-                    } else {
-                        //retry
-                        startupId = setTimeout(startupCheck, delay);
-                    }
-                }, delay);
+                // heavy database operations should start from this...
+                _self.eventPublisher.$pub(AppConstant.EVENT_DB_INITIALIZED);
             }
         }, delay);
     }

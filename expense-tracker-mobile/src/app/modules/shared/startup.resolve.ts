@@ -23,7 +23,7 @@ export class StartupResolver implements Resolve<any> {
         //we make sure this variable exist before we fire db init event in db services
         (<any>window).startupResolved = true;
         //subscribe first...
-+        this.eventPub.$sub(AppConstant.EVENT_DB_INITIALIZED, () => {
+        this.eventPub.$sub(AppConstant.EVENT_DB_INITIALIZED, () => {
             this._isDbReady = true;
             if(AppConstant.DEBUG) {
                 console.log('Event received: EVENT_DB_INITIALIZED');
