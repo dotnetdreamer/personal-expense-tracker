@@ -178,6 +178,10 @@ export class DbSqlService implements DbService {
         });
     }
 
+    delete() {
+        return this._deleteDatabase();
+    }
+
     private _prepareTables() {
         return new Promise((resolve, reject) => {
             this._db.transaction(async (transaction) => {

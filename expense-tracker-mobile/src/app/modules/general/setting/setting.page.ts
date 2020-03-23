@@ -33,8 +33,7 @@ export class SettingPage extends BasePage implements OnInit {
   async onDeleteDbClickec() {
     const res = await this.helperSvc.presentConfirmDialog();
     if(res) {
-      // const rtest = k
+      await this.dbService.delete();
     }
   }
-
 }
