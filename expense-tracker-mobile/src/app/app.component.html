@@ -9,13 +9,17 @@
       <ion-content>
         <ion-list>
           <ion-menu-toggle auto-hide="false">
-            <ion-item routerDirection="root" routerLink="/home">
+            <ion-item (click)="onItemClicked('/home')">
               <ion-icon slot="start" name="home"></ion-icon>
               <ion-label>{{'home.title' | localizedresource | async}}</ion-label>
             </ion-item>
-            <ion-item routerDirection="root" routerLink="/category">
+            <ion-item (click)="onItemClicked('/category')">
               <ion-icon slot="start" name="list"></ion-icon>
               <ion-label>{{'category.title' | localizedresource | async}}</ion-label>
+            </ion-item>
+            <ion-item (click)="onItemClicked('/general/setting')">
+              <ion-icon slot="start" name="list"></ion-icon>
+              <ion-label>{{'setting.title' | localizedresource | async}}</ion-label>
             </ion-item>
           </ion-menu-toggle>
         </ion-list>

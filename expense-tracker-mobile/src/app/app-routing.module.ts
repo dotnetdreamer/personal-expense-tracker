@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
-import { StartupResolver } from './modules/shared/startup.resolve';
 
 const routes: Routes = [
   // {
@@ -10,10 +9,7 @@ const routes: Routes = [
   // },
   {
     path: 'home',
-    loadChildren: () => import('./modules/home/home.module').then(m => m.HomePageModule),
-    resolve: {
-      startupResolve: StartupResolver
-    }
+    loadChildren: () => import('./modules/home/home.module').then(m => m.HomePageModule)
   },
   {
     path: 'list', 
@@ -21,18 +17,16 @@ const routes: Routes = [
   },
   {
     path: 'category',
-    loadChildren: () => import('./modules/category/category.module').then( m => m.CategoryPageModule),
-    resolve: {
-      startupResolve: StartupResolver
-    }
+    loadChildren: () => import('./modules/category/category.module').then( m => m.CategoryPageModule)
   },
   {
     path: 'expense',
-    loadChildren: () => import('./modules/expense/expense.common.module').then( m => m.ExpenseCommonModule),
-    resolve: {
-      startupResolve: StartupResolver
-    }
-  }
+    loadChildren: () => import('./modules/expense/expense.common.module').then( m => m.ExpenseCommonModule)
+  },
+  {
+    path: 'general',
+    loadChildren: () => import('./modules/general/general.common.module').then( m => m.GeneralCommonModule)
+  },
 ];
 
 @NgModule({

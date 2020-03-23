@@ -1,0 +1,16 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>setting</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-list>
+    <ion-item>
+      <ion-label>{{'setting.delete_db' | localizedresource | async}}</ion-label>
+      <ion-button (click)="onDeleteDbClickec()">
+        {{'common.delete' | localizedresource | async}}
+      </ion-button>
+    </ion-item>
+  </ion-list>
+</ion-content>

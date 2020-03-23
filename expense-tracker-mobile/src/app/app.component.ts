@@ -11,6 +11,7 @@ import { SyncHelperService } from './modules/shared/sync/sync-helper.service';
 import { SyncConstant } from './modules/shared/sync/sync-constant';
 import { AppConstant } from './modules/shared/app-constant';
 import { DOCUMENT } from '@angular/common';
+import { HelperService } from './modules/shared/helper.service';
 
 @Component({
   selector: 'app-root',
@@ -27,7 +28,7 @@ export class AppComponent {
     private statusBar: StatusBar
     , private eventPub: EventPublisher
     , private appSettingSvc: AppSettingService, private syncHelperSvc: SyncHelperService
-    , private categorySvc: CategoryService
+    , private categorySvc: CategoryService, private helperSvc: HelperService
   ) {
     this.initializeApp();
   }
@@ -38,6 +39,20 @@ export class AppComponent {
     this.platform.ready().then(async () => {
       this.statusBar.styleDefault();
     });
+  }
+
+  async onItemClicked(url, timeout?) {
+    setTimeout(async () => {
+      switch(url) {
+        case '/home':
+          //clear all history
+          this.router.navigate([url], { replaceUrl: true });
+        break;
+        default:
+          this.router.navigate([url]);
+        break;
+      }
+    }, typeof timeout !== 'undefined' ? timeout : 300);
   }
 
   private async _subscribeToEvents() {

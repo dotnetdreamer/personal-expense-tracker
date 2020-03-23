@@ -22,5 +22,9 @@
     },
     "home": {
         "title": "Home"
+    },
+    "setting": {
+        "title": "Setting",
+        "delete_db": "Delete Database"
     }
 }
