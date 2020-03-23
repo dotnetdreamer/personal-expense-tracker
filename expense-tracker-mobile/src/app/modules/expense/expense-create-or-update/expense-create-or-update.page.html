@@ -15,7 +15,8 @@
           <ion-icon name="close"></ion-icon>{{cat.name}}</ion-select-option>
       </ion-select> -->
       <ion-button fill="clear" (click)="onCategoryClicked($event)">
-        <ion-icon name="clipboard-outline"></ion-icon>
+        <ion-icon name="clipboard-outline" *ngIf="!selectedCategory"></ion-icon>
+        <ion-icon [attr.name]="selectedCategory.icon" *ngIf="selectedCategory"></ion-icon>
       </ion-button>
       <ion-list>
         <ion-item>
@@ -28,7 +29,7 @@
     </div>
   </form>
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-    <ion-fab-button (click)="onSaveClick(formGroup.value)">
+    <ion-fab-button (click)="onSaveClick(formGroup.value)" [disabled]="!formGroup.valid">
       <ion-icon name="checkmark-outline"></ion-icon>
     </ion-fab-button>
   </ion-fab>
