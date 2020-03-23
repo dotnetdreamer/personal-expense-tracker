@@ -8,4 +8,6 @@ export class DbService {
     remove(store, id): Promise<any>{ return; }
 
     removeAll(store): Promise<any>{ return; }
+
+    count(store, opts?: { key }): Promise<number> { return; }
 }

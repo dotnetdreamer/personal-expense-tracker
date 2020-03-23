@@ -167,7 +167,7 @@ export class DbSqlService implements DbService {
         });
     }
 
-    count(store) {
+    count(store, opts?: { key }): Promise<number> {
         return new Promise((resolve, reject) => {
             let sql = `SELECT count(*) AS total FROM ${store} `;
             this._db.executeSql(sql, [], (rs) => {

@@ -118,6 +118,11 @@ export class CategoryService extends BaseService {
     }
 
     async populate() {
+        const items = await this.count();
+        if(items > 0) {
+            return;
+        }
+        
         const categories: ICategory[] = [
             { groupName: '', name: 'General', icon: 'newspaper-outline' },
             //Entertainment
@@ -201,4 +206,8 @@ export class CategoryService extends BaseService {
     // removeAll() {
     //     return this.dbService.removeAll(this.schemaService.tables.category);
     // }
+
+    count() {
+        return this.dbService.count(this.schemaService.tables.category);
+    }
 }
