@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation, Inject } from '@angular/core';
 
 import { BasePage } from '../../shared/base.page';
 import { DbService } from '../../shared/db/db-base.service';
@@ -6,6 +6,7 @@ import { AppInjector } from '../../shared/app-injector';
 import { Platform } from '@ionic/angular';
 import { DbSqlService } from '../../shared/db/db-sql.service';
 import { DbWebService } from '../../shared/db/db-web.service';
+import { DOCUMENT } from '@angular/common';
 
 @Component({
   selector: 'page-general-setting',
@@ -16,7 +17,7 @@ import { DbWebService } from '../../shared/db/db-web.service';
 export class SettingPage extends BasePage implements OnInit {
   protected dbService: DbService;
 
-  constructor(private platform: Platform) { 
+  constructor(private platform: Platform, @Inject(DOCUMENT) private document: Document) { 
     super();
 
     const injector = AppInjector.getInjector();
@@ -34,6 +35,9 @@ export class SettingPage extends BasePage implements OnInit {
     const res = await this.helperSvc.presentConfirmDialog();
     if(res) {
       await this.dbService.delete();
+
+      await this.navigateToHome();
+      this.document.location.reload(true);
     }
   }
 }
