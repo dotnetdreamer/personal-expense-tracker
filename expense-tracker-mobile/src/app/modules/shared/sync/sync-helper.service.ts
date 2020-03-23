@@ -24,9 +24,14 @@ export class SyncHelperService {
             //expense
             promises.push(this.expenseSvc.pull());
             
-            await Promise.all(promises);
-            this.eventPub.$pub(AppConstant.EVENT_SYNC_INIT_COMPLETE);
-            resolve();
+            try {
+                await Promise.all(promises);
+                resolve();
+            } catch(e) {
+                reject(e);
+            } finally {
+                this.eventPub.$pub(AppConstant.EVENT_SYNC_INIT_COMPLETE);
+            }
         });
     }
     

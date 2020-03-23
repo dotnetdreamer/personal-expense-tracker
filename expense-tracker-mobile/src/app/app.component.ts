@@ -56,9 +56,13 @@ export class AppComponent {
 
       //populate categories
       await this.categorySvc.populate();
-      //sync
-      await this.syncHelperSvc.pull();
 
+      try {
+        //sync
+        await this.syncHelperSvc.pull();
+      } catch (e) {
+        //ignore
+      }
 
       // await this._navigateTo('/expense/expense-create-or-update');
       // await this._navigateTo('/expense/expense-listing');

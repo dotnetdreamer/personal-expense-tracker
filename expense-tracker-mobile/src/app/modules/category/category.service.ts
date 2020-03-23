@@ -21,6 +21,7 @@ export class CategoryService extends BaseService {
     
     pull() {
         return new Promise(async (resolve, reject) => {
+            try {
             // const products = await this.getTodayProducts();
             // if(products.length) {
             //     //remove all first
@@ -29,6 +30,9 @@ export class CategoryService extends BaseService {
             //     await this.putAllLocal(products, true, true);
             // }
             resolve();
+            }catch (e) {
+                reject(e);
+            }
         });
     }
 

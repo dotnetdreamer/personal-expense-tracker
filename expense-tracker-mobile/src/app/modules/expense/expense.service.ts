@@ -21,14 +21,18 @@ export class ExpenseService extends BaseService {
 
     pull() {
         return new Promise(async (resolve, reject) => {
-            const items = await this.getExpenses();
-            if(items.length) {
-                //remove all first
-                await this.removeAll();
-                //now add
-                await this.putAllLocal(items, true, true);
+            try {
+                const items = await this.getExpenses();
+                if(items.length) {
+                    //remove all first
+                    await this.removeAll();
+                    //now add
+                    await this.putAllLocal(items, true, true);
+                }
+                resolve();
+            } catch(e) {
+                reject(e);
             }
-            resolve();
         });
     }
 
