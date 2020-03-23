@@ -148,6 +148,12 @@ export class BaseService {
         if(!args.ignoreContentType) {
             headers = headers.append('Content-Type', 'application/json;charset=utf-8');            
         }
+
+        if(args.httpHeaders) {
+            args.httpHeaders.keys().forEach(k => {
+                headers = headers.append(k, args.httpHeaders.get(k));
+            });
+        }
         return headers;
     }
 }
@@ -158,4 +164,5 @@ export class HttpParams {
     errorCallback?
     ignoreContentType?: boolean
     overrideUrl?: boolean
+    httpHeaders?: HttpHeaders
 }
