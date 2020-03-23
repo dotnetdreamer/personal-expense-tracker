@@ -5,8 +5,8 @@ export interface ICategoryParams {
     id?: number
     createdOn: string
     updatedOn?: string
-    isDeleted: boolean
-    markedForAdd: boolean
-    markedForUpdate: boolean
-    markedForDelete: boolean
+    isDeleted?: boolean
+    markedForAdd?: boolean
+    markedForUpdate?: boolean
+    markedForDelete?: boolean
 }

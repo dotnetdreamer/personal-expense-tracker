@@ -26,5 +26,5 @@ export class Expense extends BaseEntity {
   createdOn: Date
 
   @Column({ nullable: true })
-  updatedOn: Date
+  updatedOn?: Date
 }

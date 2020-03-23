@@ -21,6 +21,8 @@ export class SyncHelperService {
         return new Promise(async (resolve, reject) => {
             const promises: Array<Promise<any>> = [];
 
+            //category
+            promises.push(this.categorySvc.pull());
             //expense
             promises.push(this.expenseSvc.pull());
             

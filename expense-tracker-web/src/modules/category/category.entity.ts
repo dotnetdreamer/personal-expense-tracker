@@ -11,14 +11,14 @@ export class Category extends BaseEntity {
   groupName: string
 
   @Column({ nullable: true })
-  icon?: string
+  icon: string
 
   @Column()
   isDeleted: boolean
 
   @Column()
-  createdOn: string
+  createdOn: Date
 
   @Column({ nullable: true })
-  updatedOn: string
+  updatedOn?: Date
 }

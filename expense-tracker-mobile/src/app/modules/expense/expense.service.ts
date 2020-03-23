@@ -48,6 +48,8 @@ export class ExpenseService extends BaseService {
                 return;
             }
 
+            //make sure category is synced...
+
             //server returns array of dictionary objects, each key in dict is the localdb id
             //we map the localids and update its serverid locally
             const items = await this.postData<any[]>({

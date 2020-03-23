@@ -22,14 +22,14 @@ export class CategoryService extends BaseService {
     pull() {
         return new Promise(async (resolve, reject) => {
             try {
-            // const products = await this.getTodayProducts();
-            // if(products.length) {
-            //     //remove all first
-            //     await this.removeAll();
-            //     //now add
-            //     await this.putAllLocal(products, true, true);
-            // }
-            resolve();
+                const categories = await this.getCategoryList();
+                if(categories.length) {
+                    //remove all first
+                    await this.removeAll();
+                    //now add
+                    await this.putAllLocal(categories, true, true);
+                }
+                resolve();
             }catch (e) {
                 reject(e);
             }
@@ -117,25 +117,8 @@ export class CategoryService extends BaseService {
         });
     }
 
-    async populate() {
-        const items = await this.count();
-        if(items > 0) {
-            return;
-        }
-        
-        const categories: ICategory[] = [
-            { groupName: '', name: 'General', icon: 'newspaper-outline' },
-            //Entertainment
-            { groupName: 'Entertainment', name: 'Games', icon: 'game-controller-outline' },
-            { groupName: 'Entertainment', name: 'Movies', icon: 'videocam-outline' },
-            { groupName: 'Entertainment', name: 'Music', icon: 'musical-notes-outline' },
-            { groupName: 'Entertainment', name: 'Other', icon: 'newspaper-outline' },
-            { groupName: 'Entertainment', name: 'Sports', icon: 'football-outline' },
-            //Food and Drink
-            { groupName: 'Food and Drink', name: 'Dinning Out', icon: 'restaurant-outline' },
-        ];
-        
-        await this.putAllLocal(categories, true, true);
+    getCategoryList() {
+        return this.getData<ICategory[]>({ url: `${this.BASE_URL}/getAll` });
     }
 
     getCategoryListLocal(): Promise<ICategory[]> {
@@ -203,9 +186,10 @@ export class CategoryService extends BaseService {
         return this.dbService.remove(this.schemaService.tables.category, id);
     }
 
-    // removeAll() {
-    //     return this.dbService.removeAll(this.schemaService.tables.category);
-    // }
+
+    removeAll() {
+        return this.dbService.removeAll(this.schemaService.tables.category);
+    }
 
     count() {
         return this.dbService.count(this.schemaService.tables.category);

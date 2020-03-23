@@ -6,12 +6,15 @@ import * as moment from 'moment';
 
 import { Expense } from './expense.entity';
 import { IExpenseParams } from './expense.model';
+import { HelperService } from '../shared/helper.service';
+import { AppConstant } from '../shared/app-constant';
 
 @Injectable()
 export class ExpenseService {
   constructor(
     @InjectRepository(Expense)
-    private expenseRepo: Repository<Expense>,
+    private expenseRepo: Repository<Expense>
+    , private helperSvc: HelperService
   ) {}
 
   async findAll(args?: { fromDate?: string, toDate?: string }): Promise<Expense[]> {
@@ -58,6 +61,13 @@ export class ExpenseService {
     let newOrUpdated: any = Object.assign({}, expense);
     if(typeof newOrUpdated.isDeleted === 'undefined') {
       newOrUpdated.isDeleted = false;
+    }
+
+    if(newOrUpdated.createdOn && !this.helperSvc.isValidDate(newOrUpdated.createdOn)) {
+      newOrUpdated.createdOn = moment(expense.createdOn, AppConstant.DEFAULT_DATETIME_FORMAT).toDate();
+    }
+    if(newOrUpdated.updatedOn && !this.helperSvc.isValidDate(newOrUpdated.updatedOn)) {
+      newOrUpdated.updatedOn = moment(expense.updatedOn, AppConstant.DEFAULT_DATETIME_FORMAT).toDate();
     }
     return this.expenseRepo.save<Expense>(newOrUpdated);
   }

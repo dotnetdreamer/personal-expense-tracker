@@ -69,9 +69,6 @@ export class AppComponent {
       this.eventPub.$pub(AppConstant.EVENT_LANGUAGE_CHANGED, { wkLangauge: wk, reload: false });
       this.workingLanguage = wk;
 
-      //populate categories
-      await this.categorySvc.populate();
-
       try {
         //sync
         await this.syncHelperSvc.pull();

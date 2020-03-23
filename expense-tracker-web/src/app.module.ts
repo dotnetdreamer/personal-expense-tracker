@@ -8,6 +8,7 @@ import { Category } from './modules/category/category.entity';
 import { CategoryModule } from './modules/category/category.module';
 import { Expense } from './modules/expense/expense.entity';
 import { ExpenseModule } from './modules/expense/expense.module';
+import { SharedModule } from './modules/shared/shared.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { ExpenseModule } from './modules/expense/expense.module';
       entities: [Category, Expense],
       synchronize: true,
     }),
+    SharedModule,
     CategoryModule,
     ExpenseModule,
   ],
