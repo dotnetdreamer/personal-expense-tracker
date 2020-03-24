@@ -9,6 +9,7 @@ import { CategoryModule } from './modules/category/category.module';
 import { Expense } from './modules/expense/expense.entity';
 import { ExpenseModule } from './modules/expense/expense.module';
 import { SharedModule } from './modules/shared/shared.module';
+import { AttachmentModule } from './modules/attachment/attachment.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { SharedModule } from './modules/shared/shared.module';
     SharedModule,
     CategoryModule,
     ExpenseModule,
+    AttachmentModule
   ],
   controllers: [AppController],
   providers: [AppService],
