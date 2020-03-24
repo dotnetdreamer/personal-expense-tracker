@@ -1,16 +1,12 @@
 import { Controller, Get, Query, Body, Post, UseInterceptors, ClassSerializerInterceptor, UploadedFiles, Req, UploadedFile } from '@nestjs/common';
 
 import { FilesInterceptor, AnyFilesInterceptor, FileInterceptor, MulterModule } from '@nestjs/platform-express'
+import { diskStorage } from 'multer';
 
 import { Request } from 'express';
 import { IAttachment } from './attachment.model';
+import { imageFileFilter, editFileName } from './attachment.utils';
 
-export const imageFileFilter = (req, file, callback) => {
-  // if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
-  //   return callback(new Error('Only image files are allowed!'), false);
-  // }
-  callback(null, true);
-};
 
 @Controller('attachment')
 export class AttachmentController {
@@ -29,10 +25,14 @@ export class AttachmentController {
     // @UseInterceptors(AnyFilesInterceptor())
     @Post('sync')   
     @UseInterceptors(FilesInterceptor('files[]', 10, {
+      storage: diskStorage({
+        destination: './files',
+        filename: editFileName,
+      }),
       fileFilter: imageFileFilter
     }))    
     sync(@Req() request: Request
-    , @UploadedFiles() files: Array<{ fieldname, originalname, mimetype, buffer, size }>) {
+      , @UploadedFiles() files: Array<{ fieldname, originalname, mimetype, buffer, size }>) {
       const attachments = <IAttachment[]>request.body.attachments;
     }
 }
