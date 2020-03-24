@@ -10,14 +10,13 @@ import { ExpenseService } from '../expense.service';
 import { AppConstant } from '../../shared/app-constant';
 import { MediaUploaderService } from '../../shared/media/media-uploader.service';
 import { MediaDeviceHelper } from '../../shared/media/media-device-helper';
-import { MediaReturnFileType, MediaFileType } from '../../shared/media/media.model';
 import { IExpense } from '../expense.model';
 import { ICategory } from '../../category/category.model';
 import { CategoryService } from '../../category/category.service';
-import { Subscription } from 'rxjs';
 import { CategoryPage } from '../../category/category.page';
 import { SyncConstant } from '../../shared/sync/sync-constant';
 import { SyncEntity } from '../../shared/sync/sync.model';
+import { IAttachment } from '../../attachment/attachment.model';
 
 @Component({
   selector: 'page-expense-create-or-update',
@@ -29,6 +28,8 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit {
   formGroup: FormGroup;
   categories: ICategory[];
   selectedCategory: ICategory;
+
+  private _attachment: IAttachment;
 
   constructor(private formBuilder: FormBuilder, private location: Location
     , private alertCtrl: AlertController
@@ -65,7 +66,7 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit {
       categoryId: args.categoryId,
       description: args.description,
       notes: args.notes,
-      attachment: args.attachment,
+      attachment: this._attachment,
       createdOn: args.date
     };
     //TODO: add update logic here
@@ -93,48 +94,58 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit {
     // }
   }
 
-  async onAttachmentClicked() {
-    try {
-      const result = await this.mediaDeviceHelper.presentMediaOptionsDialog({
-        returnFileType: MediaReturnFileType.FILE_URI_OR_NATIVE_URI,
-        mediaType: MediaFileType.Picture,
-        validateFormatAndSize: false,
-        displayRemoveLink: false,
-        removeLinkCallback: async () => {
-          const result = await this.helperSvc.presentConfirmDialog();
-          if(!result) {
-            return;
-          }
-        }
-      });   
-
-      if(AppConstant.DEBUG) {
-        console.log('ExpenseCreateOrUpdatePage: onAttachmentClicked: result: ', result)
-      }
-    } catch (e) {
-      if(e.permissionDenied) {
-        let msg = await this.localizationSvc.getResource('common.permissiondenied');
-        await this.helperSvc.presentToast(msg);
-      }
-    }
-  }
-
   async onAttachmentChanged($event) {
-    const file = $event.srcElement.files[0];
-    if(file != undefined){
+    const file: File = $event.srcElement.files[0];
+    if(file != undefined) {
+      this._attachment = {
+        filename: file.name,
+        contentType: file.type,
+        extension: file.name.split('.').pop(),
+        attachment: file,
+        guid: this.helperSvc.generateGuid()
+      };
       let reader = new FileReader();
       reader.onload = (e) => {
+        const arrayBuffer = reader.result;
+        this._attachment.attachment = arrayBuffer;
         // let blob = new Blob([e.target.result], { type: file.type });
-        this.f.attachment.setValue(e.target.result);
+        // this.f.attachment.setValue(e.target.result);
       };
       reader.readAsArrayBuffer(file);
+      // reader.readAsBinaryString(file);
     } else {
-      this.f.attachment.setValue(null);
+      this._attachment = null;
     }
     if(AppConstant.DEBUG) {
-      console.log('onAttachmentChanged: attachment', this.f.attachment.value);
+      console.log('onAttachmentChanged: attachment', this._attachment);
     }
   }
+
+  // async onAttachmentClicked() {
+  //   try {
+  //     const result = await this.mediaDeviceHelper.presentMediaOptionsDialog({
+  //       returnFileType: MediaReturnFileType.FILE_URI_OR_NATIVE_URI,
+  //       mediaType: MediaFileType.Picture,
+  //       validateFormatAndSize: false,
+  //       displayRemoveLink: false,
+  //       removeLinkCallback: async () => {
+  //         const result = await this.helperSvc.presentConfirmDialog();
+  //         if(!result) {
+  //           return;
+  //         }
+  //       }
+  //     });   
+
+  //     if(AppConstant.DEBUG) {
+  //       console.log('ExpenseCreateOrUpdatePage: onAttachmentClicked: result: ', result)
+  //     }
+  //   } catch (e) {
+  //     if(e.permissionDenied) {
+  //       let msg = await this.localizationSvc.getResource('common.permissiondenied');
+  //       await this.helperSvc.presentToast(msg);
+  //     }
+  //   }
+  // }
 
   async onNotesClicked() {
     const resources = await Promise.all([this.localizationSvc.getResource('expense.notes')

@@ -6,6 +6,7 @@ import { BaseService } from '../shared/base.service';
 import { IExpense } from './expense.model';
 import { AppConstant } from '../shared/app-constant';
 import { CategoryService } from '../category/category.service';
+import { AttachmentService } from '../attachment/attachment.service';
 
 declare const ydn: any;
 
@@ -15,7 +16,7 @@ declare const ydn: any;
 export class ExpenseService extends BaseService {
     private readonly BASE_URL = "expense";
 
-    constructor(private categorySvc: CategoryService) {
+    constructor(private categorySvc: CategoryService, private attachmentSvc: AttachmentService) {
         super();
     }
 
@@ -48,7 +49,10 @@ export class ExpenseService extends BaseService {
                 return;
             }
 
-            //make sure category is synced...
+            //TODO:make sure category and attachments are synced...
+
+            //attachment
+            await this.attachmentSvc.push();
 
             //server returns array of dictionary objects, each key in dict is the localdb id
             //we map the localids and update its serverid locally
@@ -168,8 +172,8 @@ export class ExpenseService extends BaseService {
         return this.dbService.get<IExpense>(this.schemaService.tables.expense, id);
     }
 
-    putLocal(item: IExpense, ignoreFiringEvent?: boolean, ignoreDefaults?: boolean) {
-         //defaults
+    async putLocal(item: IExpense, ignoreFiringEvent?: boolean, ignoreDefaults?: boolean) {
+        //defaults
          if(!ignoreDefaults) {
             if(typeof item.markedForAdd === 'undefined' 
                 && typeof item.markedForUpdate === 'undefined' && typeof item.markedForDelete === 'undefined') {
@@ -185,6 +189,11 @@ export class ExpenseService extends BaseService {
                 item.markedForUpdate = false;
             }
         }
+        
+        if(item.attachment) {
+            const id = await this.attachmentSvc.putLocal(item.attachment);
+            item.attachment.id = +id;
+        }
 
         return this.dbService.putLocal(this.schemaService.tables.expense, item)
         .then((affectedRows) => {
@@ -193,15 +202,6 @@ export class ExpenseService extends BaseService {
             }
             return affectedRows;
         });
-
-        // return this.dbService.putLocal(this.schemaService.tables.expense, {
-        //     description: item.description,
-        //     amount: item.amount,
-        //     categoryId: item.categoryId,
-        //     notes: item.notes,
-        //     attachment: item.attachment,
-        //     createdOn: item.createdOn
-        // });
     }
 
     putAllLocal(expenses: IExpense[], ignoreFiringEvent?: boolean, ignoreDefaults?: boolean) {

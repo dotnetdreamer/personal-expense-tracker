@@ -1,4 +1,5 @@
 import { ICategory } from '../category/category.model';
+import { IAttachment } from '../attachment/attachment.model';
 
 export interface IExpense {
     id?: number
@@ -7,7 +8,7 @@ export interface IExpense {
     description: string
     amount: string
     notes?: string
-    attachment?
+    attachment?: IAttachment
     createdOn?: string
     updatedOn?: string
     markedForAdd?: boolean

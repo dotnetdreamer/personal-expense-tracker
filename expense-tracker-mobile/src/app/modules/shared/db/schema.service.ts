@@ -7,6 +7,7 @@ export class SchemaService {
     private _setting = "setting";
     private _category = "category";
     private _expense = "expense";
+    private _attachment = "attachment";
 
     schema = {
         stores: [
@@ -73,14 +74,33 @@ export class SchemaService {
                     name: 'value', 
                     type: 'TEXT'  
                 }],              
-                // autoIncrement: false
+            }, {
+                name: this._attachment,
+                columns: [{ 
+                    name: 'id', 
+                    isPrimaryKey: true, 
+                    type: 'INTEGER'
+                }, {
+                    name: 'contentType',
+                    type: 'TEXT'
+                }, {
+                    name: 'filename',
+                    type: 'TEXT'
+                }, {
+                    name: 'extension',
+                    type: 'TEXT'
+                }, {
+                    name: 'attachment',
+                    type: 'BLOB'
+                }]
             }
         ]
     };
     tables = {
         setting: this._setting,
         category: this._category,
-        expense: this._expense
+        expense: this._expense,
+        attachment: this._attachment
     };
 
     constructor() {
