@@ -40,12 +40,15 @@ export class AttachmentService extends BaseService {
             });
 
             let formData = new FormData();
-            for (let i = 0; i < unSycedLocal.length; i++) { 
-                const myItemInArr = unSycedLocal[i]; 
-                for (const prop in myItemInArr) { 
-                    formData.append(`attachment[${i}][${prop}]`, myItemInArr[prop]); 
-                }
-            }
+            // for (let i = 0; i < unSycedLocal.length; i++) { 
+            //     const myItemInArr = unSycedLocal[i]; 
+            //     for (const prop in myItemInArr) { 
+            //         formData.append(`attachments[${i}][${prop}]`, myItemInArr[prop]); 
+            //     }
+            // }
+            unSycedLocal.forEach((file) => {
+                formData.append('files[]', file.attachment, file.filename);
+            });
 
             let headers = new HttpHeaders();
             headers = headers.append('Content-Type', 'multipart/form-data');
@@ -55,7 +58,7 @@ export class AttachmentService extends BaseService {
                 url: `${this.BASE_URL}/sync`,
                 body: formData,
                 ignoreContentType: true,
-                httpHeaders: headers
+                // httpHeaders: headers
             });
             
             //something bad happend or in case of update, we don't need to update server ids
