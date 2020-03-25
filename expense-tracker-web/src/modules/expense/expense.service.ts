@@ -23,16 +23,18 @@ export class ExpenseService {
     let qb = await getRepository(Expense)
       .createQueryBuilder('exp');
       
-    //TODO: need to fix this filtering.
     if(args && (args.fromDate || args.toDate)) {
       if(args.fromDate) {
-        // qb = qb.andWhere('createdAt >= :after');
-        const fromDate =  moment(args.fromDate).toISOString();
-        qb = qb.andWhere('exp.createdOn >= :createdOn', { createdOn: fromDate });
+        // const fromDate =  moment(args.fromDate, AppConstant.DEFAULT_DATE_FORMAT).toDate();
+        const fromDate = args.fromDate;
+        qb = qb.andWhere('date(exp.createdOn) >= :createdOn', { createdOn: fromDate });
       }
       if(args.toDate) {
-        const toDate =  moment(args.toDate).toISOString();
-        qb = qb.andWhere('exp.createdOn <= :createdOn', { createdOn: toDate });
+        // const toDate = moment(args.toDate, AppConstant.DEFAULT_DATE_FORMAT)
+        //   .utc()
+        //   .format(AppConstant.DEFAULT_DATE_FORMAT);
+        const toDate =  args.toDate;
+        qb = qb.andWhere('date(exp.createdOn) <= :createdOn', { createdOn: toDate });
       }
 
       // console.log(qb.getQuery())
@@ -88,7 +90,7 @@ export class ExpenseService {
     } else {
       categoryId = expense.category;
     }
-    
+
     //now save
     return this.expenseRepo.save<Expense>({
       ...newOrUpdated,

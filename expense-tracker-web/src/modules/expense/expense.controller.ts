@@ -14,7 +14,12 @@ export class ExpenseController {
   @UseInterceptors(ClassSerializerInterceptor)
   @Get('getAll')
   async getAll() {
-    const expenses = await this.expenseSvc.findAll();
+    // const filters = {
+    //   fromDate: '2020-03-25',
+    //   toDate: '2020-03-25'
+    // };
+    const filters = null;
+    const expenses = await this.expenseSvc.findAll(filters);
 
     //map it
     const model = expenses.map(async (e) => {
