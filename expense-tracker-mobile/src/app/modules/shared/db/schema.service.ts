@@ -90,8 +90,26 @@ export class SchemaService {
                     name: 'extension',
                     type: 'TEXT'
                 }, {
+                    name: 'guid',
+                    type: 'TEXT'
+                }, {
                     name: 'attachment',
                     type: 'BLOB'
+                }, { 
+                    name: 'updatedOn', 
+                    type: 'TEXT' 
+                }, {
+                    name: 'createdOn', 
+                    type: 'TEXT'  
+                }, {
+                    name: 'markedForAdd', 
+                    type: 'TEXT'  
+                }, {
+                    name: 'markedForUpdate', 
+                    type: 'TEXT'  
+                }, {
+                    name: 'markedForDelete', 
+                    type: 'TEXT'  
                 }]
             }
         ]
