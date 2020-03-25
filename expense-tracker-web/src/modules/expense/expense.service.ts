@@ -8,6 +8,8 @@ import { Expense } from './expense.entity';
 import { IExpenseParams } from './expense.model';
 import { HelperService } from '../shared/helper.service';
 import { AppConstant } from '../shared/app-constant';
+import { IAttachmentParams } from '../attachment/attachment.model';
+import { ICategoryParams } from '../category/category.model';
 
 @Injectable()
 export class ExpenseService {
@@ -21,7 +23,7 @@ export class ExpenseService {
     let qb = await getRepository(Expense)
       .createQueryBuilder('exp');
       
-      //TODO: need to fix this.
+    //TODO: need to fix this filtering.
     if(args && (args.fromDate || args.toDate)) {
       if(args.fromDate) {
         // qb = qb.andWhere('createdAt >= :after');
@@ -69,7 +71,30 @@ export class ExpenseService {
     if(newOrUpdated.updatedOn && !this.helperSvc.isValidDate(newOrUpdated.updatedOn)) {
       newOrUpdated.updatedOn = moment(expense.updatedOn, AppConstant.DEFAULT_DATETIME_FORMAT).toDate();
     }
-    return this.expenseRepo.save<Expense>(newOrUpdated);
+
+    //in some cases (e.g adding in syncing) it is all attachment or category params object
+    let attachmentId;
+    if(typeof expense.attachment !== 'number') {
+      const att = <IAttachmentParams>expense.attachment;
+      attachmentId = att.id;
+    } else {
+      attachmentId = expense.attachment;
+    }
+
+    let categoryId;
+    if(typeof expense.category !== 'number') {
+      const cat = <ICategoryParams>expense.category;
+      categoryId = cat.id;
+    } else {
+      categoryId = expense.category;
+    }
+    
+    //now save
+    return this.expenseRepo.save<Expense>({
+      ...newOrUpdated,
+      attachmentId: attachmentId,
+      categoryId: categoryId
+    });
   }
 
   remove(id) {

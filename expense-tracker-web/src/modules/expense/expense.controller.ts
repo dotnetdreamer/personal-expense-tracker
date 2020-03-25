@@ -3,15 +3,25 @@ import { Controller, UseInterceptors, Get, ClassSerializerInterceptor, Post, Bod
 import { ExpenseService } from "./expense.service";
 import { IExpenseParams } from "./expense.model";
 import { Expense } from "./expense.entity";
+import { AttachmentService } from "../attachment/attachment.service";
+import { CategoryService } from "../category/category.service";
 
 @Controller('expense')
 export class ExpenseController {
-  constructor(private readonly expenseSvc: ExpenseService) {}
+  constructor(private readonly expenseSvc: ExpenseService
+    , private attachmentSvc: AttachmentService, private categorySvc: CategoryService) {}
 
   @UseInterceptors(ClassSerializerInterceptor)
   @Get('getAll')
-  getAll() {
-    return this.expenseSvc.findAll();
+  async getAll() {
+    const expenses = await this.expenseSvc.findAll();
+
+    //map it
+    const model = expenses.map(async (e) => {
+      const mapped = await this._prepare(e);
+      return mapped;
+    });
+    return Promise.all(model);
   }
 
   @UseInterceptors(ClassSerializerInterceptor)
@@ -72,5 +82,22 @@ export class ExpenseController {
     await this.expenseSvc.save(updated);
 
     return updated;
+  }
+
+  private async _prepare(exp: Expense) {
+    let mExp = Object.assign({}, exp);
+    //category
+    mExp["category"] = await this.categorySvc.findOne(mExp.categoryId);
+    //attachment
+    if(mExp.attachmentId) {
+      const attachment = await this.attachmentSvc.findOne(mExp.attachmentId);
+      mExp["attachment"] = attachment;
+    }
+
+    //remove 
+    delete mExp.attachmentId;
+    delete mExp.categoryId;
+
+    return mExp;
   }
 }

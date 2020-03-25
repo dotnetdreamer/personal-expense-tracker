@@ -17,7 +17,7 @@ export class Expense extends BaseEntity {
   notes: string;
 
   @Column({ nullable: true })
-  attachment: Buffer;
+  attachmentId: number;
 
   @Column()
   isDeleted: boolean
