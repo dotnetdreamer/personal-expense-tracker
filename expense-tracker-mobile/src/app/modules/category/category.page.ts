@@ -10,7 +10,7 @@ import { SyncEntity } from '../shared/sync/sync.model';
 import { CategoryOptionsPopover } from './category-option.popover';
 
 @Component({
-  selector: 'app-category',
+  selector: 'page-category',
   templateUrl: './category.page.html',
   styleUrls: ['./category.page.scss'],
 })

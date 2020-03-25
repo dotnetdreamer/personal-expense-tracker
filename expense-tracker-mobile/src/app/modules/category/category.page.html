@@ -3,7 +3,7 @@
     <ion-title>{{'category.title' | localizedresource | async}}</ion-title>
     <ion-buttons slot="start">
       <ion-back-button *ngIf="!isOpenedAsModal"></ion-back-button>
-      <ion-button (click)="onCloseModalClicked()" *ngIf="isOpenedAsModal">
+      <ion-button (click)="onCloseModalClicked(null)" *ngIf="isOpenedAsModal">
         <ion-icon name="close" slot="icon-only"></ion-icon>
       </ion-button>
     </ion-buttons>
