@@ -10,13 +10,14 @@ import { Expense } from './modules/expense/expense.entity';
 import { ExpenseModule } from './modules/expense/expense.module';
 import { SharedModule } from './modules/shared/shared.module';
 import { AttachmentModule } from './modules/attachment/attachment.module';
+import { Attachment } from './modules/attachment/attachment.entity';
 
 @Module({
   imports: [
     TypeOrmModule.forRoot({
       type: 'sqlite',
       database: 'expense-tracker.db',
-      entities: [Category, Expense],
+      entities: [Category, Expense, Attachment],
       synchronize: true,
     }),
     SharedModule,

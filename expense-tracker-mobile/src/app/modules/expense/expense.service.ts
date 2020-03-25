@@ -49,10 +49,18 @@ export class ExpenseService extends BaseService {
                 return;
             }
 
-            //TODO:make sure category and attachments are synced...
-
-            //attachment
-            await this.attachmentSvc.push();
+            //make sure category and attachments are synced...if dependant
+            unSycedLocal.forEach(async (ul) => {
+                if(ul.category 
+                    && (ul.category.markedForAdd || ul.category.markedForUpdate || ul.category.markedForDelete)) {
+                    await this.categorySvc.push();
+                }
+                //make sure its synched before...
+                if(ul.attachment 
+                    && (ul.attachment.markedForAdd || ul.attachment.markedForUpdate || ul.attachment.markedForDelete)) {
+                    await this.attachmentSvc.push();
+                }            
+            });
 
             //server returns array of dictionary objects, each key in dict is the localdb id
             //we map the localids and update its serverid locally

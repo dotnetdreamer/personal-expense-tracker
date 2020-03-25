@@ -4,13 +4,17 @@ import { FilesInterceptor, AnyFilesInterceptor, FileInterceptor, MulterModule } 
 import { diskStorage } from 'multer';
 
 import { Request } from 'express';
-import { IAttachment } from './attachment.model';
+import { IAttachmentParams } from './attachment.model';
 import { imageFileFilter, editFileName } from './attachment.utils';
+import { Attachment } from './attachment.entity';
+import { AttachmentService } from './attachment.service';
 
 
 @Controller('attachment')
 export class AttachmentController {
-  constructor() {}
+  constructor(private attachmentSvc: AttachmentService) {
+
+  }
 
 //   @UseInterceptors(ClassSerializerInterceptor)
 //   @Get('getAll')
@@ -26,13 +30,81 @@ export class AttachmentController {
     @Post('sync')   
     @UseInterceptors(FilesInterceptor('files[]', 10, {
       storage: diskStorage({
-        destination: './files',
+        destination: './_uploaded',
         filename: editFileName,
       }),
-      fileFilter: imageFileFilter
-    }))    
-    sync(@Req() request: Request
-      , @UploadedFiles() files: Array<{ fieldname, originalname, mimetype, buffer, size }>) {
-      const attachments = <IAttachment[]>request.body.attachments;
+      // fileFilter: imageFileFilter
+    }),
+    ClassSerializerInterceptor)    
+    async sync(@Req() request: Request
+      , @UploadedFiles() files: Array<{ fieldname, originalname, mimetype, buffer, size, filename }>) {
+      //local id and mapping server record
+      let items: Array<Map<number, any>> = [];
+
+      const attachments = <IAttachmentParams[]>request.body.attachments;
+      //verify if file uploaded successfully
+      // const successUploadedAttachs = attachments.filter(i => {
+      //   const file = files.filter(f => {
+      //     const guidFromName = f.filename.split('.')[0];
+      //     if(guidFromName == i.guid) {
+      //       return true;
+      //     }
+      //     return false;
+      //   });
+      //   return file || false;
+      // });
+ 
+      for (let model of attachments)
+      {
+        const itemMap: Map<number, IAttachmentParams> = new Map();
+        let returnedItem: any;
+  
+        if (model.markedForAdd) {
+          //generate new one..ignore id from client
+          let toAdd = Object.assign({}, model);
+          delete toAdd.id;
+  
+          const item = await this.attachmentSvc.save(toAdd);
+          returnedItem = item;        
+          
+          delete returnedItem.markedForAdd;
+        } else if(model.markedForUpdate) {
+          const toUpdate = await this.attachmentSvc.findOne(model.id);
+          if(!toUpdate) {
+            continue;
+          }
+      
+          let updated = await this._updateOrDelete(toUpdate, model, false);
+          returnedItem = updated;
+  
+          delete returnedItem.markedForUpdate;
+        } else if(model.markedForDelete) {
+          const toDelete = await this.attachmentSvc.findOne(model.id);
+          if(!toDelete) {
+            continue;
+          }
+  
+          let deleted = await this._updateOrDelete(toDelete, model, true);
+          returnedItem = deleted;
+          
+          delete returnedItem.markedForDelete;
+        }
+  
+        itemMap.set(model.id, returnedItem);
+        items.push(itemMap);
+      }
+
+      return items;
+    }
+
+    private async _updateOrDelete(toUpdateOrDelete: Attachment, model, shouldDelete?: boolean) {
+      //no need to update
+      delete toUpdateOrDelete.createdOn;
+      toUpdateOrDelete.isDeleted = shouldDelete;
+  
+      let updated = Object.assign(toUpdateOrDelete, model);
+      await this.attachmentSvc.save(updated);
+  
+      return updated;
     }
 }

@@ -2,7 +2,7 @@
 export class AppConstant {
     public static readonly DEBUG = true;
 
-    // public static readonly BASE_URL = "http://dotnetdreamer2.net/";
+    // public static readonly BASE_URL = "http://nest.dotnetdreamer2.net/";
     public static readonly BASE_URL = "http://localhost:3000/";
     public static readonly BASE_API_URL = `${AppConstant.BASE_URL}`;
     public static readonly DB_NAME = "et.db";

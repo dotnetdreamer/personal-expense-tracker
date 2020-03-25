@@ -1,4 +1,4 @@
-export interface IAttachment {
+export interface IAttachmentParams {
     id: number
     guid: string
     contentType: string

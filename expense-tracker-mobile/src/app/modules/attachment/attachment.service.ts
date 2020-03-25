@@ -40,18 +40,20 @@ export class AttachmentService extends BaseService {
             });
 
             let formData = new FormData();
-            // for (let i = 0; i < unSycedLocal.length; i++) { 
-            //     const myItemInArr = unSycedLocal[i]; 
-            //     for (const prop in myItemInArr) { 
-            //         formData.append(`attachments[${i}][${prop}]`, myItemInArr[prop]); 
-            //     }
-            // }
-            unSycedLocal.forEach((file) => {
-                formData.append('files[]', file.attachment, file.filename);
-            });
+            for (let i = 0; i < unSycedLocal.length; i++) { 
+                const item = unSycedLocal[i]; 
+                for (const prop in item) { 
+                    if(prop == 'attachment') {
+                        formData.append(`files[]`, item.attachment, `${item.guid}.${item.extension}`); 
+                    } else {
+                        formData.append(`attachments[${i}][${prop}]`, item[prop]); 
+                    }
+                }
+            }
 
-            let headers = new HttpHeaders();
-            headers = headers.append('Content-Type', 'multipart/form-data');
+            // let headers = new HttpHeaders();
+            // headers = headers.append('Content-Type', 'multipart/form-data');
+
             //server returns array of dictionary objects, each key in dict is the localdb id
             //we map the localids and update its serverid locally
             const items = await this.postData<any[]>({
