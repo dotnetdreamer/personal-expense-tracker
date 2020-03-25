@@ -16,8 +16,11 @@
         <div class="date">{{ expense?.createdOn }}</div>
       </div>
     </div>
-    <div class="attachment">
-      <img #attachment>
+    <div class="attachment" *ngIf="expense && expense.attachment">
+      <ion-button fill="clear">
+        <ion-icon name="document-outline" *ngIf="!expense.attachment.contentType.startsWith('image')"></ion-icon>
+        <ion-icon name="image-outline" *ngIf="expense.attachment.contentType.startsWith('image')"></ion-icon>
+      </ion-button>
     </div>
     <div class="notes">
       {{ expense?.notes }}

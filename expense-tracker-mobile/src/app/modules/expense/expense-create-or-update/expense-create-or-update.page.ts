@@ -63,7 +63,6 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit {
   async onSaveClick(args) {
     const exp: IExpense = {
       amount: args.amount,
-      categoryId: this.selectedCategory.id,
       category: this.selectedCategory,
       description: args.description,
       notes: args.notes,

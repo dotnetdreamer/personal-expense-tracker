@@ -251,14 +251,15 @@ export class ExpenseService extends BaseService {
     }
 
     private async _map(expenses: Array<IExpense>) {
-        const promises = [];
-        for(let exp of expenses) {
-            const expPromise = this.categorySvc.getCategoryByIdLocal(exp.categoryId)
-            .then(e => exp.category = e);
-            promises.push(exp);
-        }
-        const exMapeed = await Promise.all(promises);
-        return exMapeed;
+        // const promises = [];
+        // for(let exp of expenses) {
+        //     const expPromise = this.categorySvc.getCategoryByIdLocal(exp.categoryId)
+        //     .then(e => exp.category = e);
+        //     promises.push(exp);
+        // }
+        // const exMapeed = await Promise.all(promises);
+        // return exMapeed;
+        return expenses;
     }
 
     private _sort(expenses: Array<IExpense>) {

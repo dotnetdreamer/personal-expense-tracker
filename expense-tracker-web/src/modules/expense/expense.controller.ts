@@ -5,6 +5,7 @@ import { IExpenseParams } from "./expense.model";
 import { Expense } from "./expense.entity";
 import { AttachmentService } from "../attachment/attachment.service";
 import { CategoryService } from "../category/category.service";
+import { AppConstant } from "../shared/app-constant";
 
 @Controller('expense')
 export class ExpenseController {
@@ -96,7 +97,10 @@ export class ExpenseController {
     //attachment
     if(mExp.attachmentId) {
       const attachment = await this.attachmentSvc.findOne(mExp.attachmentId);
-      mExp["attachment"] = attachment;
+      mExp["attachment"] = {
+        ...attachment,
+        attachment: `${AppConstant.UPLOADED_PATH}/${attachment.guid}.${attachment.extension}`
+      };
     }
 
     //remove 

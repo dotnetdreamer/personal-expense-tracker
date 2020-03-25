@@ -4,4 +4,15 @@ page-expense-detail {
             // --min-height: 112px;
         }
     }
+
+    ion-content {
+        .container {
+            .attachment {
+                ion-button {
+                    font-size: 80px;
+                    height: auto;
+                }
+            }
+        }
+    }
 }
