@@ -85,10 +85,10 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit {
     await this.helperSvc.presentToast(msg);
 
     // if (window.history.length > 1) {
-      await this.location.back();
+      // await this.location.back();
     // } 
     // else {
-    //   await this.navigate({ path: '/expense/expense-listing', extras: { replaceUrl: true }});
+      await this.navigate({ path: '/expense/expense-listing', extras: { replaceUrl: true }});
     // }
   }
 
