@@ -148,20 +148,20 @@ export class AppComponent {
   }
 
   private async _setDefaults() {
-    let wk = await this.appSettingSvc.getWorkingLanguage();
-    if(!wk) {
-      wk = 'en';
-      await this.appSettingSvc.putWorkingLanguage(wk);
+    let wkl = await this.appSettingSvc.getWorkingLanguage();
+    if(!wkl) {
+      wkl = 'en';
+      await this.appSettingSvc.putWorkingLanguage(wkl);
     }
-    this.eventPub.$pub(AppConstant.EVENT_LANGUAGE_CHANGED, { wkLangauge: wk, reload: false });
-    this.workingLanguage = wk;
+    this.eventPub.$pub(AppConstant.EVENT_LANGUAGE_CHANGED, { wkLangauge: wkl, reload: false });
+    this.workingLanguage = wkl;
 
-    let wc = await this.currencySettingSvc.getWorkingCurrency();
-    if(!wc) {
-      wc = 'AED';
-      await this.currencySettingSvc.putWorkingCurrency(wk);
+    let wkc = await this.currencySettingSvc.getWorkingCurrency();
+    if(!wkc) {
+      wkc = 'AED';
+      await this.currencySettingSvc.putWorkingCurrency(wkc);
     }
-    this.eventPub.$pub(CurrencyConstant.EVENT_CURRENCY_CHANGED, { wkCurrency: wk, reload: false });
+    this.eventPub.$pub(CurrencyConstant.EVENT_CURRENCY_CHANGED, { wkCurrency: wkc, reload: false });
 
   }
 

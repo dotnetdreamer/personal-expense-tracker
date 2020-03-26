@@ -63,10 +63,18 @@ export class CategoryService {
       { groupName: 'Entertainment', name: 'Games', icon: 'game-controller-outline', createdOn: toDate },
       { groupName: 'Entertainment', name: 'Movies', icon: 'videocam-outline', createdOn: toDate },
       { groupName: 'Entertainment', name: 'Music', icon: 'musical-notes-outline', createdOn: toDate },
-      { groupName: 'Entertainment', name: 'Other', icon: 'newspaper-outline', createdOn: toDate },
+      { groupName: 'Entertainment', name: 'Other', icon: 'musical-note-outline', createdOn: toDate },
       { groupName: 'Entertainment', name: 'Sports', icon: 'football-outline', createdOn: toDate },
       //Food and Drink
-      { id: 6, groupName: 'Food and Drink', name: 'Dinning Out', icon: 'restaurant-outline', createdOn: toDate },
+      { groupName: 'Food and Drink', name: 'Dinning Out', icon: 'restaurant-outline', createdOn: toDate },
+      { groupName: 'Food and Drink', name: 'Groceries', icon: 'cart-outline', createdOn: toDate },
+      { groupName: 'Food and Drink', name: 'Other', icon: 'fast-food-outline', createdOn: toDate },
+      //Home
+      { groupName: 'Home', name: 'Electronics', icon: 'flash-outline', createdOn: toDate },
+      { groupName: 'Home', name: 'Furniture', icon: 'bed-outline', createdOn: toDate },
+      { groupName: 'Home', name: 'Other', icon: 'home-outline', createdOn: toDate },
+      { groupName: 'Home', name: 'Rent', icon: 'analytics-outline', createdOn: toDate },
+      { groupName: 'Home', name: 'Services', icon: 'build-outline', createdOn: toDate },
     ];
     
     categories.forEach(async (c) => {

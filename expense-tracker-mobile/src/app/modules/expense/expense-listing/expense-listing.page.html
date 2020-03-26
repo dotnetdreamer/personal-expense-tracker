@@ -20,7 +20,7 @@
       </div>
       <div class="category-description-amount">
         <div class="category-description">
-          <div class="description">{{expense.description}}</div>
+          <div class="description">{{expense.description | slice:0:40 }}{{expense.description.length > 40 ? '...' : ''}}</div>
           <div class="category">{{expense.category?.name}}</div>
         </div>
         <div class="amount">{{expense.amount}}&nbsp;{{workingCurrency}}</div>
