@@ -106,7 +106,8 @@ export class CategoryPage extends BasePage implements OnInit {
   private async _presentAddOrUpdateModal(category?: ICategory) {
     const resources = await Promise.all([this.localizationSvc.getResource('category.title')
       , this.localizationSvc.getResource('category.name')
-      , this.localizationSvc.getResource('category.groupName')]);
+      , this.localizationSvc.getResource('category.groupName')
+      , this.localizationSvc.getResource('category.icon')]);
 
     const catNameTitle = resources[0];
     const alert = await this.alertCtrl.create({
@@ -123,6 +124,12 @@ export class CategoryPage extends BasePage implements OnInit {
           type: 'text',
           value: category?.groupName,
           placeholder: resources[2]
+        },
+        {
+          name: 'icon',
+          type: 'text',
+          value: category?.icon,
+          placeholder: resources[3]
         }
       ],
       buttons: [
@@ -139,13 +146,16 @@ export class CategoryPage extends BasePage implements OnInit {
               return;
             }
 
-            if(!data.categoryName.trim().length && !data.groupName.trim().length) {
+            if(!data.categoryName.trim().length 
+              || !data.groupName.trim().length
+              || !data.icon.trim().length) {
               return;
             }
 
             const cat: ICategory = {
               name: data.categoryName,
-              groupName: data.groupName
+              groupName: data.groupName,
+              icon: data.icon
             };
             if(category) {
               cat.id = category.id;

@@ -1,52 +1,60 @@
 page-expense-listing {
     .expenses {
-        .expense-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding-left: var(--ion-padding, 16px);
-            padding-right: var(--ion-padding, 16px);
-            min-height: 80px;
-            padding-top: 10px;
-            padding-bottom: 10px;
+        ion-item-sliding {
+            ion-item {
+                .expense-item {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    // padding-left: var(--ion-padding, 16px);
+                    // padding-right: var(--ion-padding, 16px);
+                    min-height: 80px;
+                    padding-top: 10px;
+                    padding-bottom: 10px;
+                    width: 100%;
 
-            &:nth-child(2n) {
-                background-color: #f7f7f7;
+                    .icon-container {
+                        width: 50px;
+                        height: 50px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: space-between;
+        
+                        ion-icon {
+                            font-size: 28px;
+                        }
+                    }
+        
+                    .category-description-amount {
+                        width: 100%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: space-between;
+        
+                        .category-description {
+                            .description {
+                                font-size: 1em;
+                                margin: 5px 0;
+                            }
+        
+                            .category {
+                                font-size: 0.85em;
+                            }
+                        }
+            
+                        .amount {
+            
+                        }
+                    }
+                }
             }
             
-            .icon-container {
-                width: 50px;
-                height: 50px;
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-
-                ion-icon {
-                    font-size: 28px;
-                }
-            }
-
-            .category-description-amount {
-                width: 100%;
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-
-                .category-description {
-                    .description {
-                        font-size: 1em;
-                        margin: 5px 0;
-                    }
-
-                    .category {
-                        font-size: 0.85em;
-                    }
-                }
-    
-                .amount {
-    
+            &:nth-child(2n) {
+                .expense-item {
+                    background-color: #f7f7f7;
                 }
             }
         }
+
     }
 }

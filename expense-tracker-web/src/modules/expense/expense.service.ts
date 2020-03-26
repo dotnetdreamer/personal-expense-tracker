@@ -19,7 +19,7 @@ export class ExpenseService {
     , private helperSvc: HelperService
   ) {}
 
-  async findAll(args?: { fromDate?: string, toDate?: string }): Promise<Expense[]> {
+  async findAll(args?: { fromDate?: string, toDate?: string, showHidden: boolean }): Promise<Expense[]> {
     let qb = await getRepository(Expense)
       .createQueryBuilder('exp');
       
@@ -42,10 +42,13 @@ export class ExpenseService {
 
     }
       
-      // .orWhere('user.email = :email', { email });
-      qb = qb.orderBy("exp.id", 'DESC')
+    // .orWhere('user.email = :email', { email });
+    if(!args || (args && !args.showHidden)) {
+      qb = qb.andWhere('exp.isDeleted <= :isDeleted', { isDeleted: false });
+    }
+    qb = qb.orderBy("exp.id", 'DESC')
 
-      return qb.getMany();
+    return qb.getMany();
     // const user = await qb.getOne();
 
     // if (user) {

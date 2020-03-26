@@ -65,11 +65,11 @@ export class SyncHelperService {
 
             try {
                 await Promise.all(promises);
-                this.eventPub.$pub(SyncConstant.EVENT_SYNC_DATA_PUSH_COMPLETE, promises.length);
-
                 resolve();
             } catch (e) {
                 resolve(e);
+            } finally {
+                this.eventPub.$pub(SyncConstant.EVENT_SYNC_DATA_PUSH_COMPLETE, promises.length);
             }
         });
     }

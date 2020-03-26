@@ -43,6 +43,11 @@ export class HelperService {
         const msg = await this.localizationService.getResource('common.genericerror');
         return this.presentToast(msg, autoHide);
     }
+
+    async presentToastGenericSuccess() {
+        const msg = await this.localizationService.getResource('common.success');
+        return this.presentToast(msg);
+    }
     
     async presentInfoDialog(message, title?, okButtonCallback?) {
         let okTxt = await this.localizationService.getResource('common.ok');

@@ -25,8 +25,14 @@ export class ExpenseService extends BaseService {
             try {
                 const items = await this.getExpenses();
                 if(items.length) {
-                    //remove all first
-                    await this.removeAll();
+                    //local item marked for local changes i.e (delete, update or add) should be ignored...
+                    items.forEach(async (i) => {
+                        const localItem = await this.getByIdLocal(i.id);
+                        if(localItem 
+                            && !(localItem && (localItem.markedForAdd || localItem.markedForUpdate || localItem.markedForDelete))) {
+                            await this.remove(localItem.id);
+                        }
+                    });
                     //now add
                     await this.putAllLocal(items, true, true);
                 }
@@ -157,15 +163,15 @@ export class ExpenseService extends BaseService {
     getExpenseListLocal(args?: { term?, fromDate?, toDate? }): Promise<IExpense[]> {
         return new Promise(async (resolve, reject) => {
             let results = [];
-            if(!args) {
-                results = await this.dbService.getAll<IExpense[]>(this.schemaService.tables.expense);
-                //sor by desc
-                results = await this._map(results);
-                results = this._sort(results);
+            // if(!args) {
+            //     results = await this.dbService.getAll<IExpense[]>(this.schemaService.tables.expense);
+            //     //sor by desc
+            //     results = await this._map(results);
+            //     results = this._sort(results);
 
-                resolve(results);
-                return;
-            }
+            //     resolve(results);
+            //     return;
+            // }
             const db = this.dbService.Db;
             // new ydn.db.IndexValueIterator(store, opt.key, key_range, (pageSize == 0 ? undefined : pageSize), (skip > 0 ? skip: undefined), false);
             //https://github.com/yathit/ydn-db/blob/8d217ba5ff58a1df694b5282e20ebc2c52104197/test/qunit/ver_1_iteration.js#L117
@@ -178,10 +184,21 @@ export class ExpenseService extends BaseService {
                 // const objToFind = v.company.locales.find(l => l.languageId == wkLanguage.id);
 
                 // const cLocaledName: string = objToFind.name.toLowerCase();
-                if((args.term 
-                    && v.description.toLowerCase().startsWith(args.term) || (v.category.name.toLowerCase().startsWith(args.term)))) {
-                    results.push(v);
+                let item: IExpense;
+                if(args) {
+                    if((args.term 
+                        && v.description.toLowerCase().startsWith(args.term) || (v.category.name.toLowerCase().startsWith(args.term)))) {
+                        item = v;
+                    }
+                } else {
+                    item = v;
                 }
+
+                if(item && !item.markedForDelete) {
+                    //do not show deleted...
+                    results.push(item);
+                }
+
                 req.done();
                 // idx++;
                 // console.log(idx);

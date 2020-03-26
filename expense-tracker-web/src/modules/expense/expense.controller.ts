@@ -82,7 +82,7 @@ export class ExpenseController {
   private async _updateOrDelete(toUpdateOrDelete: Expense, model, shouldDelete?: boolean) {
     //no need to update
     delete toUpdateOrDelete.createdOn;
-    toUpdateOrDelete.isDeleted = shouldDelete;
+    model.isDeleted = shouldDelete;
 
     let updated = Object.assign(toUpdateOrDelete, model);
     await this.expenseSvc.save(updated);
@@ -94,6 +94,7 @@ export class ExpenseController {
     let mExp = Object.assign({}, exp);
     //category
     mExp["category"] = await this.categorySvc.findOne(mExp.categoryId);
+
     //attachment
     if(mExp.attachmentId) {
       const attachment = await this.attachmentSvc.findOne(mExp.attachmentId);

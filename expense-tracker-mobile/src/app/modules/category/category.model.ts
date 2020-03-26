@@ -1,7 +1,7 @@
 export interface ICategory {
     name: string
     groupName: string
-    icon?: string
+    icon: string
     id?: number
     createdOn?: string
     updatedOn?: string

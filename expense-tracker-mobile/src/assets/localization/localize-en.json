@@ -14,7 +14,8 @@
     "category": {
         "title": "Category",
         "name": "Name",
-        "groupName": "Group Name"
+        "groupName": "Group Name",
+        "icon": "Icon"
     },
     "expense": {
         "title": "Expense",

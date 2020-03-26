@@ -5,6 +5,8 @@ import { ExpenseService } from '../expense.service';
 import { IExpense } from '../expense.model';
 import { AppConstant } from '../../shared/app-constant';
 import { CurrencySettingService } from '../../currency/currency-setting.service';
+import { SyncConstant } from '../../shared/sync/sync-constant';
+import { SyncEntity } from '../../shared/sync/sync.model';
 
 @Component({
   selector: 'page-expense-listing',
@@ -53,6 +55,18 @@ export class ExpenseListingPage extends BasePage implements OnInit {
     await this.navigate({ path: '/expense/expense-detail', params: { id: expense.id }});
   }
 
+  async onExpenseItemDeleteClicked(ev: CustomEvent, expense: IExpense) {
+    ev.stopImmediatePropagation();
+
+    const res = await this.helperSvc.presentConfirmDialog();
+    if(res) {
+      expense.markedForDelete = true;
+      await this.expenseSvc.putLocal(expense);
+      
+      this.eventPub.$pub(SyncConstant.EVENT_SYNC_DATA_PUSH, SyncEntity.Expense);
+      await this.helperSvc.presentToastGenericSuccess();
+    }
+  }
 
   private async _getExpenses(term?) {
     let filters = null;
@@ -71,6 +85,9 @@ export class ExpenseListingPage extends BasePage implements OnInit {
 
   private _subscribeToEvents() {
     this.eventPub.$sub(AppConstant.EVENT_EXPENSE_CREATED_OR_UPDATED, async (expense: IExpense) => {
+      if(AppConstant.DEBUG) {
+        console.log('ExpenseListingPage: EVENT_EXPENSE_CREATED_OR_UPDATED: expense', expense);
+      }
       await this._getExpenses();
     });
   }

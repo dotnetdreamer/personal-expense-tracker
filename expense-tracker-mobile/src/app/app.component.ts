@@ -66,7 +66,8 @@ export class AppComponent {
 
       await this._setDefaults();
       try {
-        //sync
+        //first sync then pull
+        await this.syncHelperSvc.push();
         await this.syncHelperSvc.pull();
       } catch (e) {
         //ignore

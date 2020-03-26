@@ -13,20 +13,29 @@
     (ionChange)="onSearchInputChanged($event)" (ionClear)="onSearchInputCleared($event)"
     [placeholder]="'search.title' | localizedresource | async"></ion-searchbar>
 
-  <div class="expenses">
-    <div class="expense-item" *ngFor="let expense of expenses" (click)="onExpenseItemClicked(expense)">
-      <div class="icon-container">
-        <ion-icon [attr.name]="expense.category.icon"></ion-icon>
-      </div>
-      <div class="category-description-amount">
-        <div class="category-description">
-          <div class="description">{{expense.description | slice:0:40 }}{{expense.description.length > 40 ? '...' : ''}}</div>
-          <div class="category">{{expense.category?.name}}</div>
+  <ion-list class="expenses">
+    <ion-item-sliding *ngFor="let expense of expenses" (click)="onExpenseItemClicked(expense)">
+      <ion-item lines="none">
+        <div class="expense-item">
+          <div class="icon-container">
+            <ion-icon [attr.name]="expense.category.icon"></ion-icon>
+          </div>
+          <div class="category-description-amount">
+            <div class="category-description">
+              <div class="description">{{expense.description | slice:0:40 }}{{expense.description.length > 40 ? '...' : ''}}</div>
+              <div class="category">{{expense.category?.name}}</div>
+            </div>
+            <div class="amount">{{expense.amount}}&nbsp;{{workingCurrency}}</div>
+          </div>
         </div>
-        <div class="amount">{{expense.amount}}&nbsp;{{workingCurrency}}</div>
-      </div>
-    </div>
-  </div>
+      </ion-item>
+      <ion-item-options side="end">
+        <ion-item-option color="danger" (click)="onExpenseItemDeleteClicked($event, expense)">
+          {{'common.delete' | localizedresource | async}}
+        </ion-item-option>
+      </ion-item-options>
+    </ion-item-sliding>
+  </ion-list>
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
     <ion-fab-button (click)="onAddClick()">
       <ion-icon name="add"></ion-icon>

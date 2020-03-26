@@ -81,8 +81,7 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit {
     this.eventPub.$pub(AppConstant.EVENT_EXPENSE_CREATED_OR_UPDATED, exp);
     this.eventPub.$pub(SyncConstant.EVENT_SYNC_DATA_PUSH, SyncEntity.Expense);
 
-    const msg = await this.localizationSvc.getResource('common.success');
-    await this.helperSvc.presentToast(msg);
+    await this.helperSvc.presentToastGenericSuccess();
 
     // if (window.history.length > 1) {
       // await this.location.back();

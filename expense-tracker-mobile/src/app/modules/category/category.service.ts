@@ -22,12 +22,18 @@ export class CategoryService extends BaseService {
     pull() {
         return new Promise(async (resolve, reject) => {
             try {
-                const categories = await this.getCategoryList();
-                if(categories.length) {
-                    //remove all first
-                    await this.removeAll();
+                const items = await this.getCategoryList();
+                if(items.length) {
+                    //local item marked for local changes i.e (delete, update or add) should be ignored...
+                    items.forEach(async (i) => {
+                        const localItem = await this.getByIdLocal(i.id);
+                        if(localItem 
+                            && !(localItem && (localItem.markedForAdd || localItem.markedForUpdate || localItem.markedForDelete))) {
+                            await this.remove(localItem.id);
+                        }
+                    });
                     //now add
-                    await this.putAllLocal(categories, true, true);
+                    await this.putAllLocal(items, true, true);
                 }
                 resolve();
             }catch (e) {
@@ -139,7 +145,7 @@ export class CategoryService extends BaseService {
         });
     }
 
-    getCategoryByIdLocal(categoryId) {
+    getByIdLocal(categoryId) {
         return this.dbService.get<ICategory>(this.schemaService.tables.category, categoryId);
     }
 
