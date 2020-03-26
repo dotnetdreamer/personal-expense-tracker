@@ -8,8 +8,6 @@ import * as moment from 'moment';
 import { BasePage } from '../../shared/base.page';
 import { ExpenseService } from '../expense.service';
 import { AppConstant } from '../../shared/app-constant';
-import { MediaUploaderService } from '../../shared/media/media-uploader.service';
-import { MediaDeviceHelper } from '../../shared/media/media-device-helper';
 import { IExpense } from '../expense.model';
 import { ICategory } from '../../category/category.model';
 import { CategoryService } from '../../category/category.service';
@@ -33,8 +31,8 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit {
 
   constructor(private formBuilder: FormBuilder, private location: Location
     , private alertCtrl: AlertController
-    , private expenseSvc: ExpenseService, private mediaUploaderSvc: MediaUploaderService
-    , private mediaDeviceHelper: MediaDeviceHelper, private categorySvc: CategoryService
+    , private expenseSvc: ExpenseService
+    , private categorySvc: CategoryService
     , private modalCtrl: ModalController
     ) {
     super();

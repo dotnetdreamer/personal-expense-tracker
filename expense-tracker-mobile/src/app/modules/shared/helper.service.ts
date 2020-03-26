@@ -43,23 +43,7 @@ export class HelperService {
         const msg = await this.localizationService.getResource('common.genericerror');
         return this.presentToast(msg, autoHide);
     }
-
-    async print(content, workingLanguage?) {
-        if(!workingLanguage) {
-            workingLanguage = await this.appSettingSvc.getWorkingLanguage();
-        }
-
-        let style =`html, body { width: 100%; height: 100%; margin: 0px; padding: 0px;}`;
-        if(workingLanguage !== 'en') {
-            style += `body { direction: rtl; }`;
-        }
-        content = `<html><style type="text/css">${style}</style><body>${content}</body></html>`;
-        if(AppConstant.DEBUG) {
-            //console.log('Printing all', content);
-        }
-        (<any>cordova.plugins).printer.print(content);
-    }
-
+    
     async presentInfoDialog(message, title?, okButtonCallback?) {
         let okTxt = await this.localizationService.getResource('common.ok');
         const alert = await this.alertCtrl.create({
