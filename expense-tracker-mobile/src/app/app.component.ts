@@ -1,7 +1,7 @@
 import { Component, ViewEncapsulation, Renderer2, Inject } from '@angular/core';
 
 import { Plugins } from '@capacitor/core';
-const { SplashScreen, StatusBar } = Plugins;
+const { SplashScreen, StatusBar, Device } = Plugins;
 import { Platform } from '@ionic/angular';
 
 import { AppSettingService } from './modules/shared/app-setting.service';
@@ -22,6 +22,7 @@ import { HelperService } from './modules/shared/helper.service';
 })
 export class AppComponent {
   workingLanguage;
+  appVersion;
 
   constructor( private router: Router, @Inject(DOCUMENT) private document: Document
   , private renderer: Renderer2, private platform: Platform
@@ -80,6 +81,7 @@ export class AppComponent {
       // await this._navigateTo('/category');
       await this._navigateTo('/home');
     });
+
     this.eventPub.$sub(AppConstant.EVENT_LANGUAGE_CHANGED, async (params) => {
       if(AppConstant.DEBUG) {
         console.log('EVENT_LANGUAGE_CHANGED', params);
@@ -123,6 +125,10 @@ export class AppComponent {
       if(AppConstant.DEBUG) {
         console.log('AppComponent:Event received: EVENT_SYNC_INIT_COMPLETE');
       }
+
+      const { appVersion } = await (await Device.getInfo());
+      this.appVersion = appVersion;
+
       try {
         SplashScreen.hide();
       } catch(e) { }

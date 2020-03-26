@@ -8,7 +8,8 @@
         "cancel": "Cancel",
         "yes": "Yes",
         "no": "No",
-        "areyousure": "Are you sure ?"
+        "areyousure": "Are you sure ?",
+        "version": "Version"
     },
     "category": {
         "title": "Category",
@@ -16,6 +17,8 @@
         "groupName": "Group Name"
     },
     "expense": {
+        "title": "Expense",
+        "title_listing": "Expenses",
         "description": "Description",
         "date": "Date",
         "notes": "Notes"
