@@ -16,7 +16,7 @@ export class ExpenseListingPage extends BasePage implements OnInit {
   expenses: Array<IExpense> = [];
   searchTerm: string;
   sum = 0;
-  workingCurrency;
+  workingCurrency = ''; //fix for undefined showing in title
 
   constructor(private expenseSvc: ExpenseService
     , private currencySettingSvc: CurrencySettingService) { 
