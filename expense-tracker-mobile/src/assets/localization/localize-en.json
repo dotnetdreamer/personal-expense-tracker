@@ -19,6 +19,7 @@
     "expense": {
         "title": "Expense",
         "title_listing": "Expenses",
+        "add": "Add expense",
         "description": "Description",
         "date": "Date",
         "notes": "Notes"
