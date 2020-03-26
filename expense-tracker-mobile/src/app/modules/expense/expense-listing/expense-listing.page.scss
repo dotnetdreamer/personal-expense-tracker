@@ -6,7 +6,9 @@ page-expense-listing {
             justify-content: space-between;
             padding-left: var(--ion-padding, 16px);
             padding-right: var(--ion-padding, 16px);
-            min-height: 60px;
+            min-height: 80px;
+            padding-top: 10px;
+            padding-bottom: 10px;
 
             &:nth-child(2n) {
                 background-color: #f7f7f7;
