@@ -75,12 +75,14 @@ export class ExpenseService {
     }
 
     //in some cases (e.g adding in syncing) it is all attachment or category params object
-    let attachmentId;
-    if(typeof expense.attachment !== 'number') {
-      const att = <IAttachmentParams>expense.attachment;
-      attachmentId = att.id;
-    } else {
-      attachmentId = expense.attachment;
+    let attachmentId = undefined;
+    if(expense.attachment) {
+      if(typeof expense.attachment !== 'number') {
+        const att = <IAttachmentParams>expense.attachment;
+        attachmentId = att.id;
+      } else {
+        attachmentId = expense.attachment;
+      }
     }
 
     let categoryId;
