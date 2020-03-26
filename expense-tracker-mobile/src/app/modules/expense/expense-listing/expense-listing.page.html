@@ -10,11 +10,16 @@
 <ion-content>
   <div class="expenses">
     <div class="expense-item" *ngFor="let expense of expenses" (click)="onExpenseItemClicked(expense)">
-      <div class="item-category-description">
-        <div class="item-description">{{expense.description}}</div>
-        <div class="item-description">{{expense.category?.name}}</div>
+      <div class="icon-container">
+        <ion-icon [attr.name]="expense.category.icon"></ion-icon>
       </div>
-      <div class="item-amount">{{expense.amount}}</div>
+      <div class="category-description-amount">
+        <div class="category-description">
+          <div class="description">{{expense.description}}</div>
+          <div class="category">{{expense.category?.name}}</div>
+        </div>
+        <div class="amount">{{expense.amount}}</div>
+      </div>
     </div>
   </div>
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
