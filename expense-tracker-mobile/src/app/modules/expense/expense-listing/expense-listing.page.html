@@ -8,6 +8,11 @@
 </ion-header>
 
 <ion-content>
+  <ion-searchbar animated inputmode="search" debounce="300"
+    [(ngModel)]="searchTerm" 
+    (ionChange)="onSearchInputChanged($event)" (ionClear)="onSearchInputCleared($event)"
+    [placeholder]="'search.title' | localizedresource | async"></ion-searchbar>
+
   <div class="expenses">
     <div class="expense-item" *ngFor="let expense of expenses" (click)="onExpenseItemClicked(expense)">
       <div class="icon-container">

@@ -178,7 +178,8 @@ export class ExpenseService extends BaseService {
                 // const objToFind = v.company.locales.find(l => l.languageId == wkLanguage.id);
 
                 // const cLocaledName: string = objToFind.name.toLowerCase();
-                if((args.term && v.description.toLowerCase().startsWith(args.term))) {
+                if((args.term 
+                    && v.description.toLowerCase().startsWith(args.term) || (v.category.name.toLowerCase().startsWith(args.term)))) {
                     results.push(v);
                 }
                 req.done();
