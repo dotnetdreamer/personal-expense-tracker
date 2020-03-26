@@ -4,6 +4,7 @@ import { BasePage } from '../../shared/base.page';
 import { ExpenseService } from '../expense.service';
 import { IExpense } from '../expense.model';
 import { AppConstant } from '../../shared/app-constant';
+import { CurrencySettingService } from '../../currency/currency-setting.service';
 
 @Component({
   selector: 'page-expense-listing',
@@ -14,8 +15,11 @@ import { AppConstant } from '../../shared/app-constant';
 export class ExpenseListingPage extends BasePage implements OnInit {
   expenses: Array<IExpense> = [];
   searchTerm: string;
+  sum = 0;
+  workingCurrency;
 
-  constructor(private expenseSvc: ExpenseService) { 
+  constructor(private expenseSvc: ExpenseService
+    , private currencySettingSvc: CurrencySettingService) { 
     super();
 
     this._subscribeToEvents();
@@ -23,6 +27,7 @@ export class ExpenseListingPage extends BasePage implements OnInit {
 
   async ngOnInit() {
     await this._getExpenses();
+    this.workingCurrency = await this.currencySettingSvc.getWorkingCurrency();
   }
 
   async onSearchInputChanged(args: CustomEvent) {
@@ -58,6 +63,7 @@ export class ExpenseListingPage extends BasePage implements OnInit {
     }
 
     this.expenses = await this.expenseSvc.getExpenseListLocal(filters);
+    this.sum = this.expenses.reduce((a, b) => a + (+b.amount), 0);
     if(AppConstant.DEBUG) {
       console.log('ExpenseListingPage: _getExpenses: expenses', this.expenses);
     }

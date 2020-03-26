@@ -18,8 +18,9 @@ export class AppSettingService {
 
     protected dbService: DbService;
     protected schemaService: SchemaService;
+    protected platform: Platform;
  
-    constructor(private platform: Platform) {
+    constructor() {
         // https://blogs.msdn.microsoft.com/premier_developer/2018/06/17/angular-how-to-simplify-components-with-typescript-inheritance/
         const injector = AppInjector.getInjector();
         
@@ -29,6 +30,7 @@ export class AppSettingService {
             this.dbService = injector.get(DbWebService);
         // }
         this.schemaService = injector.get(SchemaService);
+        this.platform = injector.get(Platform);
     }
 
     putWorkingLanguage(lang) {

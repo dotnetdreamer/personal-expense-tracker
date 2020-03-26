@@ -13,6 +13,8 @@ import { SyncConstant } from './modules/shared/sync/sync-constant';
 import { AppConstant } from './modules/shared/app-constant';
 import { DOCUMENT } from '@angular/common';
 import { HelperService } from './modules/shared/helper.service';
+import { CurrencySettingService } from './modules/currency/currency-setting.service';
+import { CurrencyConstant } from './modules/currency/currency-constant';
 
 @Component({
   selector: 'app-root',
@@ -27,6 +29,7 @@ export class AppComponent {
   constructor( private router: Router, @Inject(DOCUMENT) private document: Document
   , private renderer: Renderer2, private platform: Platform
     , private eventPub: EventPublisher
+    , protected currencySettingSvc: CurrencySettingService
     , private appSettingSvc: AppSettingService, private syncHelperSvc: SyncHelperService
     , private categorySvc: CategoryService, private helperSvc: HelperService
   ) {
@@ -61,14 +64,7 @@ export class AppComponent {
           console.log('Event received: EVENT_DB_INITIALIZED');
       }
 
-      let wk = await this.appSettingSvc.getWorkingLanguage();
-      if(!wk) {
-        wk = 'en';
-        await this.appSettingSvc.putWorkingLanguage(wk);
-      }
-      this.eventPub.$pub(AppConstant.EVENT_LANGUAGE_CHANGED, { wkLangauge: wk, reload: false });
-      this.workingLanguage = wk;
-
+      await this._setDefaults();
       try {
         //sync
         await this.syncHelperSvc.pull();
@@ -105,6 +101,22 @@ export class AppComponent {
       }
     });
 
+    this.eventPub.$sub(CurrencyConstant.EVENT_CURRENCY_CHANGED, async (params) => {
+      if(AppConstant.DEBUG) {
+        console.log('EVENT_CURRENCY_CHANGED', params);
+      }
+      const { wkCurrency, reload } = params;
+      if(reload) {
+        SplashScreen.show();
+
+        // make sure we are in root page before reoloading, just incase if user tries to change the language from inner page
+        await this._navigateTo('/home', true);
+        setTimeout(() => {
+          this.document.location.reload(true);
+        });
+      }
+    });
+
     this.eventPub.$sub(SyncConstant.EVENT_SYNC_DATA_PUSH, async (table?) => {
       if(AppConstant.DEBUG) {
         console.log('HomePage: EVENT_SYNC_DATA_PUSH: table:', table);
@@ -133,6 +145,24 @@ export class AppComponent {
         SplashScreen.hide();
       } catch(e) { }
     });
+  }
+
+  private async _setDefaults() {
+    let wk = await this.appSettingSvc.getWorkingLanguage();
+    if(!wk) {
+      wk = 'en';
+      await this.appSettingSvc.putWorkingLanguage(wk);
+    }
+    this.eventPub.$pub(AppConstant.EVENT_LANGUAGE_CHANGED, { wkLangauge: wk, reload: false });
+    this.workingLanguage = wk;
+
+    let wc = await this.currencySettingSvc.getWorkingCurrency();
+    if(!wc) {
+      wc = 'AED';
+      await this.currencySettingSvc.putWorkingCurrency(wk);
+    }
+    this.eventPub.$pub(CurrencyConstant.EVENT_CURRENCY_CHANGED, { wkCurrency: wk, reload: false });
+
   }
 
   private async _navigateTo(path, args?, replaceUrl = false) {
