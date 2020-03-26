@@ -1,0 +1,8 @@
+{
+  "appId": "net.dotnetdreamer.et",
+  "appName": "Expense Tracker",
+  "bundledWebRuntime": false,
+  "npmClient": "npm",
+  "webDir": "www",
+  "cordova": {}
+}

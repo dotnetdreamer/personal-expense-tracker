@@ -1,6 +1,8 @@
 import { Injectable, Injector } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { Platform } from '@ionic/angular';
+import { Plugins } from '@capacitor/core';
+const { Device } = Plugins;
 
 import { AppConstant } from './app-constant';
 import { DbService } from './db/db-base.service';
@@ -37,11 +39,14 @@ export class BaseService {
         this.localizationSvc = injector.get(LocalizationService);
         this.eventPub = injector.get(EventPublisher);
 
-        if(this.platform.is('cordova')) {
-            this.dbService = injector.get(DbSqlService);
-        } else {
-            this.dbService = injector.get(DbWebService);
-        }
+        setTimeout(async () => {
+            const info = await Device.getInfo();
+            // if(info.platform === "ios" || info.platform === "android") {
+            //     this.dbService = injector.get(DbSqlService);
+            // } else {
+                this.dbService = injector.get(DbWebService);
+            // }
+        }, 0);
     }
 
     protected getData<T>(args: HttpParams): Promise<T> {

@@ -1,7 +1,7 @@
 {
   "name": "expense-tracker",
   "integrations": {
-    "cordova": {}
+    "capacitor": {}
   },
   "type": "angular"
 }

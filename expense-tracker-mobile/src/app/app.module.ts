@@ -4,18 +4,10 @@ import { RouteReuseStrategy } from '@angular/router';
 import { HttpClientModule } from '@angular/common/http';
 import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
 
-import { MediaCapture } from '@ionic-native/media-capture/ngx';
-import { Camera } from '@ionic-native/camera/ngx';
-import { Media } from '@ionic-native/media/ngx';
-import { File } from '@ionic-native/file/ngx';
-import { SplashScreen } from '@ionic-native/splash-screen/ngx';
-import { StatusBar } from '@ionic-native/status-bar/ngx';
-
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 import { AppInjector } from './modules/shared/app-injector';
 import { PipesModule } from './pipes/pipes.module';
-
 
 @NgModule({
   declarations: [AppComponent],
@@ -28,12 +20,6 @@ import { PipesModule } from './pipes/pipes.module';
     AppRoutingModule
   ],
   providers: [
-    StatusBar,
-    SplashScreen,
-    MediaCapture,
-    File,
-    Camera,
-    Media,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }
   ],
   bootstrap: [AppComponent]

@@ -1,8 +1,9 @@
 import { Component, ViewEncapsulation, Renderer2, Inject } from '@angular/core';
 
+import { Plugins } from '@capacitor/core';
+const { SplashScreen, StatusBar } = Plugins;
 import { Platform } from '@ionic/angular';
-import { SplashScreen } from '@ionic-native/splash-screen/ngx';
-import { StatusBar } from '@ionic-native/status-bar/ngx';
+
 import { AppSettingService } from './modules/shared/app-setting.service';
 import { Router } from '@angular/router';
 import { CategoryService } from './modules/category/category.service';
@@ -23,9 +24,7 @@ export class AppComponent {
   workingLanguage;
 
   constructor( private router: Router, @Inject(DOCUMENT) private document: Document
-  , private renderer: Renderer2, private platform: Platform,
-    private splashScreen: SplashScreen,
-    private statusBar: StatusBar
+  , private renderer: Renderer2, private platform: Platform
     , private eventPub: EventPublisher
     , private appSettingSvc: AppSettingService, private syncHelperSvc: SyncHelperService
     , private categorySvc: CategoryService, private helperSvc: HelperService
@@ -37,7 +36,7 @@ export class AppComponent {
     this._subscribeToEvents();
 
     this.platform.ready().then(async () => {
-      this.statusBar.styleDefault();
+      // StatusBar.styleDefault();
     });
   }
 
@@ -87,7 +86,8 @@ export class AppComponent {
       }
       const { wkLangauge, reload } = params;
       if(reload) {
-        this.splashScreen.show();
+        SplashScreen.show();
+
         // make sure we are in root page before reoloading, just incase if user tries to change the language from inner page
         await this._navigateTo('/home', true);
         setTimeout(() => {
@@ -124,7 +124,7 @@ export class AppComponent {
         console.log('AppComponent:Event received: EVENT_SYNC_INIT_COMPLETE');
       }
       try {
-        this.splashScreen.hide();
+        SplashScreen.hide();
       } catch(e) { }
     });
   }

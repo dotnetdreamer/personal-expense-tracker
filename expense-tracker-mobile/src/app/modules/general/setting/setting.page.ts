@@ -21,11 +21,11 @@ export class SettingPage extends BasePage implements OnInit {
     super();
 
     const injector = AppInjector.getInjector();
-    if(this.platform.is('cordova')) {
-      this.dbService = injector.get(DbSqlService);
-    } else {
+    // if(this.platform.is('cordova')) {
+    //   this.dbService = injector.get(DbSqlService);
+    // } else {
       this.dbService = injector.get(DbWebService);
-    }
+    // }
   }
 
   ngOnInit() {

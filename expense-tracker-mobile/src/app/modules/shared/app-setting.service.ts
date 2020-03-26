@@ -23,11 +23,11 @@ export class AppSettingService {
         // https://blogs.msdn.microsoft.com/premier_developer/2018/06/17/angular-how-to-simplify-components-with-typescript-inheritance/
         const injector = AppInjector.getInjector();
         
-        if(this.platform.is('cordova')) {
-            this.dbService = injector.get(DbSqlService);
-        } else {
+        // if(this.platform.is('cordova')) {
+        //     this.dbService = injector.get(DbSqlService);
+        // } else {
             this.dbService = injector.get(DbWebService);
-        }
+        // }
         this.schemaService = injector.get(SchemaService);
     }
 

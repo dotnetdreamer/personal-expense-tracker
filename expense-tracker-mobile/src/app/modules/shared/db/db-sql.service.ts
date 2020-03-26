@@ -1,6 +1,9 @@
 import { Injectable } from '@angular/core';
 
 import { Platform } from '@ionic/angular';
+import { Plugins } from '@capacitor/core';
+// import * as CapacitorSQLPlugin from 'capacitor-sqlite';
+const { CapacitorSQLite } = Plugins;
 
 import { SchemaService, ITableOptions } from './schema.service';
 import { AppConstant } from "../app-constant";
@@ -19,11 +22,18 @@ export class DbSqlService implements DbService {
         , private eventPub: EventPublisher, private schemaSvc: SchemaService) {
             this.platform.ready().then(async () => {
                 // await this._deleteDatabase();
-                this._db = !this.platform.is('cordova') ?
-                    (<any>window).openDatabase(this._dbName, '1.0', 'Data', 2*1024*1024, () => this._dbSuccess(), (err) => this._dbError(err)) :
-                    (<any>window).sqlitePlugin.openDatabase({ name: this._dbName, location: 'default' }, () => this._dbSuccess(), (err) => this._dbError(err));
+                this._db = CapacitorSQLite;
+                console.log('db', this._db);
+                try {
+                    let response: { result:boolean, message:string } = await this._db.open({ database: this._dbName });
+                    if(response.result) {
+                        await this._dbSuccess();
 
-                this.initializeDb();
+                        this.initializeDb();
+                    }
+                } catch (e) {
+                    this._dbError(e);
+                }
             });
     }
 
@@ -66,7 +76,7 @@ export class DbSqlService implements DbService {
 
     putLocal(store, data): Promise<{ rowsAffected, insertId }> {
         return new Promise(async (resolve, reject) => {
-            let sql;
+            let sql = `BEGIN TRANSACTION;`;
             const values = [];
             
             const total = await this.count(store);
@@ -105,58 +115,57 @@ export class DbSqlService implements DbService {
                 sql += `)`;
             }
 
+            sql += `COMMIT TRANSACTION;`;
+
             if(AppConstant.DEBUG) {
                 console.log('DbService: put: sql:', sql);
             }     
-            this._db.transaction(async (tx) => {           
-                const res = await this._executeSql<{ rowsAffected, insertId }>(tx, sql, values);
-                resolve(res);
-            }, (error) => reject(error));
+
+            const { changes } = await this._db.execute({ statements:sql, values: values });
+            resolve(changes);
+            // this._db.transaction(async (tx) => {           
+            //     const res = await this._executeSql<{ rowsAffected, insertId }>(tx, sql, values);
+            //     resolve(res);
+            // }, (error) => reject(error));
         });
     }
 
     get<T>(store: string, key: any): Promise<T> {
-        return new Promise((resolve, reject) => {
+        return new Promise(async (resolve, reject) => {
             //get primary key field form schema
             const table:any = this.schemaSvc.schema.stores.filter(s => s.name === store)[0];
             const pk = (table.columns.filter(c => c.isPrimaryKey)[0]).name;
 
             let sql = `SELECT * FROM ${store} WHERE ${pk} = '${key}' LIMIT 1`;
-
-            this._db.transaction(async (tx) => {    
+            try {
                 let data;
-                const res = await this._executeSql<any>(tx, sql);
-                if(res.rows.length) {
-                    data = res.rows.item(0);
+                const { values } = await this._db.query({ statement:sql, values:[] });
+                if(values.length) {
+                    data = values[0];
                 }
                 resolve(data);
-            }, (error) => reject(error));
+            } catch(e) {
+                reject(e);
+            }
         });
     }
 
     getAll<T>(store: string): Promise<T> {
-        return new Promise((resolve, reject) => {
-            let sql = `SELECT * FROM ${store} `;
+        return new Promise(async (resolve, reject) => {
+            let sql = `SELECT * FROM ${store}`;
 
-            this._db.transaction(async (tx) => {    
-                const data = [];
-       
-                const res = await this._executeSql<any>(tx, sql);
-                if(res.rows.length) {
-                    for(let i=0; i< res.rows.length; i++) {
-                        data.push(res.rows.item(i));
-                    }
-                }
-                resolve(<any>data);
-            }, (error) => reject(error));
+            try {
+                let data;
+                const { values } = await this._db.query({ statement:sql, values:[] });
+                resolve(values);
+            } catch(e) {
+                reject(e);
+            }
         });
     }
 
     remove(store, key): Promise<any> {
         return new Promise((resolve, reject) => {
-            // this.db.remove(store, key).done(key => {
-            //     resolve(key);
-            // });
             throw 'remove not impleted in db-sql yet';
         });
     }
@@ -168,13 +177,11 @@ export class DbSqlService implements DbService {
     }
 
     count(store, opts?: { key }): Promise<number> {
-        return new Promise((resolve, reject) => {
+        return new Promise(async (resolve, reject) => {
             let sql = `SELECT count(*) AS total FROM ${store} `;
-            this._db.executeSql(sql, [], (rs) => {
-                resolve(rs.rows.item(0).total);
-            }, (error) => {
-                reject(error);
-            });
+
+            const { values } = await this._db.query({ statement:sql, values:[] });
+            resolve(values);
         });
     }
 
@@ -183,57 +190,45 @@ export class DbSqlService implements DbService {
     }
 
     private _prepareTables() {
-        return new Promise((resolve, reject) => {
-            this._db.transaction(async (transaction) => {
-                const schemas = this.schemaSvc.schema.stores;
+        return new Promise(async (resolve, reject) => {
+            const schemas = this.schemaSvc.schema.stores;
+            
+            const promises = [];
+            for(let schema of schemas) {
+                let sql = `BEGIN TRANSACTION;`;
                 
-                const promises = [];
-                for(let schema of schemas) {
-                    let sql = `CREATE TABLE IF NOT EXISTS ${schema.name} `;
-                    sql += `(`;
+                sql += `CREATE TABLE IF NOT EXISTS ${schema.name} `;
+                sql += `(`;
 
-                    for(let col of schema.columns) {
-                        sql += `${col.name}${col.type ? ' ' + col.type : ''}${col['isPrimaryKey'] ? ' PRIMARY KEY' : ''},`;
-                    }
-
-                    //remove extra ',' at the end
-                    sql = sql.substr(0, sql.length - 1);
-                    sql += `)`;
-
-                    if(AppConstant.DEBUG) {
-                        console.log('DbService: _prepareTables: sql:', sql);
-                    }
-                    const promise = this._executeSql(transaction, sql);
-                    promises.push(promise); 
+                for(let col of schema.columns) {
+                    sql += `${col.name}${col.type ? ' ' + col.type : ''}${col['isPrimaryKey'] ? ' PRIMARY KEY' : ''},`;
                 }
 
-                try {
-                    await Promise.all(promises);
-                    resolve();
-                } catch (e) {
-                    reject(e);
+                //remove extra ',' at the end
+                sql = sql.substr(0, sql.length - 1);
+                sql += `)`;
+
+                sql += `COMMIT TRANSACTION;`;
+
+                if(AppConstant.DEBUG) {
+                    console.log('DbService: _prepareTables: sql:', sql);
                 }
-            });
+                
+                const promise = this._db.execute({ statements: sql });
+                promises.push(promise); 
+            }
+
+            try {
+                await Promise.all(promises);
+                resolve();
+            } catch (e) {
+                reject(e);
+            }
         })
     }
 
-    private _executeSql<T>(transaction, sql, params = []): Promise<T> {
-        return new Promise((resolve, reject) => {
-            transaction.executeSql(sql, params
-                , (tx, rs) => {
-                    resolve(rs);
-                }
-                , (tx, error) => {
-                    reject(error);
-                }
-            );
-        });
-    }
-
-    private _deleteDatabase() {
-        return new Promise((resolve, reject) => {
-            (<any>window).sqlitePlugin.deleteDatabase({name: this._dbName, location: 'default'}, resolve, reject);
-        });
+    private _deleteDatabase(): Promise<{ result:boolean,message:string }> {
+        return this._db.deleteDatabase({ database: this._dbName});
     }
 
     private _dbSuccess() {
