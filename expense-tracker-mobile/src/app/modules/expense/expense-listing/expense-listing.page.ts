@@ -56,7 +56,7 @@ export class ExpenseListingPage extends BasePage implements OnInit, OnDestroy {
     await loader.present();
 
     try {
-      this.selectedDate = `${args.start} - ${args.end}`;
+      this.dates.selectedDate = `${args.start} - ${args.end}`;
       const currentMonth = moment().format('M');
       //if changed month is not same as current month, then we don't have entries local..
       //fetch it from online...
