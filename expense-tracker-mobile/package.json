@@ -19,6 +19,7 @@
     "@angular/platform-browser": "~9.0.5",
     "@angular/platform-browser-dynamic": "~9.0.5",
     "@angular/router": "~9.0.5",
+    "@angular/service-worker": "~9.0.5",
     "@capacitor/android": "^1.5.1",
     "@capacitor/cli": "^1.5.1",
     "@capacitor/core": "^1.5.1",

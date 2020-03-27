@@ -15,6 +15,7 @@ import { DOCUMENT } from '@angular/common';
 import { HelperService } from './modules/shared/helper.service';
 import { CurrencySettingService } from './modules/currency/currency-setting.service';
 import { CurrencyConstant } from './modules/currency/currency-constant';
+import { CheckForUpdateService } from './modules/shared/update-service';
 
 @Component({
   selector: 'app-root',
@@ -28,7 +29,7 @@ export class AppComponent {
 
   constructor( private router: Router, @Inject(DOCUMENT) private document: Document
   , private renderer: Renderer2, private platform: Platform
-    , private eventPub: EventPublisher
+    , private eventPub: EventPublisher, private checkforUpdateSvc: CheckForUpdateService
     , protected currencySettingSvc: CurrencySettingService
     , private appSettingSvc: AppSettingService, private syncHelperSvc: SyncHelperService
     , private categorySvc: CategoryService, private helperSvc: HelperService
