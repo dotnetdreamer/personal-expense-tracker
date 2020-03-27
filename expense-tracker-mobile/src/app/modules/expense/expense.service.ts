@@ -26,13 +26,14 @@ export class ExpenseService extends BaseService {
                 const items = await this.getExpenses();
                 if(items.length) {
                     //local item marked for local changes i.e (delete, update or add) should be ignored...
-                    items.forEach(async (i) => {
+                    for(let i of items) {
                         const localItem = await this.getByIdLocal(i.id);
                         if(localItem 
                             && !(localItem && (localItem.markedForAdd || localItem.markedForUpdate || localItem.markedForDelete))) {
                             await this.remove(localItem.id);
+                            console.log('remove inside')
                         }
-                    });
+                    }
                     //now add
                     await this.putAllLocal(items, true, true);
                 }

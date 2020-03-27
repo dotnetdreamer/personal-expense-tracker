@@ -72,11 +72,6 @@ export class AppComponent {
       } catch (e) {
         //ignore
       }
-
-      // await this._navigateTo('/expense/expense-create-or-update');
-      // await this._navigateTo('/expense/expense-listing');
-      // await this._navigateTo('/category');
-      await this._navigateTo('/home');
     });
 
     this.eventPub.$sub(AppConstant.EVENT_LANGUAGE_CHANGED, async (params) => {
@@ -138,6 +133,11 @@ export class AppComponent {
       if(AppConstant.DEBUG) {
         console.log('AppComponent:Event received: EVENT_SYNC_INIT_COMPLETE');
       }
+
+      // await this._navigateTo('/expense/expense-create-or-update');
+      // await this._navigateTo('/expense/expense-listing');
+      // await this._navigateTo('/category');
+      await this._navigateTo('/home');
 
       const { appVersion } = await (await Device.getInfo());
       this.appVersion = appVersion;

@@ -25,7 +25,10 @@
               <div class="description">{{expense.description | slice:0:40 }}{{expense.description.length > 40 ? '...' : ''}}</div>
               <div class="category">{{expense.category?.name}}</div>
             </div>
-            <div class="amount">{{expense.amount}}&nbsp;{{workingCurrency}}</div>
+            <div class="amount-date">
+              <div class="amount">{{expense.amount}}&nbsp;{{workingCurrency}}</div>
+              <div class="date">{{expense.createdOn}}</div>
+            </div>
           </div>
         </div>
       </ion-item>

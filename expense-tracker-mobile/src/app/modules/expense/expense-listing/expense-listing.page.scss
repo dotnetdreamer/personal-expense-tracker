@@ -38,12 +38,19 @@ page-expense-listing {
                             }
         
                             .category {
-                                font-size: 0.85em;
+                                font-size: 0.8em;
                             }
                         }
             
-                        .amount {
-            
+                        .amount-date {
+                            text-align: right;
+                            
+                            .date {
+                                font-size: 0.8em;
+                            }
+                            .amount {
+                                font-size: 1em;
+                            }
                         }
                     }
                 }

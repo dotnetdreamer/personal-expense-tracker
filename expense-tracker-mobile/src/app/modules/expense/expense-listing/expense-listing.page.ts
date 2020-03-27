@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation, OnDestroy } from '@angular/core';
 
 import { BasePage } from '../../shared/base.page';
 import { ExpenseService } from '../expense.service';
@@ -7,6 +7,7 @@ import { AppConstant } from '../../shared/app-constant';
 import { CurrencySettingService } from '../../currency/currency-setting.service';
 import { SyncConstant } from '../../shared/sync/sync-constant';
 import { SyncEntity } from '../../shared/sync/sync.model';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'page-expense-listing',
@@ -14,11 +15,14 @@ import { SyncEntity } from '../../shared/sync/sync.model';
   styleUrls: ['./expense-listing.page.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class ExpenseListingPage extends BasePage implements OnInit {
+export class ExpenseListingPage extends BasePage implements OnInit, OnDestroy {
   expenses: Array<IExpense> = [];
   searchTerm: string;
   sum = 0;
   workingCurrency = ''; //fix for undefined showing in title
+
+  private _syncInitSub: Subscription;
+  private _expenseCreatedOrUpdatedSub: Subscription;
 
   constructor(private expenseSvc: ExpenseService
     , private currencySettingSvc: CurrencySettingService) { 
@@ -28,7 +32,8 @@ export class ExpenseListingPage extends BasePage implements OnInit {
   }
 
   async ngOnInit() {
-    await this._getExpenses();
+    //we call this on sync complete at the bottom
+    // await this._getExpenses();
     this.workingCurrency = await this.currencySettingSvc.getWorkingCurrency();
   }
 
@@ -68,6 +73,16 @@ export class ExpenseListingPage extends BasePage implements OnInit {
     }
   }
 
+  ngOnDestroy() {
+    if(this._expenseCreatedOrUpdatedSub) {
+      this._expenseCreatedOrUpdatedSub.unsubscribe();
+    }
+
+    if(this._syncInitSub) {
+      this._syncInitSub.unsubscribe();
+    }
+  }
+
   private async _getExpenses(term?) {
     let filters = null;
     if(term) {
@@ -84,9 +99,16 @@ export class ExpenseListingPage extends BasePage implements OnInit {
   }
 
   private _subscribeToEvents() {
-    this.eventPub.$sub(AppConstant.EVENT_EXPENSE_CREATED_OR_UPDATED, async (expense: IExpense) => {
+    this._expenseCreatedOrUpdatedSub = this.eventPub.$sub(AppConstant.EVENT_EXPENSE_CREATED_OR_UPDATED, async (expense: IExpense) => {
       if(AppConstant.DEBUG) {
         console.log('ExpenseListingPage: EVENT_EXPENSE_CREATED_OR_UPDATED: expense', expense);
+      }
+      await this._getExpenses();
+    });
+
+    this._syncInitSub = this.eventPub.$sub(AppConstant.EVENT_SYNC_INIT_COMPLETE, async () => {
+      if(AppConstant.DEBUG) {
+        console.log('ExpenseListingPage:Event received: EVENT_SYNC_INIT_COMPLETE');
       }
       await this._getExpenses();
     });
