@@ -3,10 +3,12 @@ import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
 
 import { NoDataModule } from './no-data/no-data.module';
+import { CalendarSwiperModule } from './calendar-swiper/calendar-swiper.module';
 
 @NgModule({
   imports: [
     NoDataModule,
+    CalendarSwiperModule,
     CommonModule,
     IonicModule
   ],
@@ -17,6 +19,7 @@ import { NoDataModule } from './no-data/no-data.module';
   ],
   exports: [
     NoDataModule,
+    CalendarSwiperModule,
     CommonModule,
     IonicModule
   ]

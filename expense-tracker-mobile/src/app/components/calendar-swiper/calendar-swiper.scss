@@ -1,0 +1,26 @@
+calendar-swiper {
+    ion-slides {
+        .swiper-wrapper {
+            ion-slide {
+                width: 45px;
+                height: 45px;
+
+                ion-button {
+                    width: 35px;
+                    height: 35px;
+                    --padding-start: 0;
+                    --padding-end: 0;
+                    font-size: 0.9em;
+                }
+
+                &.swiper-slide-active {
+                    ion-button {
+                        transform: scale(1.1);
+                        font-size: 1em;
+                        --background: #f7f7f7;
+                    }
+                }
+            }
+        }
+    }
+}
