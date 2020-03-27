@@ -19,8 +19,8 @@
 
   <ion-list class="expenses">
     <no-data *ngIf="!expenses.length"></no-data>
-    <ion-item-sliding *ngFor="let expense of expenses" (click)="onExpenseItemClicked(expense)">
-      <ion-item lines="none">
+    <ion-item-sliding *ngFor="let expense of expenses">
+      <ion-item lines="none" (click)="onExpenseItemClicked(expense)">
         <div class="expense-item">
           <div class="icon-container">
             <ion-icon [attr.name]="expense.category.icon"></ion-icon>
