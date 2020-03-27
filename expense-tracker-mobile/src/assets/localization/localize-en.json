@@ -24,7 +24,8 @@
         "add": "Add expense",
         "description": "Description",
         "date": "Date",
-        "notes": "Notes"
+        "notes": "Notes",
+        "today": "Today"
     },
     "home": {
         "title": "Home"

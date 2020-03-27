@@ -6,7 +6,7 @@
     <ion-title>{{ sum | currency: (workingCurrency + '&nbsp;')}}</ion-title>
   </ion-toolbar>
   <ion-toolbar class="toolbar-calendar">
-    <ion-label>{{ selectedDate }}</ion-label>
+    <ion-label>{{ dates?.selectedDate }}</ion-label>
     <calendar-swiper (monthChanged)="onMonthChanged($event)"></calendar-swiper>
   </ion-toolbar>
 </ion-header>
@@ -32,7 +32,14 @@
             </div>
             <div class="amount-date">
               <div class="amount">{{expense.amount}}&nbsp;{{workingCurrency}}</div>
-              <div class="date">{{expense.createdOn | formateDate | async}}</div>
+              <ng-container *ngIf="dates.todayDate">
+                <div class="date" *ngIf="dates?.todayDate != (expense.createdOn | formateDate | async)">
+                  {{expense.createdOn | formateDate | async}}
+                </div>
+                <div class="date" *ngIf="dates?.todayDate == (expense.createdOn | formateDate | async)">
+                  {{'expense.today' | localizedresource | async}}
+                </div>  
+              </ng-container>
             </div>
           </div>
         </div>

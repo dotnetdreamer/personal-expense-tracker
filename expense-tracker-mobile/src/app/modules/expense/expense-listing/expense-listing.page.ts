@@ -21,7 +21,7 @@ export class ExpenseListingPage extends BasePage implements OnInit, OnDestroy {
   expenses: Array<IExpense> = [];
   searchTerm: string;
   sum = 0;
-  selectedDate = '';
+  dates: { selectedDate?, todayDate? } = {};
   workingCurrency = ''; //fix for undefined showing in title
 
   private _syncInitSub: Subscription;
@@ -42,7 +42,9 @@ export class ExpenseListingPage extends BasePage implements OnInit, OnDestroy {
 
     const fromDate = moment().startOf('M').format(AppConstant.DEFAULT_DATE_FORMAT);
     const toDate = moment().endOf('M').format(AppConstant.DEFAULT_DATE_FORMAT);
-    this.selectedDate = `${fromDate} - ${toDate}`;
+
+    this.dates.todayDate = moment().format(AppConstant.DEFAULT_DATE_FORMAT);
+    this.dates.selectedDate = `${fromDate} - ${toDate}`;
   }
 
   async onMonthChanged(args: { start, end, month }) {
