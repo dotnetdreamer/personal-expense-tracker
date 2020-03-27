@@ -1,4 +1,16 @@
 page-expense-listing {
+    ion-header {
+        ion-toolbar {
+            &.toolbar-calendar {
+                text-align: center;
+                
+                ion-label {
+                    padding: 10px 0;
+                    font-size: 0.8em;
+                }
+            }
+        }
+    }
     .expenses {
         ion-item-sliding {
             ion-item {

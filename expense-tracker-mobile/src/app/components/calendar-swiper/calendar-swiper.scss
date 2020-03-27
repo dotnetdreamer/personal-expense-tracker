@@ -1,4 +1,8 @@
 calendar-swiper {
+    display: inline-block;
+    width: 100%;
+    padding: 16px;
+
     ion-slides {
         .swiper-wrapper {
             ion-slide {
@@ -15,7 +19,7 @@ calendar-swiper {
 
                 &.swiper-slide-active {
                     ion-button {
-                        transform: scale(1.1);
+                        transform: scale(1.2);
                         font-size: 1em;
                         --background: #f7f7f7;
                     }

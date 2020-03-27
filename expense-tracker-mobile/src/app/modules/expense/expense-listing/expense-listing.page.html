@@ -5,7 +5,8 @@
     </ion-buttons>
     <ion-title>{{ sum | currency: (workingCurrency + '&nbsp;')}}</ion-title>
   </ion-toolbar>
-  <ion-toolbar>
+  <ion-toolbar class="toolbar-calendar">
+    <ion-label>{{ selectedDate }}</ion-label>
     <calendar-swiper (monthChanged)="onMonthChanged($event)"></calendar-swiper>
   </ion-toolbar>
 </ion-header>

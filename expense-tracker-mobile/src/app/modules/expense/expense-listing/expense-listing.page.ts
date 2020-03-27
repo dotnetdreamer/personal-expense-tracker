@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation, OnDestroy } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation, OnDestroy, NgZone } from '@angular/core';
 
 import { Subscription } from 'rxjs';
 import * as moment from 'moment';
@@ -21,12 +21,14 @@ export class ExpenseListingPage extends BasePage implements OnInit, OnDestroy {
   expenses: Array<IExpense> = [];
   searchTerm: string;
   sum = 0;
+  selectedDate = '';
   workingCurrency = ''; //fix for undefined showing in title
 
   private _syncInitSub: Subscription;
   private _expenseCreatedOrUpdatedSub: Subscription;
 
-  constructor(private expenseSvc: ExpenseService
+  constructor(private ngZone: NgZone
+    , private expenseSvc: ExpenseService
     , private currencySettingSvc: CurrencySettingService) { 
     super();
 
@@ -37,13 +39,18 @@ export class ExpenseListingPage extends BasePage implements OnInit, OnDestroy {
     //we call this on sync complete at the bottom
     // await this._getExpenses();
     this.workingCurrency = await this.currencySettingSvc.getWorkingCurrency();
+
+    const fromDate = moment().startOf('M').format(AppConstant.DEFAULT_DATE_FORMAT);
+    const toDate = moment().endOf('M').format(AppConstant.DEFAULT_DATE_FORMAT);
+    this.selectedDate = `${fromDate} - ${toDate}`;
   }
 
   async onMonthChanged(args: { start, end, month }) {
     if(!args) {
       return;
     }
-
+    
+    this.selectedDate = `${args.start} - ${args.end}`;
     const currentMonth = moment().format('M');
     //if changed month is not same as current month, then we don't have entries local..
     //fetch it from online...
@@ -119,16 +126,18 @@ export class ExpenseListingPage extends BasePage implements OnInit, OnDestroy {
       }
     }
 
-    if(forceRefresh) {
-      this.expenses = await this.expenseSvc.getExpenses(args);
-    } else {
-      this.expenses = await this.expenseSvc.getExpenseListLocal(filters);
-    }
+    this.ngZone.run(async () => {
+      if(forceRefresh) {
+        this.expenses = await this.expenseSvc.getExpenses(args);
+      } else {
+        this.expenses = await this.expenseSvc.getExpenseListLocal(filters);
+      }
 
-    this.sum = this.expenses.reduce((a, b) => a + (+b.amount), 0);
-    if(AppConstant.DEBUG) {
-      console.log('ExpenseListingPage: _getExpenses: expenses', this.expenses);
-    }
+      this.sum = this.expenses.reduce((a, b) => a + (+b.amount), 0);
+      if(AppConstant.DEBUG) {
+        console.log('ExpenseListingPage: _getExpenses: expenses', this.expenses);
+      }
+    });
   }
 
   private _subscribeToEvents() {
