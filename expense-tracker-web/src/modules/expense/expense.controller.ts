@@ -1,4 +1,4 @@
-import { Controller, UseInterceptors, Get, ClassSerializerInterceptor, Post, Body } from "@nestjs/common";
+import { Controller, UseInterceptors, Get, ClassSerializerInterceptor, Post, Body, Query } from "@nestjs/common";
 
 import { ExpenseService } from "./expense.service";
 import { IExpenseParams } from "./expense.model";
@@ -14,12 +14,7 @@ export class ExpenseController {
 
   @UseInterceptors(ClassSerializerInterceptor)
   @Get('getAll')
-  async getAll() {
-    // const filters = {
-    //   fromDate: '2020-03-25',
-    //   toDate: '2020-03-25'
-    // };
-    const filters = null;
+  async getAll(@Query() filters?: { term?: string, fromDate?: string, toDate?: string }) {
     const expenses = await this.expenseSvc.findAll(filters);
 
     //map it

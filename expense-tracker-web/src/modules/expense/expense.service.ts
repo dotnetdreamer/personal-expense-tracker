@@ -19,9 +19,9 @@ export class ExpenseService {
     , private helperSvc: HelperService
   ) {}
 
-  async findAll(args?: { fromDate?: string, toDate?: string, showHidden: boolean }): Promise<Expense[]> {
+  async findAll(args?: { term?: string, fromDate?: string, toDate?: string, showHidden?: boolean }): Promise<Expense[]> {
     let qb = await getRepository(Expense)
-      .createQueryBuilder('exp');
+      .createQueryBuilder('exp'); 
       
     if(args && (args.fromDate || args.toDate)) {
       if(args.fromDate) {

@@ -16,7 +16,7 @@ import { Attachment } from './modules/attachment/attachment.entity';
   imports: [
     TypeOrmModule.forRoot({
       type: 'sqlite',
-      database: 'expense-tracker.db',
+      database: './_db/expense-tracker.db',
       entities: [Category, Expense, Attachment],
       synchronize: true,
     }),
