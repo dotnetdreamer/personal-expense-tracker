@@ -1,16 +1,19 @@
 import { NgModule } from '@angular/core';
 
 import { LocalizedResourcePipe } from './localizedRresource.pipe';
+import { FormateDatePipe } from './formateDate.pipe';
 
 @NgModule({
     declarations: [
-        LocalizedResourcePipe
+        LocalizedResourcePipe,
+        FormateDatePipe
     ],
     imports: [
 
     ],
     exports: [
-        LocalizedResourcePipe
+        LocalizedResourcePipe,
+        FormateDatePipe
     ]
 })
 export class PipesModule { }

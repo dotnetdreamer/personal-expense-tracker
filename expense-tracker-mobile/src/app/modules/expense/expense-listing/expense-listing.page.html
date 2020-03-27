@@ -27,7 +27,7 @@
             </div>
             <div class="amount-date">
               <div class="amount">{{expense.amount}}&nbsp;{{workingCurrency}}</div>
-              <div class="date">{{expense.createdOn}}</div>
+              <div class="date">{{expense.createdOn | formateDate | async}}</div>
             </div>
           </div>
         </div>
