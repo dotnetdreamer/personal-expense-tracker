@@ -9,7 +9,8 @@
         "yes": "Yes",
         "no": "No",
         "areyousure": "Are you sure ?",
-        "version": "Version"
+        "version": "Version",
+        "nodata": "No data found"
     },
     "category": {
         "title": "Category",

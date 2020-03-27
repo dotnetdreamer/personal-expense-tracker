@@ -5,7 +5,7 @@ import { Component, Input, OnInit, ViewEncapsulation } from "@angular/core";
     template: `
         <div class="data-empty">
             <ion-icon ios="data-empty" md="data-empty"></ion-icon>
-            <p>{{'label.common.nodata' | localizedresource | async}}</p>
+            <p>{{'common.nodata' | localizedresource | async}}</p>
             <ng-content></ng-content>
         </div>
     `,
