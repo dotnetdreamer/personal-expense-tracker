@@ -1,6 +1,6 @@
 {
-  "appId": "net.dotnetdreamer.et",
-  "appName": "Expense Tracker",
+  "appId": "net.dotnetdreamer.xpensive",
+  "appName": "Xpensive",
   "bundledWebRuntime": false,
   "npmClient": "npm",
   "webDir": "www",
