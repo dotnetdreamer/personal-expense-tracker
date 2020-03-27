@@ -49,19 +49,30 @@ export class ExpenseListingPage extends BasePage implements OnInit, OnDestroy {
     if(!args) {
       return;
     }
-    
-    this.selectedDate = `${args.start} - ${args.end}`;
-    const currentMonth = moment().format('M');
-    //if changed month is not same as current month, then we don't have entries local..
-    //fetch it from online...
-    if(currentMonth == args.month) {
-      await this._getExpenses({ term: this.searchTerm });
-    } else {
-      await this._getExpenses({ 
-        term: this.searchTerm, 
-        fromDate: args.start, 
-        toDate: args.end
-      }, true);
+
+    const loader = await this.helperSvc.loader;
+    await loader.present();
+
+    try {
+      this.selectedDate = `${args.start} - ${args.end}`;
+      const currentMonth = moment().format('M');
+      //if changed month is not same as current month, then we don't have entries local..
+      //fetch it from online...
+      if(currentMonth == args.month) {
+        await this._getExpenses({ term: this.searchTerm });
+      } else {
+        await this._getExpenses({ 
+          term: this.searchTerm, 
+          fromDate: args.start, 
+          toDate: args.end
+        }, true);
+      }
+    } catch (e) {
+      await this.helperSvc.presentToast(e, false);
+    } finally {
+      setTimeout(async () => {
+        await loader.dismiss();
+      }, 300);
     }
   }
 
