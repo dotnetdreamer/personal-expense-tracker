@@ -23,6 +23,7 @@
         "title_listing": "Expenses",
         "add": "Add expense",
         "description": "Description",
+        "amount": "Amount",
         "date": "Date",
         "notes": "Notes",
         "today": "Today"

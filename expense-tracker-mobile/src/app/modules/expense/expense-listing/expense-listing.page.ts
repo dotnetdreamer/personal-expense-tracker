@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewEncapsulation, OnDestroy, NgZone } from '@angular/core';
 
 import { Subscription } from 'rxjs';
+import { AlertController } from '@ionic/angular';
 import * as moment from 'moment';
 
 import { BasePage } from '../../shared/base.page';
@@ -27,7 +28,7 @@ export class ExpenseListingPage extends BasePage implements OnInit, OnDestroy {
   private _syncInitSub: Subscription;
   private _expenseCreatedOrUpdatedSub: Subscription;
 
-  constructor(private ngZone: NgZone
+  constructor(private ngZone: NgZone, private alertCtrl: AlertController
     , private expenseSvc: ExpenseService
     , private currencySettingSvc: CurrencySettingService) { 
     super();
@@ -92,25 +93,26 @@ export class ExpenseListingPage extends BasePage implements OnInit, OnDestroy {
     await this._getExpenses();
   }
 
- 
   async onAddClick() {
     await this.navigate({ path: '/expense/expense-create-or-update'})
   }
 
-  async onExpenseItemClicked(expense: IExpense) {
-    await this.navigate({ path: '/expense/expense-detail', params: { id: expense.id }});
-  }
-
-  async onExpenseItemDeleteClicked(ev: CustomEvent, expense: IExpense) {
+  async onExpenseItemClicked(ev: CustomEvent, expense: IExpense, action: 'detail' | 'edit' | 'delete' ) {
     ev.stopImmediatePropagation();
 
-    const res = await this.helperSvc.presentConfirmDialog();
-    if(res) {
-      expense.markedForDelete = true;
-      await this.expenseSvc.putLocal(expense);
-      
-      this.eventPub.$pub(SyncConstant.EVENT_SYNC_DATA_PUSH, SyncEntity.Expense);
-      await this.helperSvc.presentToastGenericSuccess();
+    if(action == 'detail') {
+      await this.navigate({ path: '/expense/expense-detail', params: { id: expense.id }});
+    } else if(action === 'edit') {
+      await this._presentUpdateModal(expense);
+    } else if(action === 'delete') {
+      const res = await this.helperSvc.presentConfirmDialog();
+      if(res) {
+        expense.markedForDelete = true;
+        await this.expenseSvc.putLocal(expense);
+        
+        this.eventPub.$pub(SyncConstant.EVENT_SYNC_DATA_PUSH, SyncEntity.Expense);
+        await this.helperSvc.presentToastGenericSuccess();
+      }
     }
   }
 
@@ -167,5 +169,65 @@ export class ExpenseListingPage extends BasePage implements OnInit, OnDestroy {
       }
       await this._getExpenses();
     });
+  }
+
+  
+  private async _presentUpdateModal(expense: IExpense) {
+    const resources = await Promise.all([
+      this.localizationSvc.getResource('expense.title')
+      , this.localizationSvc.getResource('expense.description')
+      , this.localizationSvc.getResource('expense.amount')
+      , this.localizationSvc.getResource('common.cancel')
+    ]);
+
+    const title = resources[0];
+    const alert = await this.alertCtrl.create({
+      header: title,
+      inputs: [
+        {
+          name: 'description',
+          type: 'text',
+          value: expense.description,
+          placeholder: resources[1]
+        },
+        {
+          name: 'amount',
+          type: 'tel',
+          value: expense.amount,
+          placeholder: resources[2]
+        }
+      ],
+      buttons: [
+        {
+          text: resources[3],
+          role: 'cancel',
+          cssClass: 'secondary',
+          // handler: () => {
+          // }
+        }, {
+          text: 'Ok',
+          handler: async (data) => {
+            if(!data.description && !data.amount) {
+              return;
+            }
+
+            if(!data.description.trim().length) {
+              return;
+            }
+
+            await this.expenseSvc.putLocal({
+              ...expense,
+              description: data.description,
+              amount: data.amount,
+              markedForUpdate: true
+            });   
+
+            // this.eventPub.$pub(SyncConstant.EVENT_SYNC_DATA_PUSH, SyncEntity.Expense);
+          }
+        }
+      ]
+    });
+
+    await alert.present();
   }
 }

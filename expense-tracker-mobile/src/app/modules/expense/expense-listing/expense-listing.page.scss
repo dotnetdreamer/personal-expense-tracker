@@ -72,11 +72,22 @@ page-expense-listing {
                 }
             }
             
+            ion-item-options {
+                ion-item-option {
+                    width: 60px;
+
+                    ion-icon {
+                        font-size: 24px;
+                    }
+                }
+            }
+
             &:nth-child(2n) {
                 .expense-item {
                     background-color: #f7f7f7;
                 }
             }
+
         }
 
     }

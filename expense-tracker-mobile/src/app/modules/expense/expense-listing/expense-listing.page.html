@@ -20,7 +20,7 @@
   <ion-list class="expenses">
     <no-data *ngIf="!expenses.length"></no-data>
     <ion-item-sliding *ngFor="let expense of expenses">
-      <ion-item lines="none" (click)="onExpenseItemClicked(expense)">
+      <ion-item lines="none" (click)="onExpenseItemClicked($event, expense, 'detail')">
         <div class="expense-item">
           <div class="icon-container">
             <ion-icon [attr.name]="expense.category.icon"></ion-icon>
@@ -45,8 +45,11 @@
         </div>
       </ion-item>
       <ion-item-options side="end">
-        <ion-item-option color="danger" (click)="onExpenseItemDeleteClicked($event, expense)">
-          {{'common.delete' | localizedresource | async}}
+        <ion-item-option (click)="onExpenseItemClicked($event, expense, 'edit')">
+          <ion-icon name="pencil"></ion-icon>
+        </ion-item-option>
+        <ion-item-option color="danger" (click)="onExpenseItemClicked($event, expense, 'delete')">
+          <ion-icon name="trash"></ion-icon>
         </ion-item-option>
       </ion-item-options>
     </ion-item-sliding>
