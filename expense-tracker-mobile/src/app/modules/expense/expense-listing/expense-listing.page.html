@@ -5,6 +5,9 @@
     </ion-buttons>
     <ion-title>{{ sum | currency: (workingCurrency + '&nbsp;')}}</ion-title>
   </ion-toolbar>
+  <ion-toolbar>
+    <calendar-swiper (monthChanged)="onMonthChanged($event)"></calendar-swiper>
+  </ion-toolbar>
 </ion-header>
 
 <ion-content>
@@ -14,6 +17,7 @@
     [placeholder]="'search.title' | localizedresource | async"></ion-searchbar>
 
   <ion-list class="expenses">
+    <no-data *ngIf="!expenses.length"></no-data>
     <ion-item-sliding *ngFor="let expense of expenses" (click)="onExpenseItemClicked(expense)">
       <ion-item lines="none">
         <div class="expense-item">

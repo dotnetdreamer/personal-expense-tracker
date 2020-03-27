@@ -31,7 +31,6 @@ export class ExpenseService extends BaseService {
                         if(localItem 
                             && !(localItem && (localItem.markedForAdd || localItem.markedForUpdate || localItem.markedForDelete))) {
                             await this.remove(localItem.id);
-                            console.log('remove inside')
                         }
                     }
                     //now add
@@ -155,9 +154,15 @@ export class ExpenseService extends BaseService {
         });
     }
 
-    getExpenses() {
+    getExpenses(args?: { fromDate?, toDate? }) {
+        let body;
+
+        if(args && (args.fromDate || args.toDate )) {
+            body = { ...args };
+        }
         return this.getData<IExpense[]>({
-            url: `${this.BASE_URL}/getAll`
+            url: `${this.BASE_URL}/getAll`,
+            body: body
         });
     }
 

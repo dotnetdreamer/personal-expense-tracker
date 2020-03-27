@@ -1,5 +1,8 @@
 import { Component, OnInit, ViewEncapsulation, OnDestroy } from '@angular/core';
 
+import { Subscription } from 'rxjs';
+import * as moment from 'moment';
+
 import { BasePage } from '../../shared/base.page';
 import { ExpenseService } from '../expense.service';
 import { IExpense } from '../expense.model';
@@ -7,7 +10,6 @@ import { AppConstant } from '../../shared/app-constant';
 import { CurrencySettingService } from '../../currency/currency-setting.service';
 import { SyncConstant } from '../../shared/sync/sync-constant';
 import { SyncEntity } from '../../shared/sync/sync.model';
-import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'page-expense-listing',
@@ -37,13 +39,32 @@ export class ExpenseListingPage extends BasePage implements OnInit, OnDestroy {
     this.workingCurrency = await this.currencySettingSvc.getWorkingCurrency();
   }
 
+  async onMonthChanged(args: { start, end, month }) {
+    if(!args) {
+      return;
+    }
+
+    const currentMonth = moment().format('M');
+    //if changed month is not same as current month, then we don't have entries local..
+    //fetch it from online...
+    if(currentMonth == args.month) {
+      await this._getExpenses({ term: this.searchTerm });
+    } else {
+      await this._getExpenses({ 
+        term: this.searchTerm, 
+        fromDate: args.start, 
+        toDate: args.end
+      }, true);
+    }
+  }
+
   async onSearchInputChanged(args: CustomEvent) {
     if(!this.searchTerm || this.searchTerm?.length < 3) {
       await this._getExpenses();
       return;
     }
 
-    await this._getExpenses(this.searchTerm);
+    await this._getExpenses({ term: this.searchTerm });
   }
 
   async onSearchInputCleared(args: CustomEvent) {
@@ -83,15 +104,27 @@ export class ExpenseListingPage extends BasePage implements OnInit, OnDestroy {
     }
   }
 
-  private async _getExpenses(term?) {
+  private async _getExpenses(args?: { term?, fromDate?, toDate? }, forceRefresh = false) {
     let filters = null;
-    if(term) {
-      filters = {
-        term: this.searchTerm
+    if(args && (args.term || args.fromDate || args.toDate)) {
+      filters = {};
+
+      if(args.term) {
+        filters.term = this.searchTerm;
+      }
+
+      if(args.fromDate && args.toDate) {
+        filters.fromDate = args.fromDate;
+        filters.toDate = args.toDate;
       }
     }
 
-    this.expenses = await this.expenseSvc.getExpenseListLocal(filters);
+    if(forceRefresh) {
+      this.expenses = await this.expenseSvc.getExpenses(args);
+    } else {
+      this.expenses = await this.expenseSvc.getExpenseListLocal(filters);
+    }
+
     this.sum = this.expenses.reduce((a, b) => a + (+b.amount), 0);
     if(AppConstant.DEBUG) {
       console.log('ExpenseListingPage: _getExpenses: expenses', this.expenses);
