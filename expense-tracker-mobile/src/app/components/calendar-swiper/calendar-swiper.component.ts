@@ -21,6 +21,10 @@ export class CalendarSwiperComponent implements AfterViewInit, OnDestroy {
         slidesPerView: 5,
         centeredSlides: true,
         spaceBetween: 15,
+        shortSwipes: true,
+        longSwipes: false,
+        // longSwipesRatio: 0.5,
+        // touchRatio: 0.8
     };
 
     //do not fire change event first time...
