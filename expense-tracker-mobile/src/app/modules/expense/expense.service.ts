@@ -187,9 +187,12 @@ export class ExpenseService extends BaseService {
                 // const cLocaledName: string = objToFind.name.toLowerCase();
                 let item: IExpense;
                 if(args) {
-                    if((args.term 
-                        && v.description.toLowerCase().startsWith(args.term) || (v.category.name.toLowerCase().startsWith(args.term)))) {
-                        item = v;
+                    if(args.term) {
+                        const term = args.term.toLowerCase();
+                        if(v.description.toLowerCase().startsWith(term) 
+                            || (v.category.name.toLowerCase().startsWith(term))) {
+                            item = v;
+                        }
                     }
                 } else {
                     item = v;
