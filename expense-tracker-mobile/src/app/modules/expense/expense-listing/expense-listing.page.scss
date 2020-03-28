@@ -69,6 +69,10 @@ page-expense-listing {
                             }
                         }
                     }
+
+                    &.expense-item-even {
+                        background-color: #f7f7f7;
+                    }
                 }
             }
             
@@ -81,13 +85,6 @@ page-expense-listing {
                     }
                 }
             }
-
-            &:nth-child(2n) {
-                .expense-item {
-                    background-color: #f7f7f7;
-                }
-            }
-
         }
 
     }

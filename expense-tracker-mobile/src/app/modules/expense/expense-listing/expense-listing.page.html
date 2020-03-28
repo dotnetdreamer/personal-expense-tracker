@@ -22,47 +22,48 @@
     (ionChange)="onSearchInputChanged($event)" (ionClear)="onSearchInputCleared($event)"
     [placeholder]="'search.title' | localizedresource | async"></ion-searchbar>
 
-  <ion-list class="expenses">
-    <no-data *ngIf="!expenses.length"></no-data>
-    <ion-item-sliding *ngFor="let expense of expenses">
-      <ion-item lines="none" (click)="onExpenseItemClicked($event, expense, 'detail')">
-        <div class="expense-item">
+  <no-data *ngIf="!expenses.length"></no-data>
+  <ion-virtual-scroll [items]="expenses" approxItemHeight="85px" class="expenses">
+    <!-- <ion-item-sliding *ngFor="let item of expenses"> -->
+    <ion-item-sliding *virtualItem="let item;let index=index;">
+        <ion-item lines="none" (click)="onExpenseItemClicked($event, item, 'detail')">
+        <div class="expense-item" [class.expense-item-even]="index % 2">
           <div class="icon-container">
-            <ion-icon [attr.name]="expense.category.icon" 
-              *ngIf="!expense.markedForAdd && !expense.markedForUpdate && !expense.markedForDelete"></ion-icon>
-            <ion-icon name="refresh" *ngIf="expense.markedForAdd || expense.markedForUpdate || expense.markedForDelete"></ion-icon>
+            <ion-icon [attr.name]="item.category.icon" 
+              *ngIf="!item.markedForAdd && !item.markedForUpdate && !item.markedForDelete"></ion-icon>
+            <ion-icon name="refresh" *ngIf="item.markedForAdd || item.markedForUpdate || item.markedForDelete"></ion-icon>
           </div>
           <div class="category-description-amount">
             <div class="category-description">
-              <div class="description">{{expense.description | slice:0:40 }}{{expense.description.length > 40 ? '...' : ''}}</div>
-              <div class="category">{{expense.category?.name}}</div>
+              <div class="description">{{item.description | slice:0:40 }}{{item.description.length > 40 ? '...' : ''}}</div>
+              <div class="category">{{item.category?.name}}</div>
             </div>
             <div class="amount-date">
-              <div class="amount">{{expense.amount}}&nbsp;{{workingCurrency}}</div>
+              <div class="amount">{{item.amount}}&nbsp;{{workingCurrency}}</div>
               <ng-container *ngIf="dates.todayDate">
-                <div class="date" *ngIf="dates?.todayDate != (expense.createdOn | formateDate | async)">
-                  {{expense.createdOn | formateDate | async}}
+                <div class="date" *ngIf="dates?.todayDate != (item.createdOn | formateDate | async)">
+                  {{item.createdOn | formateDate | async}}
                 </div>
-                <div class="date" *ngIf="dates?.todayDate == (expense.createdOn | formateDate | async)">
-                  {{'expense.today' | localizedresource | async}}
+                <div class="date" *ngIf="dates?.todayDate == (item.createdOn | formateDate | async)">
+                  {{'item.today' | localizedresource | async}}
                 </div>  
               </ng-container>
             </div>
           </div>
         </div>
       </ion-item>
-      <ng-container *ngIf="!expense.markedForAdd && !expense.markedForUpdate && !expense.markedForDelete">
+      <ng-container *ngIf="!item.markedForAdd && !item.markedForUpdate && !item.markedForDelete">
         <ion-item-options side="end">
-          <ion-item-option (click)="onExpenseItemClicked($event, expense, 'edit')">
+          <ion-item-option (click)="onExpenseItemClicked($event, item, 'edit')">
             <ion-icon name="pencil"></ion-icon>
           </ion-item-option>
-          <ion-item-option color="danger" (click)="onExpenseItemClicked($event, expense, 'delete')">
+          <ion-item-option color="danger" (click)="onExpenseItemClicked($event, item, 'delete')">
             <ion-icon name="trash"></ion-icon>
           </ion-item-option>
         </ion-item-options>
       </ng-container>
     </ion-item-sliding>
-  </ion-list>
+  </ion-virtual-scroll>
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
     <ion-fab-button (click)="onAddClick()">
       <ion-icon name="add"></ion-icon>
