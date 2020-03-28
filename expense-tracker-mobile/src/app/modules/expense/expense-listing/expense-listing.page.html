@@ -4,7 +4,8 @@
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
     <ion-buttons slot="end">
-      <ion-button (click)="onSyncButtonClicked()">
+      <ion-button (click)="onSyncButtonClicked()" [disabled]="isSyncInProgress" 
+         class="animated infinite" [class.spin]="isSyncInProgress">
         <ion-icon name="refresh"></ion-icon>
       </ion-button>
     </ion-buttons>
@@ -31,7 +32,8 @@
           <div class="icon-container">
             <ion-icon [attr.name]="item.category.icon" 
               *ngIf="!item.markedForAdd && !item.markedForUpdate && !item.markedForDelete"></ion-icon>
-            <ion-icon name="refresh" *ngIf="item.markedForAdd || item.markedForUpdate || item.markedForDelete"></ion-icon>
+            <ion-icon name="refresh" class="animated infinite spin" 
+              *ngIf="item.markedForAdd || item.markedForUpdate || item.markedForDelete"></ion-icon>
           </div>
           <div class="category-description-amount">
             <div class="category-description">
