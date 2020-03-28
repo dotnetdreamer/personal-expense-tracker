@@ -10,6 +10,7 @@ import { HelperService } from '../shared/helper.service';
 import { AppConstant } from '../shared/app-constant';
 import { IAttachmentParams } from '../attachment/attachment.model';
 import { ICategoryParams } from '../category/category.model';
+import { Category } from '../category/category.entity';
 
 @Injectable()
 export class ExpenseService {
@@ -27,14 +28,14 @@ export class ExpenseService {
       if(args.fromDate) {
         // const fromDate =  moment(args.fromDate, AppConstant.DEFAULT_DATE_FORMAT).toDate();
         const fromDate = args.fromDate;
-        qb = qb.andWhere('date(exp.createdOn) >= :createdOn', { createdOn: fromDate });
+        qb = qb.andWhere('date(exp.createdOn) >= :createdOnFrom', { createdOnFrom: fromDate });
       }
       if(args.toDate) {
         // const toDate = moment(args.toDate, AppConstant.DEFAULT_DATE_FORMAT)
         //   .utc()
         //   .format(AppConstant.DEFAULT_DATE_FORMAT);
         const toDate =  args.toDate;
-        qb = qb.andWhere('date(exp.createdOn) <= :createdOn', { createdOn: toDate });
+        qb = qb.andWhere('date(exp.createdOn) <= :createdOnToDate', { createdOnToDate: toDate });
       }
 
       // console.log(qb.getQuery())
@@ -49,15 +50,25 @@ export class ExpenseService {
     qb = qb.orderBy("exp.id", 'DESC')
 
     return qb.getMany();
-    // const user = await qb.getOne();
+  }
 
-    // if (user) {
-    //   const errors = {username: 'Username and email must be unique.'};
-    //   throw new HttpException({message: 'Input data validation failed', errors}, HttpStatus.BAD_REQUEST);
+  async getReportByCategory(fromDate: string, toDate: string, totalItems = 5) {
+    let qb = await getRepository(Expense)
+      .createQueryBuilder("exp");
 
-    // }
+    qb = qb.innerJoinAndSelect(Category, "cat", "cat.id == categoryId");
+    qb = qb.andWhere('date(exp.createdOn) >= :createdOnFrom', { createdOnFrom: fromDate });
+    qb = qb.andWhere('date(exp.createdOn) <= :createdOnToDate', { createdOnToDate: toDate });
 
-    // return this.expenseRepo.find();
+    qb = qb.select("COUNT(exp.id)", "total")
+    .addSelect("exp.categoryId", "categoryId")
+    .addSelect("cat.name", "categoryName");
+
+    qb = qb.groupBy("exp.categoryId");
+    qb = qb.orderBy("total", 'ASC');
+    qb = qb.limit(totalItems);
+
+    return qb.getRawMany();
   }
 
   findOne(id): Promise<Expense> {

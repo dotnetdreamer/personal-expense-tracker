@@ -26,6 +26,14 @@ export class ExpenseController {
   }
 
   @UseInterceptors(ClassSerializerInterceptor)
+  @Get('getReportByCategory')
+  async getReportByCategory(@Query() filters: { fromDate: string, toDate: string }) {
+    const items = await this.expenseSvc.getReportByCategory(
+      filters.fromDate, filters.toDate);
+    return items;
+  }
+
+  @UseInterceptors(ClassSerializerInterceptor)
   @Post('sync')
   async sync(@Body() models: IExpenseParams[]) {
     //local id and mapping server record
