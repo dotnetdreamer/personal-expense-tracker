@@ -13,6 +13,10 @@
               <ion-icon slot="start" name="home"></ion-icon>
               <ion-label>{{'home.title' | localizedresource | async}}</ion-label>
             </ion-item>
+            <ion-item (click)="onItemClicked('/expense')">
+              <ion-icon slot="start" name="home"></ion-icon>
+              <ion-label>{{'expense.title_listing' | localizedresource | async}}</ion-label>
+            </ion-item>
             <ion-item (click)="onItemClicked('/category')">
               <ion-icon slot="start" name="list"></ion-icon>
               <ion-label>{{'category.title' | localizedresource | async}}</ion-label>

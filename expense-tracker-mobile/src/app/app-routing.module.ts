@@ -22,7 +22,7 @@ const routes: Routes = [
   {
     path: 'general',
     loadChildren: () => import('./modules/general/general.common.module').then( m => m.GeneralCommonModule)
-  },
+  }
 ];
 
 @NgModule({

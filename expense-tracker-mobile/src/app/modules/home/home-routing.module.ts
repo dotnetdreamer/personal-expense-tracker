@@ -8,6 +8,15 @@ const routes: Routes = [
     component: HomePage,
     children: [
       {
+        path: 'dashboard',
+        children: [
+          {
+            path: '',
+            loadChildren: () => import('./dashboard/dashboard.module').then( m => m.DashboardPageModule)
+          }
+        ]
+      },
+      {
         path: 'expense',
         children: [
           {
@@ -19,7 +28,7 @@ const routes: Routes = [
       },
       {
         path: '',
-        redirectTo: '/home/tabs/expense',
+        redirectTo: '/home/tabs/dashboard',
         pathMatch: 'full'
       }
     ]
@@ -27,7 +36,7 @@ const routes: Routes = [
   },
   {
     path: '',
-    redirectTo: '/home/tabs/expense',
+    redirectTo: '/home/tabs/dashboard',
     pathMatch: 'full'
   }
 ];

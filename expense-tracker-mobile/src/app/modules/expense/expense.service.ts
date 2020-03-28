@@ -226,6 +226,37 @@ export class ExpenseService extends BaseService {
         });
     }
 
+    getReportByCategory(fromDate: string, toDate: string)
+        : Promise<Array<{ categoryId, categoryName, total }>> {
+        return new Promise((resolve, reject) => {
+            const db = this.dbService.Db;
+            const iter = new ydn.db.ValueIterator(this.schemaService.tables.expense);
+
+            const items = [];
+            let req = db.open(x => {
+                let e: IExpense = x.getValue();
+                if (moment(e.createdOn).format(AppConstant.DEFAULT_DATE_FORMAT) >= fromDate
+                    && moment(e.createdOn).format(AppConstant.DEFAULT_DATE_FORMAT) <= toDate) {
+                    items.push(e);
+                }
+            }, iter);
+
+            req.always(() => {
+                const result = [];
+
+                const catGroup = items.groupBy((i: IExpense) => i.category.id.toString());
+                for(let cat in catGroup) {
+                    result.push({
+                        categoryId: cat,
+                        categoryName: catGroup[cat][0].category.name,
+                        total: catGroup[cat].length
+                    });
+                } 
+                resolve(result);
+            });
+        });
+    }
+
     getByIdLocal(id) {
         return this.dbService.get<IExpense>(this.schemaService.tables.expense, id);
     }

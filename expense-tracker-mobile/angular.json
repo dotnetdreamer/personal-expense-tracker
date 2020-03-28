@@ -46,6 +46,7 @@
               }
             ],
             "scripts": [
+              "node_modules/apexcharts/dist/apexcharts.min.js",
               "node_modules/ydn.db/jsc/ydn.db-dev.js"
             ]
           },
