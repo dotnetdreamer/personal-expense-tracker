@@ -14,12 +14,32 @@
 </ion-header>
 
 <ion-content>
+  <ion-list-header>
+    <ion-label>{{'setting.database' | localizedresource | async}}</ion-label>
+  </ion-list-header>
   <ion-list>
     <ion-item>
       <ion-label>{{'setting.delete_db' | localizedresource | async}}</ion-label>
       <ion-button (click)="onDeleteDbClickec()">
         {{'common.delete' | localizedresource | async}}
       </ion-button>
+    </ion-item>
+    <ion-item>
+      <ion-label>{{'setting.table' | localizedresource | async}}</ion-label>
+      <ion-select [(ngModel)]="selectedTable" 
+        [placeholder]="'common.select' | localizedresource | async" 
+        (ionChange)="onTableSelectionChanged()">
+        <ion-select-option [value]="tab" *ngFor="let tab of tables">{{tab}}</ion-select-option>
+      </ion-select>
+      <ion-button color="danger" (click)="onTableActionClicked('update')">
+        {{'common.update' | localizedresource | async}}
+      </ion-button>
+      <ion-button (click)="onTableActionClicked('reset')">
+        {{'common.reset' | localizedresource | async}}
+      </ion-button>
+    </ion-item>
+    <ion-item *ngIf="selectedTable">
+      <ion-textarea rows="5" #tableDataTextArea></ion-textarea>
     </ion-item>
   </ion-list>
 </ion-content>

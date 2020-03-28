@@ -8,6 +8,10 @@
         "cancel": "Cancel",
         "yes": "Yes",
         "no": "No",
+        "update": "Update",
+        "clear": "Clear",
+        "reset": "Reset",
+        "select": "[ Select ]",
         "areyousure": "Are you sure ?",
         "version": "Version",
         "nodata": "No data found"
@@ -33,7 +37,9 @@
     },
     "setting": {
         "title": "Setting",
-        "delete_db": "Delete Database"
+        "database": "Database",
+        "delete_db": "Delete Database",
+        "table": "Table"
     },
     "search": {
         "title": "Search"    
