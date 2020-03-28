@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewEncapsulation, OnDestroy, NgZone } from '@angular/core';
 
 import { Subscription } from 'rxjs';
-import { AlertController } from '@ionic/angular';
+import { AlertController, IonItemSliding } from '@ionic/angular';
 import * as moment from 'moment';
 
 import { BasePage } from '../../shared/base.page';
@@ -99,9 +99,11 @@ export class ExpenseListingPage extends BasePage implements OnInit, OnDestroy {
     await this.navigate({ path: '/expense/expense-create-or-update'})
   }
 
-  async onExpenseItemClicked(ev: CustomEvent, expense: IExpense, action: 'detail' | 'edit' | 'delete' ) {
+  async onExpenseItemClicked(ev: CustomEvent, expense: IExpense
+    , action: 'detail' | 'edit' | 'delete', slidingItem: IonItemSliding) {
     ev.stopImmediatePropagation();
-
+    await slidingItem.close();
+    
     if(action == 'detail') {
       await this.navigate({ path: '/expense/expense-detail', params: { id: expense.id }});
     } else if(action === 'edit') {

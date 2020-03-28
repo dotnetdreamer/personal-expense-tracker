@@ -26,8 +26,8 @@
   <no-data *ngIf="!expenses.length"></no-data>
   <ion-virtual-scroll [items]="expenses" approxItemHeight="85px" class="expenses">
     <!-- <ion-item-sliding *ngFor="let item of expenses"> -->
-    <ion-item-sliding *virtualItem="let item;let index=index;">
-        <ion-item lines="none" (click)="onExpenseItemClicked($event, item, 'detail')">
+    <ion-item-sliding #slidingItem *virtualItem="let item;let index=index;">
+        <ion-item lines="none" (click)="onExpenseItemClicked($event, item, 'detail', slidingItem)">
         <div class="expense-item" [class.expense-item-even]="index % 2">
           <div class="icon-container">
             <ion-icon [attr.name]="item.category.icon" 
@@ -56,10 +56,10 @@
       </ion-item>
       <ng-container *ngIf="!item.markedForAdd && !item.markedForUpdate && !item.markedForDelete">
         <ion-item-options side="end">
-          <ion-item-option (click)="onExpenseItemClicked($event, item, 'edit')">
+          <ion-item-option (click)="onExpenseItemClicked($event, item, 'edit', slidingItem)">
             <ion-icon name="pencil"></ion-icon>
           </ion-item-option>
-          <ion-item-option color="danger" (click)="onExpenseItemClicked($event, item, 'delete')">
+          <ion-item-option color="danger" (click)="onExpenseItemClicked($event, item, 'delete', slidingItem)">
             <ion-icon name="trash"></ion-icon>
           </ion-item-option>
         </ion-item-options>
