@@ -4,6 +4,12 @@
     <ion-buttons slot="start">
       <ion-back-button></ion-back-button>
     </ion-buttons>
+    <ion-buttons slot="end">
+      <ion-button (click)="onSyncButtonClicked()" [disabled]="isSyncInProgress" 
+         class="animated infinite" [class.spin]="isSyncInProgress">
+        <ion-icon name="refresh"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
