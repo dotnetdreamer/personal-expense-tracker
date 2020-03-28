@@ -8,6 +8,14 @@
 </ion-header>
 
 <ion-content>
+  <div class="date-filters">
+    <ion-datetime 
+      [displayFormat]="DEFAULT_DATE_FORMAT" [value]="selectedFromDate"  
+        (ionChange)="onDateSelectionChanged($event, 'fromDate')"></ion-datetime>
+    &nbsp;-&nbsp;
+    <ion-datetime [value]="selectedToDate" [displayFormat]="DEFAULT_DATE_FORMAT" 
+      (ionChange)="onDateSelectionChanged($event, 'toDate')"></ion-datetime>
+  </div>
   <ion-card>
     <ion-card-header>
       <ion-card-title>Spending by Top 5 Categories</ion-card-title>

@@ -28,19 +28,29 @@ export type ChartOptions = {
 export class DashboardPage implements AfterViewInit {
   @ViewChild("chart") chart: ChartComponent;
   chartOptions: Partial<ChartOptions>;
+  DEFAULT_DATE_FORMAT = AppConstant.DEFAULT_DATE_FORMAT;
+  selectedFromDate;
+  selectedToDate;
 
   constructor(private expenseSvc: ExpenseService) { 
+    this.selectedFromDate = moment().add(-7, 'd').format(AppConstant.DEFAULT_DATE_FORMAT);
+    this.selectedToDate = moment().format(AppConstant.DEFAULT_DATE_FORMAT);
   }
 
   async ngAfterViewInit() {
-    await this._render();
+    await this._render(this.selectedFromDate, this.selectedToDate);
   }
 
-  private async _render() {
-    const fromDate = moment().add(-7, 'd').format(AppConstant.DEFAULT_DATE_FORMAT);
-    const toDate = moment().format(AppConstant.DEFAULT_DATE_FORMAT);
+  async onDateSelectionChanged($event: CustomEvent, prop: 'fromDate' | 'toDate') {
+    const d = moment($event.detail.value).format(AppConstant.DEFAULT_DATE_FORMAT);
 
+    await this._render(prop == 'fromDate' ? d : this.selectedFromDate
+      , prop == 'toDate' ? d : this.selectedToDate);
+  }
+
+  private async _render(fromDate, toDate) {
     const report = await this.expenseSvc.getReportByCategory(fromDate, toDate);
+
     const totals = report.map(r => r.total);
     const categories = report.map(r => r.categoryName);
 
@@ -52,7 +62,7 @@ export class DashboardPage implements AfterViewInit {
         }
       ],
       chart: {
-        height: 350,
+        height: 300,
         type: "bar"
       },
       // title: {
