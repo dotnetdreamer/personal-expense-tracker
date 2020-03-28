@@ -45,7 +45,7 @@
                   {{item.createdOn | formateDate | async}}
                 </div>
                 <div class="date" *ngIf="dates?.todayDate == (item.createdOn | formateDate | async)">
-                  {{'item.today' | localizedresource | async}}
+                  {{'expense.today' | localizedresource | async}}
                 </div>  
               </ng-container>
             </div>
