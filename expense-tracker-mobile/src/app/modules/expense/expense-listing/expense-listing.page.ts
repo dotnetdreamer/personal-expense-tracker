@@ -27,6 +27,7 @@ export class ExpenseListingPage extends BasePage implements OnInit, OnDestroy {
 
   private _syncInitSub: Subscription;
   private _expenseCreatedOrUpdatedSub: Subscription;
+  private _syncDataPushCompleteSub: Subscription;
 
   constructor(private ngZone: NgZone, private alertCtrl: AlertController
     , private expenseSvc: ExpenseService
@@ -103,6 +104,10 @@ export class ExpenseListingPage extends BasePage implements OnInit, OnDestroy {
     if(action == 'detail') {
       await this.navigate({ path: '/expense/expense-detail', params: { id: expense.id }});
     } else if(action === 'edit') {
+      //wait till item is synced...
+      // if(expense.markedForAdd || expense.markedForUpdate || expense.markedForDelete) {
+      //   return;
+      // }
       await this._presentUpdateModal(expense);
     } else if(action === 'delete') {
       const res = await this.helperSvc.presentConfirmDialog();
@@ -116,13 +121,19 @@ export class ExpenseListingPage extends BasePage implements OnInit, OnDestroy {
     }
   }
 
+  async onSyncButtonClicked() {
+    this.eventPub.$pub(SyncConstant.EVENT_SYNC_DATA_PUSH, SyncEntity.Expense);
+  }
+
   ngOnDestroy() {
     if(this._expenseCreatedOrUpdatedSub) {
       this._expenseCreatedOrUpdatedSub.unsubscribe();
     }
-
     if(this._syncInitSub) {
       this._syncInitSub.unsubscribe();
+    }
+    if(this._syncDataPushCompleteSub) {
+      this._syncDataPushCompleteSub.unsubscribe();
     }
   }
 
@@ -163,7 +174,20 @@ export class ExpenseListingPage extends BasePage implements OnInit, OnDestroy {
       await this._getExpenses();
     });
 
-    this._syncInitSub = this.eventPub.$sub(AppConstant.EVENT_SYNC_INIT_COMPLETE, async () => {
+    this._syncDataPushCompleteSub = this.eventPub.$sub(SyncConstant.EVENT_SYNC_DATA_PUSH_COMPLETE, async () => {
+      if(AppConstant.DEBUG) {
+        console.log('ExpenseListingPage:Event received: EVENT_SYNC_DATA_PUSH_COMPLETE');
+      }
+      //force refresh...
+      this.expenses = [];
+      setTimeout(async () => {
+        await this._getExpenses();
+      });
+    });
+
+    //important to add here since the application loads and the view will show but there will be no data...
+    //this is needed only when the application runs first time (i.e startup)
+    this._syncInitSub = this.eventPub.$sub(SyncConstant.EVENT_SYNC_INIT_COMPLETE, async () => {
       if(AppConstant.DEBUG) {
         console.log('ExpenseListingPage:Event received: EVENT_SYNC_INIT_COMPLETE');
       }
@@ -171,7 +195,6 @@ export class ExpenseListingPage extends BasePage implements OnInit, OnDestroy {
     });
   }
 
-  
   private async _presentUpdateModal(expense: IExpense) {
     const resources = await Promise.all([
       this.localizationSvc.getResource('expense.title')
@@ -222,6 +245,7 @@ export class ExpenseListingPage extends BasePage implements OnInit, OnDestroy {
               markedForUpdate: true
             });   
 
+            this.eventPub.$pub(SyncConstant.EVENT_SYNC_DATA_PUSH, SyncEntity.Expense);
             // this.eventPub.$pub(SyncConstant.EVENT_SYNC_DATA_PUSH, SyncEntity.Expense);
           }
         }

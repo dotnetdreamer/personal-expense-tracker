@@ -56,7 +56,7 @@ export class ExpenseService extends BaseService {
             }
 
             let dependancySynced = true;
-            //make sure category and attachments are synced...if dependant
+            //make sure category and attachments are synced...if dependant are found
             unSycedLocal.forEach(async (ul) => {
                 //make sure its synched first...
                 try {
@@ -85,12 +85,18 @@ export class ExpenseService extends BaseService {
                 return; 
             }
 
+            let items: Array<any>;
             //server returns array of dictionary objects, each key in dict is the localdb id
             //we map the localids and update its serverid locally
-            const items = await this.postData<any[]>({
-                url: `${this.BASE_URL}/sync`,
-                body: unSycedLocal
-            });
+            try {
+                items = await this.postData<any[]>({
+                    url: `${this.BASE_URL}/sync`,
+                    body: unSycedLocal
+                });
+            } catch(e) {
+                reject(e);
+                return;
+            }
             
             //something bad happend or in case of update, we don't need to update server ids
             if(items == null) {
@@ -239,10 +245,12 @@ export class ExpenseService extends BaseService {
             //added item can't be marked for update or delete...
             if((item.markedForAdd && item.markedForUpdate) || (item.markedForAdd && item.markedForDelete)) {
                 item.markedForUpdate = false;
+                item.markedForDelete = false;
             }
         }
         
-        if(item.attachment) {
+        //push attachment only in case of Add, ignore in edit/delete
+        if(item.attachment && item.markedForAdd) {
             const id = await this.attachmentSvc.putLocal(item.attachment);
             item.attachment.id = +id;
         }

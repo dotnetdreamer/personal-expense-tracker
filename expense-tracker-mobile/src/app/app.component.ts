@@ -130,7 +130,7 @@ export class AppComponent {
       // }, 1000);
     });
 
-    this.eventPub.$sub(AppConstant.EVENT_SYNC_INIT_COMPLETE, async () => {
+    this.eventPub.$sub(SyncConstant.EVENT_SYNC_INIT_COMPLETE, async () => {
       if(AppConstant.DEBUG) {
         console.log('AppComponent:Event received: EVENT_SYNC_INIT_COMPLETE');
       }

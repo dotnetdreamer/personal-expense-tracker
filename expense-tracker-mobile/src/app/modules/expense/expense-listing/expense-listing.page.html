@@ -3,6 +3,11 @@
     <ion-buttons slot="start">
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
+    <ion-buttons slot="end">
+      <ion-button (click)="onSyncButtonClicked()">
+        <ion-icon name="refresh"></ion-icon>
+      </ion-button>
+    </ion-buttons>
     <ion-title>{{ sum | currency: (workingCurrency + '&nbsp;')}}</ion-title>
   </ion-toolbar>
   <ion-toolbar class="toolbar-calendar">
@@ -23,7 +28,9 @@
       <ion-item lines="none" (click)="onExpenseItemClicked($event, expense, 'detail')">
         <div class="expense-item">
           <div class="icon-container">
-            <ion-icon [attr.name]="expense.category.icon"></ion-icon>
+            <ion-icon [attr.name]="expense.category.icon" 
+              *ngIf="!expense.markedForAdd && !expense.markedForUpdate && !expense.markedForDelete"></ion-icon>
+            <ion-icon name="refresh" *ngIf="expense.markedForAdd || expense.markedForUpdate || expense.markedForDelete"></ion-icon>
           </div>
           <div class="category-description-amount">
             <div class="category-description">
@@ -44,14 +51,16 @@
           </div>
         </div>
       </ion-item>
-      <ion-item-options side="end">
-        <ion-item-option (click)="onExpenseItemClicked($event, expense, 'edit')">
-          <ion-icon name="pencil"></ion-icon>
-        </ion-item-option>
-        <ion-item-option color="danger" (click)="onExpenseItemClicked($event, expense, 'delete')">
-          <ion-icon name="trash"></ion-icon>
-        </ion-item-option>
-      </ion-item-options>
+      <ng-container *ngIf="!expense.markedForAdd && !expense.markedForUpdate && !expense.markedForDelete">
+        <ion-item-options side="end">
+          <ion-item-option (click)="onExpenseItemClicked($event, expense, 'edit')">
+            <ion-icon name="pencil"></ion-icon>
+          </ion-item-option>
+          <ion-item-option color="danger" (click)="onExpenseItemClicked($event, expense, 'delete')">
+            <ion-icon name="trash"></ion-icon>
+          </ion-item-option>
+        </ion-item-options>
+      </ng-container>
     </ion-item-sliding>
   </ion-list>
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">

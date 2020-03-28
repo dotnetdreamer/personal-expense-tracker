@@ -1,4 +1,8 @@
 import { Component, OnInit, ViewEncapsulation, ViewChild, ElementRef } from '@angular/core';
+
+import { Plugins } from '@capacitor/core';
+const { Browser } = Plugins;
+
 import { BasePage } from '../../shared/base.page';
 import { ActivatedRoute } from '@angular/router';
 import { AppConstant } from '../../shared/app-constant';
@@ -31,6 +35,12 @@ export class ExpenseDetailPage extends BasePage implements OnInit {
       const { id } = params;
       await this._getExpese(+id);
     });
+  }
+
+  async onAttachmentClicked(expense: IExpense) {
+    if(expense.attachment) {
+      await Browser.open({ url: `${AppConstant.BASE_URL}${expense.attachment.attachment}` });
+    }
   }
 
   private async _getExpese(id) {

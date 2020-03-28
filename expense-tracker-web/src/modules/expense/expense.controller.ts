@@ -43,8 +43,6 @@ export class ExpenseController {
 
         const item = await this.expenseSvc.save(toAdd);
         returnedExpense = item;        
-        
-        delete returnedExpense.markedForAdd;
       } else if(model.markedForUpdate) {
         const toUpdate = await this.expenseSvc.findOne(model.id);
         if(!toUpdate) {
@@ -53,8 +51,6 @@ export class ExpenseController {
     
         let updated = await this._updateOrDelete(toUpdate, model, false);
         returnedExpense = updated;
-
-        delete returnedExpense.markedForUpdate;
       } else if(model.markedForDelete) {
         const toDelete = await this.expenseSvc.findOne(model.id);
         if(!toDelete) {
@@ -63,9 +59,24 @@ export class ExpenseController {
 
         let deleted = await this._updateOrDelete(toDelete, model, true);
         returnedExpense = deleted;
-        
-        delete returnedExpense.markedForDelete;
       }
+
+      // delete returnedExpense.markedForAdd;
+      // delete returnedExpense.markedForUpdate;
+      // delete returnedExpense.markedForDelete;
+
+      // if(returnedExpense.category) {
+      //   delete returnedExpense.category.markedForAdd;
+      //   delete returnedExpense.category.markedForUpdate;
+      //   delete returnedExpense.category.markedForDelete;
+      // }
+
+      // if(returnedExpense.attachment) {
+      //   delete returnedExpense.attachment.markedForAdd;
+      //   delete returnedExpense.attachment.markedForUpdate;
+      //   delete returnedExpense.attachment.markedForDelete;
+      // }
+      returnedExpense = await this._prepare(returnedExpense);
 
       itemMap.set(model.id, returnedExpense);
       items.push(itemMap);
@@ -76,7 +87,8 @@ export class ExpenseController {
 
   private async _updateOrDelete(toUpdateOrDelete: Expense, model, shouldDelete?: boolean) {
     //no need to update
-    delete toUpdateOrDelete.createdOn;
+    delete model.createdOn;
+    delete model.attachment;
     model.isDeleted = shouldDelete;
 
     let updated = Object.assign(toUpdateOrDelete, model);
@@ -87,9 +99,11 @@ export class ExpenseController {
 
   private async _prepare(exp: Expense) {
     let mExp = Object.assign({}, exp);
+    
     //category
-    mExp["category"] = await this.categorySvc.findOne(mExp.categoryId);
-
+    const category = await this.categorySvc.findOne(mExp.categoryId);
+    mExp["category"] = category;
+ 
     //attachment
     if(mExp.attachmentId) {
       const attachment = await this.attachmentSvc.findOne(mExp.attachmentId);
@@ -102,6 +116,21 @@ export class ExpenseController {
     //remove 
     delete mExp.attachmentId;
     delete mExp.categoryId;
+    delete mExp['markedForAdd'];
+    delete mExp['markedForUpdate'];
+    delete mExp['markedForDelete'];
+
+    // if(mExp.category) {
+    //   delete mExp.category.markedForAdd;
+    //   delete mExp.category.markedForUpdate;
+    //   delete mExp.category.markedForDelete;
+    // }
+
+    // if(mExp.attachment) {
+    //   delete mExp.attachment.markedForAdd;
+    //   delete mExp.attachment.markedForUpdate;
+    //   delete mExp.attachment.markedForDelete;
+    // }
 
     return mExp;
   }

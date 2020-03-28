@@ -56,11 +56,17 @@ export class CategoryService extends BaseService {
 
             //server returns array of dictionary objects, each key in dict is the localdb id
             //we map the localids and update its serverid locally
-            const items = await this.postData<any[]>({
-                url: `${this.BASE_URL}/sync`,
-                body: unSycedLocal
-            });
-            
+            let items: Array<any>;
+            try {
+                items = await this.postData<any[]>({
+                    url: `${this.BASE_URL}/sync`,
+                    body: unSycedLocal
+                });
+            } catch(e) {
+                reject(e);
+                return;
+            }
+
             //something bad happend or in case of update, we don't need to update server ids
             if(items == null) {
                 resolve();
@@ -164,6 +170,7 @@ export class CategoryService extends BaseService {
             //added item can't be marked for update or delete...
             if((item.markedForAdd && item.markedForUpdate) || (item.markedForAdd && item.markedForDelete)) {
                 item.markedForUpdate = false;
+                item.markedForDelete = false;
             }
         }
 
