@@ -1,7 +1,7 @@
-import { Component, OnInit, ViewEncapsulation, OnDestroy } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation, OnDestroy, ViewChild } from '@angular/core';
 import { Location } from '@angular/common';
 
-import { AlertController, ModalController } from '@ionic/angular';
+import { AlertController, ModalController, IonInput } from '@ionic/angular';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import * as moment from 'moment';
 
@@ -23,6 +23,8 @@ import { IAttachment } from '../../attachment/attachment.model';
   encapsulation: ViewEncapsulation.None
 })
 export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit {
+  @ViewChild('description') descriptionInput: IonInput;
+
   formGroup: FormGroup;
   categories: ICategory[];
   selectedCategory: ICategory;
@@ -53,6 +55,10 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit {
   async ngOnInit() {
     await this._getCategoryList();
 
+    //auto focus on first field
+    setTimeout(async () => {
+      await this.descriptionInput.setFocus();
+    }, 300);
     // if(AppConstant.DEBUG) {
     //   this._preFill();
     // }
