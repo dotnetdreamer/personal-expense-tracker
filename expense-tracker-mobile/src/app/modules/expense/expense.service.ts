@@ -227,7 +227,7 @@ export class ExpenseService extends BaseService {
     }
 
     getReportByCategory(fromDate: string, toDate: string, totalItems = 10)
-        : Promise<Array<{ categoryId, categoryName, total, totalAmount }>> {
+        : Promise<{ categories: Array<{ label, total, totalAmount }>, dates: Array<{ label, total, totalAmount }> }> {
         return new Promise((resolve, reject) => {
             const db = this.dbService.Db;
             const iter = new ydn.db.ValueIterator(this.schemaService.tables.expense);
@@ -242,9 +242,12 @@ export class ExpenseService extends BaseService {
             }, iter);
 
             req.always(() => {
-                let result = [];
+                let result: { categories, dates };
 
-                const catGroup = items.groupBy((i: IExpense) => i.category.id.toString());
+                const catGroup = items.groupBy((i: IExpense) => {
+                    return i.category.id.toString();
+                });
+                let categories = [];
                 let i = 0;
                 for(let cat in catGroup) {
                     if(i == totalItems) {
@@ -252,18 +255,34 @@ export class ExpenseService extends BaseService {
                     }
 
                     const sum = (<IExpense[]>catGroup[cat]).reduce((a, b) => a + (+b.amount), 0);
-                    result.push({
-                        categoryId: cat,
-                        categoryName: catGroup[cat][0].category.name,
+                    categories.push({
+                        label: catGroup[cat][0].category.name,
                         total: catGroup[cat].length,
                         totalAmount: sum
                     });
                     i++;
                 } 
                 //order by...
-                result = result.sort((a, b) => {
+                categories = categories.sort((a, b) => {
                     return a.total - b.total;
-                })
+                });
+
+                let dates = [];
+                const dateGroup = items.groupBy((i: IExpense) => {
+                    return moment(i.createdOn).format(AppConstant.DEFAULT_DATE_FORMAT);
+                });
+                for(let dat in dateGroup) {
+                    const sum = (<IExpense[]>dateGroup[dat]).reduce((a, b) => a + (+b.amount), 0);
+                    dates.push({
+                        label: moment(dateGroup[dat][0].createdOn).format(AppConstant.DEFAULT_DATE_FORMAT),
+                        total: dateGroup[dat].length,
+                        totalAmount: sum
+                    });
+                } 
+                result = {
+                    categories: categories,
+                    dates: dates
+                }
                 resolve(result);
             });
         });

@@ -36,7 +36,8 @@
     "home": {
         "title": "Home",
         "dashboard": {
-            "spending_by_category": "Spending by Top 10 Categories"
+            "spending_by_category": "Spendings by Top 10 categories",
+            "spending_by_date": "Spendings by date"
         }
     },
     "setting": {

@@ -62,8 +62,7 @@ export class ExpenseService {
 
     qb = qb.select("COUNT(exp.id)", "total")
     .addSelect("SUM(exp.amount)", "totalAmount")
-    .addSelect("exp.categoryId", "categoryId")
-    .addSelect("cat.name", "categoryName");
+    .addSelect("cat.name", "label");
 
     qb = qb.groupBy("exp.categoryId");
     qb = qb.orderBy("total", 'ASC');

@@ -15,15 +15,23 @@ import {
   ChartComponent,
   ApexDataLabels,
   ApexXAxis,
-  ApexPlotOptions
+  ApexPlotOptions,
+  ApexNonAxisChartSeries,
+  ApexResponsive
 } from "ng-apexcharts";
 
-export type ChartOptions = {
+export type DateChartOptions = {
   series: ApexAxisChartSeries;
   chart: ApexChart;
   dataLabels: ApexDataLabels;
   plotOptions: ApexPlotOptions;
   xaxis: ApexXAxis;
+};
+
+export type CategoryChartOptions = {
+  series: ApexNonAxisChartSeries;
+  chart: ApexChart;
+  labels: any;
 };
 
 @Component({
@@ -33,8 +41,11 @@ export type ChartOptions = {
   encapsulation: ViewEncapsulation.None
 })
 export class DashboardPage extends BasePage implements AfterViewInit, OnDestroy {
-  @ViewChild("chart") chart: ChartComponent;
-  chartOptions: Partial<ChartOptions>;
+  // @ViewChild("categoryChart") categoryChart: ChartComponent;
+  // @ViewChild("dateChart") categoryChart: ChartComponent;
+  categoryChartOptions: Partial<CategoryChartOptions>;
+  dateChartOptions: Partial<DateChartOptions>;
+
   totalAmount = 0;
   DEFAULT_DATE_FORMAT = AppConstant.DEFAULT_DATE_FORMAT;
   selectedFromDate;
@@ -86,19 +97,24 @@ export class DashboardPage extends BasePage implements AfterViewInit, OnDestroy 
 
   private async _renderCharts(fromDate, toDate) {
     const resoures = await Promise.all([
-      this.localizationSvc.getResource('expense.title_listing')
+      this.localizationSvc.getResource('expense.total')
     ]);
     const report = await this.expenseSvc.getReportByCategory(fromDate, toDate);
-    this.totalAmount = report.reduce((a, b) => a + (+b.totalAmount), 0);
+    let categories = report.categories;
+    let dates = report.dates;
+    this.totalAmount = categories.reduce((a, b) => a + (+b.totalAmount), 0);
     
-    const totals = report.map(r => r.totalAmount);
-    const categories = report.map(r => r.categoryName);
+    const dateTotalAmounts = dates.map(d => d.totalAmount);
+    const dateLabels = dates.map(d => d.label);
 
-    this.chartOptions = {
+    const categoryTotalAmounts = categories.map(r => r.totalAmount);
+    const categoryLabels = categories.map(r => r.label);
+
+    this.dateChartOptions = {
       series: [
         {
           name: resoures[0],
-          data: totals
+          data: dateTotalAmounts
         }
       ],
       chart: {
@@ -114,27 +130,18 @@ export class DashboardPage extends BasePage implements AfterViewInit, OnDestroy 
         enabled: false
       },
       xaxis: {
-        categories: categories
+        categories: dateLabels
       }
     };
-    // this.chartOptions = {
-    //   series: [
-    //     {
-    //       name: "Spending",
-    //       data: totals
-    //     }
-    //   ],
-    //   chart: {
-    //     height: 300,
-    //     type: "bar"
-    //   },
-    //   // title: {
-    //   //   text: "My First Angular Chart"
-    //   // },
-    //   xaxis: {
-    //     categories: categories
-    //   }
-    // };
+   
+    this.categoryChartOptions = {
+      series: categoryTotalAmounts,
+      chart: {
+        // width: 320,
+        type: "pie"
+      },
+      labels: categoryLabels
+    };
   }
 
   private _subscribeToEvents() {
