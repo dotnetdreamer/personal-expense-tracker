@@ -226,7 +226,7 @@ export class ExpenseService extends BaseService {
         });
     }
 
-    getReportByCategory(fromDate: string, toDate: string, totalItems = 10)
+    getReport(fromDate: string, toDate: string, totalItems = 10)
         : Promise<{ categories: Array<{ label, total, totalAmount }>, dates: Array<{ label, total, totalAmount }> }> {
         return new Promise((resolve, reject) => {
             const db = this.dbService.Db;

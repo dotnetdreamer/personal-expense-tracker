@@ -99,7 +99,7 @@ export class DashboardPage extends BasePage implements AfterViewInit, OnDestroy 
     const resoures = await Promise.all([
       this.localizationSvc.getResource('expense.total')
     ]);
-    const report = await this.expenseSvc.getReportByCategory(fromDate, toDate);
+    const report = await this.expenseSvc.getReport(fromDate, toDate);
     let categories = report.categories;
     let dates = report.dates;
     this.totalAmount = categories.reduce((a, b) => a + (+b.totalAmount), 0);

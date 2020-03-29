@@ -26,9 +26,9 @@ export class ExpenseController {
   }
 
   @UseInterceptors(ClassSerializerInterceptor)
-  @Get('getReportByCategory')
-  async getReportByCategory(@Query() filters: { fromDate: string, toDate: string }) {
-    const items = await this.expenseSvc.getReportByCategory(
+  @Get('getReport')
+  async getReport(@Query() filters: { fromDate: string, toDate: string }) {
+    const items = await this.expenseSvc.getReport(
       filters.fromDate, filters.toDate);
     return items;
   }

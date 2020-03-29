@@ -52,7 +52,8 @@ export class ExpenseService {
     return qb.getMany();
   }
 
-  async getReportByCategory(fromDate: string, toDate: string, totalItems = 10) {
+  async getReport(fromDate: string, toDate: string, totalItems = 10)
+    : Promise<{ categories: Array<{ label, total, totalAmount }>, dates: Array<{ label, total, totalAmount }> }> {
     let qb = await getRepository(Expense)
       .createQueryBuilder("exp");
 
@@ -61,14 +62,24 @@ export class ExpenseService {
     qb = qb.andWhere('date(exp.createdOn) <= :createdOnToDate', { createdOnToDate: toDate });
 
     qb = qb.select("COUNT(exp.id)", "total")
-    .addSelect("SUM(exp.amount)", "totalAmount")
-    .addSelect("cat.name", "label");
+    .addSelect("SUM(exp.amount)", "totalAmount");
 
-    qb = qb.groupBy("exp.categoryId");
     qb = qb.orderBy("total", 'ASC');
-    qb = qb.limit(totalItems);
 
-    return qb.getRawMany();
+    let catQb = qb;
+    catQb = catQb.addSelect("cat.name", "label");
+    catQb = catQb.groupBy("exp.categoryId");
+    const categories: any = await catQb.limit(totalItems).getRawMany();
+
+    let datQb = qb;
+    datQb = datQb.addSelect("date(exp.createdOn)", "label");
+    datQb = datQb.groupBy("date(exp.createdOn)");
+    const dates: any = await datQb.getRawMany();
+
+    return {
+      categories: categories,
+      dates: dates
+    };
   }
 
   findOne(id): Promise<Expense> {
