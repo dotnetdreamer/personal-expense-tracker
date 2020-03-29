@@ -52,12 +52,23 @@ export class DashboardPage extends BasePage implements AfterViewInit, OnDestroy 
   async onDateSelectionChanged($event: CustomEvent, prop: 'fromDate' | 'toDate') {
     const d = moment($event.detail.value).format(AppConstant.DEFAULT_DATE_FORMAT);
 
-    await this._render(prop == 'fromDate' ? d : this.selectedFromDate
+    await this._renderCharts(prop == 'fromDate' ? d : this.selectedFromDate
       , prop == 'toDate' ? d : this.selectedToDate);
   }
 
   async onAddClick() {
     await this.navigate({ path: '/expense/expense-create-or-update'})
+  }
+
+  async doRefresh(ev) {
+    //reset
+    this.selectedFromDate = moment().add(-7, 'd').format(AppConstant.DEFAULT_DATE_FORMAT);
+    this.selectedToDate = moment().format(AppConstant.DEFAULT_DATE_FORMAT);
+
+    await this._renderCharts(this.selectedFromDate, this.selectedToDate);
+    setTimeout(() => {
+      ev.target.complete();
+    }, 300);
   }
 
   ngOnDestroy() {
@@ -66,7 +77,7 @@ export class DashboardPage extends BasePage implements AfterViewInit, OnDestroy 
     }
   }
 
-  private async _render(fromDate, toDate) {
+  private async _renderCharts(fromDate, toDate) {
     const report = await this.expenseSvc.getReportByCategory(fromDate, toDate);
 
     const totals = report.map(r => r.total);
@@ -97,7 +108,7 @@ export class DashboardPage extends BasePage implements AfterViewInit, OnDestroy 
       if(AppConstant.DEBUG) {
         console.log('DashboardPage:Event received: EVENT_SYNC_DATA_PUSH_COMPLETE');
       }
-      await this._render(this.selectedFromDate, this.selectedToDate);
+      await this._renderCharts(this.selectedFromDate, this.selectedToDate);
     });
   }
 }
