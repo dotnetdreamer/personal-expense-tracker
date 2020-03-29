@@ -15,6 +15,7 @@ import { CategoryPage } from '../../category/category.page';
 import { SyncConstant } from '../../shared/sync/sync-constant';
 import { SyncEntity } from '../../shared/sync/sync.model';
 import { IAttachment } from '../../attachment/attachment.model';
+import { MlService } from '../../shared/ml/ml.service';
 
 @Component({
   selector: 'page-expense-create-or-update',
@@ -32,10 +33,9 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit {
   private _attachment: IAttachment;
 
   constructor(private formBuilder: FormBuilder, private location: Location
-    , private alertCtrl: AlertController
-    , private expenseSvc: ExpenseService
+    , private alertCtrl: AlertController, private modalCtrl: ModalController
+    , private expenseSvc: ExpenseService, private mlSvc: MlService
     , private categorySvc: CategoryService
-    , private modalCtrl: ModalController
     ) {
     super();
 
@@ -207,6 +207,19 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit {
     } else {
       this.f.categoryId.setValue('');
     }
+  }
+
+  async onDescriptionBlurred(ev) {
+   let description = this.f.description.value;
+   if(description) {
+    description = description.trim();
+    if(description && !this.selectedCategory) {
+      const prediction = await this.mlSvc.predictCategoryForExpenses(description);
+      console.log(prediction);
+    }
+   }
+
+
   }
 
   private async _getCategoryList() {

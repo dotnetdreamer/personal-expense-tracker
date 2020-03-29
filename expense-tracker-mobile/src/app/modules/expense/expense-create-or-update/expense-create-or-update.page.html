@@ -21,7 +21,8 @@
       <ion-list>
         <ion-item>
           <ion-input #description formControlName="description" 
-            placeholder="{{'expense.description' | localizedresource | async}}"></ion-input>
+            placeholder="{{'expense.description' | localizedresource | async}}" 
+            (ionBlur)="onDescriptionBlurred($event)"></ion-input>
         </ion-item>
         <ion-item>
           <ion-input type="tel" formControlName="amount" placeholder="e.g 100"></ion-input>

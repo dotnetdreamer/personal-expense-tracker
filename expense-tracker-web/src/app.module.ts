@@ -11,6 +11,7 @@ import { ExpenseModule } from './modules/expense/expense.module';
 import { SharedModule } from './modules/shared/shared.module';
 import { AttachmentModule } from './modules/attachment/attachment.module';
 import { Attachment } from './modules/attachment/attachment.entity';
+import { MlModule } from './modules/ml/ml.module';
 
 @Module({
   imports: [
@@ -23,7 +24,8 @@ import { Attachment } from './modules/attachment/attachment.entity';
     SharedModule,
     CategoryModule,
     ExpenseModule,
-    AttachmentModule
+    AttachmentModule,
+    MlModule
   ],
   controllers: [AppController],
   providers: [AppService],
