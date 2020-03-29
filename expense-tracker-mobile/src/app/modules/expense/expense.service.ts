@@ -226,7 +226,7 @@ export class ExpenseService extends BaseService {
         });
     }
 
-    getReportByCategory(fromDate: string, toDate: string)
+    getReportByCategory(fromDate: string, toDate: string, totalItems = 10)
         : Promise<Array<{ categoryId, categoryName, total }>> {
         return new Promise((resolve, reject) => {
             const db = this.dbService.Db;
@@ -245,12 +245,19 @@ export class ExpenseService extends BaseService {
                 const result = [];
 
                 const catGroup = items.groupBy((i: IExpense) => i.category.id.toString());
+                let i = 0;
                 for(let cat in catGroup) {
+                    if(i == totalItems) {
+                        break;
+                    }
+
                     result.push({
                         categoryId: cat,
                         categoryName: catGroup[cat][0].category.name,
                         total: catGroup[cat].length
                     });
+
+                    i++;
                 } 
                 resolve(result);
             });

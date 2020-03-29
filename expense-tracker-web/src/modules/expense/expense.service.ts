@@ -52,7 +52,7 @@ export class ExpenseService {
     return qb.getMany();
   }
 
-  async getReportByCategory(fromDate: string, toDate: string, totalItems = 5) {
+  async getReportByCategory(fromDate: string, toDate: string, totalItems = 10) {
     let qb = await getRepository(Expense)
       .createQueryBuilder("exp");
 
