@@ -30,7 +30,8 @@
         "amount": "Amount",
         "date": "Date",
         "notes": "Notes",
-        "today": "Today"
+        "today": "Today",
+        "total": "Total"
     },
     "home": {
         "title": "Home",

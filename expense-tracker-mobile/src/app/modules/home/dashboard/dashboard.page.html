@@ -19,9 +19,14 @@
     <ion-datetime [value]="selectedToDate" [displayFormat]="DEFAULT_DATE_FORMAT" 
       (ionChange)="onDateSelectionChanged($event, 'toDate')"></ion-datetime>
   </div>
-  <ion-card>
+  <ion-card class="card-total">
+    <ion-card-header>
+      <ion-card-title>{{'expense.total' | localizedresource | async }}</ion-card-title>
+    </ion-card-header>
     <ion-cart-content>
-      <ion-label>{{ totalAmount | currency: (workingCurrency + '&nbsp;')}}</ion-label>
+      <div>
+        <ion-label>{{ totalAmount | currency: (workingCurrency + '&nbsp;')}}</ion-label>
+      </div>
     </ion-cart-content>
   </ion-card>
   <ion-card>

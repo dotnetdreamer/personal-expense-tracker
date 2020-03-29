@@ -5,6 +5,23 @@ page-home-dashboard {
             display: flex;
             justify-content: center;
             align-items: center;
+
+            ion-datetime {
+                --padding-end: 20px;
+            }
+        }
+
+        .card-total {
+            ion-cart-content {
+                > div {
+                    padding: 0 20px 20px 20px;
+
+                    ion-label {
+                        font-size: 1.2em;
+                        font-weight: bold;
+                    }
+                }
+            }
         }
     }
 }
