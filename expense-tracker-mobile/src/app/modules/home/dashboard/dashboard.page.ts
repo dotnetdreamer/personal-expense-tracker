@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation, ViewChild, ElementRef, AfterViewInit, OnDestroy } from '@angular/core';
 
 import * as moment from 'moment';
 
@@ -11,6 +11,9 @@ import {
 } from "ng-apexcharts";
 import { ExpenseService } from '../../expense/expense.service';
 import { AppConstant } from '../../shared/app-constant';
+import { BasePage } from '../../shared/base.page';
+import { SyncConstant } from '../../shared/sync/sync-constant';
+import { Subscription } from 'rxjs';
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
@@ -25,20 +28,25 @@ export type ChartOptions = {
   styleUrls: ['./dashboard.page.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class DashboardPage implements AfterViewInit {
+export class DashboardPage extends BasePage implements AfterViewInit, OnDestroy {
   @ViewChild("chart") chart: ChartComponent;
   chartOptions: Partial<ChartOptions>;
   DEFAULT_DATE_FORMAT = AppConstant.DEFAULT_DATE_FORMAT;
   selectedFromDate;
   selectedToDate;
 
+  private _syncDataPushCompleteSub: Subscription;
+
   constructor(private expenseSvc: ExpenseService) { 
+    super();
+    
+    this._subscribeToEvents();
+
     this.selectedFromDate = moment().add(-7, 'd').format(AppConstant.DEFAULT_DATE_FORMAT);
     this.selectedToDate = moment().format(AppConstant.DEFAULT_DATE_FORMAT);
   }
 
   async ngAfterViewInit() {
-    await this._render(this.selectedFromDate, this.selectedToDate);
   }
 
   async onDateSelectionChanged($event: CustomEvent, prop: 'fromDate' | 'toDate') {
@@ -46,6 +54,16 @@ export class DashboardPage implements AfterViewInit {
 
     await this._render(prop == 'fromDate' ? d : this.selectedFromDate
       , prop == 'toDate' ? d : this.selectedToDate);
+  }
+
+  async onAddClick() {
+    await this.navigate({ path: '/expense/expense-create-or-update'})
+  }
+
+  ngOnDestroy() {
+    if(this._syncDataPushCompleteSub) {
+      this._syncDataPushCompleteSub.unsubscribe();
+    }
   }
 
   private async _render(fromDate, toDate) {
@@ -72,5 +90,14 @@ export class DashboardPage implements AfterViewInit {
         categories: categories
       }
     };
+  }
+
+  private _subscribeToEvents() {
+    this._syncDataPushCompleteSub = this.eventPub.$sub(SyncConstant.EVENT_SYNC_DATA_PUSH_COMPLETE, async () => {
+      if(AppConstant.DEBUG) {
+        console.log('DashboardPage:Event received: EVENT_SYNC_DATA_PUSH_COMPLETE');
+      }
+      await this._render(this.selectedFromDate, this.selectedToDate);
+    });
   }
 }
