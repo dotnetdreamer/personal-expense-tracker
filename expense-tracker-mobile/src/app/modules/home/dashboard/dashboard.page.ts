@@ -19,6 +19,7 @@ import {
   ApexNonAxisChartSeries,
   ApexResponsive
 } from "ng-apexcharts";
+import { IExpenseDashboardReport } from '../../expense/expense.model';
 
 export type DateChartOptions = {
   series: ApexAxisChartSeries;
@@ -96,10 +97,22 @@ export class DashboardPage extends BasePage implements AfterViewInit, OnDestroy 
   }
 
   private async _renderCharts(fromDate, toDate) {
+    const currentMonth = +moment().format('M');
+    const selectedFromDateMonth = +moment(fromDate, AppConstant.DEFAULT_DATE_FORMAT).format('M');
+    const selectedToDateMonth = +moment(toDate, AppConstant.DEFAULT_DATE_FORMAT).format('M');
+
+    let report: IExpenseDashboardReport;
+    //if selected month is not same as current month, then we don't have entries local..
+    //fetch it from online...
+    if(selectedFromDateMonth != currentMonth || selectedToDateMonth != currentMonth) {
+      report = await this.expenseSvc.getReport(fromDate, toDate);
+    } else {
+      report = await this.expenseSvc.getReportLocal(fromDate, toDate);
+    }
+
     const resoures = await Promise.all([
       this.localizationSvc.getResource('expense.total')
     ]);
-    const report = await this.expenseSvc.getReport(fromDate, toDate);
     let categories = report.categories;
     let dates = report.dates;
     this.totalAmount = categories.reduce((a, b) => a + (+b.totalAmount), 0);

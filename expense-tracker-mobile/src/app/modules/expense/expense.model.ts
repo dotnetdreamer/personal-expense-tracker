@@ -14,3 +14,8 @@ export interface IExpense {
     markedForUpdate?: boolean
     markedForDelete?: boolean
 }
+
+export interface IExpenseDashboardReport {
+    categories: Array<{ label, total, totalAmount }>;
+    dates: Array<{ label, total, totalAmount }>;
+}

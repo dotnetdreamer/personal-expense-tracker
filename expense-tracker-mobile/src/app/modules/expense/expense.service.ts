@@ -3,7 +3,7 @@ import { Injectable } from "@angular/core";
 import * as moment from 'moment';
 
 import { BaseService } from '../shared/base.service';
-import { IExpense } from './expense.model';
+import { IExpense, IExpenseDashboardReport } from './expense.model';
 import { AppConstant } from '../shared/app-constant';
 import { CategoryService } from '../category/category.service';
 import { AttachmentService } from '../attachment/attachment.service';
@@ -226,8 +226,18 @@ export class ExpenseService extends BaseService {
         });
     }
 
-    getReport(fromDate: string, toDate: string, totalItems = 10)
-        : Promise<{ categories: Array<{ label, total, totalAmount }>, dates: Array<{ label, total, totalAmount }> }> {
+    getReport(fromDate: string, toDate: string, totalItems = 10) {
+        const body = {
+            fromDate: fromDate,
+            toDate: toDate,
+            totalItems: totalItems
+        };
+        return this.getData<IExpenseDashboardReport>({
+            url: `${this.BASE_URL}/getReport`,
+            body: body
+        });
+    }
+    getReportLocal(fromDate: string, toDate: string, totalItems = 10): Promise<IExpenseDashboardReport> {
         return new Promise((resolve, reject) => {
             const db = this.dbService.Db;
             const iter = new ydn.db.ValueIterator(this.schemaService.tables.expense);
