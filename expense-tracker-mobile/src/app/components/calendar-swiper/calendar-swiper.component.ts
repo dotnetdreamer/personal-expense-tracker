@@ -9,7 +9,8 @@ import { AppConstant } from 'src/app/modules/shared/app-constant';
     encapsulation: ViewEncapsulation.None,
     styleUrls: ['./calendar-swiper.scss'],
     template: `
-    <ion-slides #calendarSwiper [options]="slideOpts" (ionSlideDidChange)="onIonSlideDidChange($event)">
+    <ion-slides #calendarSwiper [options]="slideOpts" 
+        (ionSlideDidChange)="onIonSlideDidChange($event)" *ngIf="viewLoaded">
     </ion-slides>
     `
 })
@@ -17,6 +18,7 @@ export class CalendarSwiperComponent implements AfterViewInit, OnDestroy {
     @ViewChild('calendarSwiper') calendarSwiper: IonSlides;
     @Output() monthChanged = new EventEmitter()
 
+    viewLoaded = false;
     slideOpts = {
         slidesPerView: 5,
         centeredSlides: true,
@@ -35,7 +37,12 @@ export class CalendarSwiperComponent implements AfterViewInit, OnDestroy {
     }
 
     async ngAfterViewInit() {
-        await this._init();
+        this.viewLoaded = true;
+
+        //fix: quickly comming back to view sometimes breaks swiper
+        setTimeout(async () => {
+            await this._init();
+        });
     }
 
     async onIonSlideDidChange(ev: CustomEvent) {
@@ -59,9 +66,12 @@ export class CalendarSwiperComponent implements AfterViewInit, OnDestroy {
     }
 
     async ngOnDestroy() {
+        this.viewLoaded = false;
+
         if(this.calendarSwiper) {
             const swiper = await this.calendarSwiper.getSwiper();
             swiper.destroy();
+            this.calendarSwiper = null;
         }
     }
 
