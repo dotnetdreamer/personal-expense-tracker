@@ -33,7 +33,10 @@
         "today": "Today"
     },
     "home": {
-        "title": "Home"
+        "title": "Home",
+        "dashboard": {
+            "spending_by_category": "Spending by Top 10 Categories"
+        }
     },
     "setting": {
         "title": "Setting",

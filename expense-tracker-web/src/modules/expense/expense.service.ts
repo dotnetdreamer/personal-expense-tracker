@@ -61,6 +61,7 @@ export class ExpenseService {
     qb = qb.andWhere('date(exp.createdOn) <= :createdOnToDate', { createdOnToDate: toDate });
 
     qb = qb.select("COUNT(exp.id)", "total")
+    .addSelect("SUM(exp.amount)", "totalAmount")
     .addSelect("exp.categoryId", "categoryId")
     .addSelect("cat.name", "categoryName");
 

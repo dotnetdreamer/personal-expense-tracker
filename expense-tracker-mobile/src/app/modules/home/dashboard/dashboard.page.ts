@@ -14,6 +14,7 @@ import { AppConstant } from '../../shared/app-constant';
 import { BasePage } from '../../shared/base.page';
 import { SyncConstant } from '../../shared/sync/sync-constant';
 import { Subscription } from 'rxjs';
+import { CurrencySettingService } from '../../currency/currency-setting.service';
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
@@ -31,13 +32,15 @@ export type ChartOptions = {
 export class DashboardPage extends BasePage implements AfterViewInit, OnDestroy {
   @ViewChild("chart") chart: ChartComponent;
   chartOptions: Partial<ChartOptions>;
+  totalAmount = 0;
   DEFAULT_DATE_FORMAT = AppConstant.DEFAULT_DATE_FORMAT;
   selectedFromDate;
   selectedToDate;
+  workingCurrency;
 
   private _syncDataPushCompleteSub: Subscription;
 
-  constructor(private expenseSvc: ExpenseService) { 
+  constructor(private expenseSvc: ExpenseService, private currencySettingSvc: CurrencySettingService) { 
     super();
     
     this._subscribeToEvents();
@@ -47,6 +50,7 @@ export class DashboardPage extends BasePage implements AfterViewInit, OnDestroy 
   }
 
   async ngAfterViewInit() {
+    this.workingCurrency = await this.currencySettingSvc.getWorkingCurrency();
   }
 
   async onDateSelectionChanged($event: CustomEvent, prop: 'fromDate' | 'toDate') {
@@ -79,8 +83,9 @@ export class DashboardPage extends BasePage implements AfterViewInit, OnDestroy 
 
   private async _renderCharts(fromDate, toDate) {
     const report = await this.expenseSvc.getReportByCategory(fromDate, toDate);
-
-    const totals = report.map(r => r.total);
+    this.totalAmount = report.reduce((a, b) => a + (+b.totalAmount), 0);
+    
+    const totals = report.map(r => r.totalAmount);
     const categories = report.map(r => r.categoryName);
 
     this.chartOptions = {

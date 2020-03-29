@@ -227,7 +227,7 @@ export class ExpenseService extends BaseService {
     }
 
     getReportByCategory(fromDate: string, toDate: string, totalItems = 10)
-        : Promise<Array<{ categoryId, categoryName, total }>> {
+        : Promise<Array<{ categoryId, categoryName, total, totalAmount }>> {
         return new Promise((resolve, reject) => {
             const db = this.dbService.Db;
             const iter = new ydn.db.ValueIterator(this.schemaService.tables.expense);
@@ -242,7 +242,7 @@ export class ExpenseService extends BaseService {
             }, iter);
 
             req.always(() => {
-                const result = [];
+                let result = [];
 
                 const catGroup = items.groupBy((i: IExpense) => i.category.id.toString());
                 let i = 0;
@@ -251,14 +251,19 @@ export class ExpenseService extends BaseService {
                         break;
                     }
 
+                    const sum = (<IExpense[]>catGroup[cat]).reduce((a, b) => a + (+b.amount), 0);
                     result.push({
                         categoryId: cat,
                         categoryName: catGroup[cat][0].category.name,
-                        total: catGroup[cat].length
+                        total: catGroup[cat].length,
+                        totalAmount: sum
                     });
-
                     i++;
                 } 
+                //order by...
+                result = result.sort((a, b) => {
+                    return a.total - b.total;
+                })
                 resolve(result);
             });
         });

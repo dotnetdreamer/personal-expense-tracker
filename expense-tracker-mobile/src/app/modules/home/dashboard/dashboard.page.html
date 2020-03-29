@@ -1,6 +1,6 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>{{'dashboard.title' | localizedresource | async}}</ion-title>
+    <!-- <ion-title>{{'dashboard.title' | localizedresource | async}}</ion-title> -->
     <ion-buttons slot="start">
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
@@ -20,8 +20,13 @@
       (ionChange)="onDateSelectionChanged($event, 'toDate')"></ion-datetime>
   </div>
   <ion-card>
+    <ion-cart-content>
+      <ion-label>{{ totalAmount | currency: (workingCurrency + '&nbsp;')}}</ion-label>
+    </ion-cart-content>
+  </ion-card>
+  <ion-card>
     <ion-card-header>
-      <ion-card-title>Spending by Top 5 Categories</ion-card-title>
+      <ion-card-title>{{'home.dashboard.spending_by_category' | localizedresource | async }}</ion-card-title>
     </ion-card-header>
     <ion-card-content>
       <apx-chart #chart *ngIf="chartOptions" 
