@@ -34,12 +34,13 @@
       <ion-card-title>{{'home.dashboard.spending_by_category' | localizedresource | async }}</ion-card-title>
     </ion-card-header>
     <ion-card-content>
-      <apx-chart #chart *ngIf="chartOptions" 
-        [series]="chartOptions.series"
-        [chart]="chartOptions.chart"
-        [xaxis]="chartOptions.xaxis"
-        [title]="chartOptions.title"
-      ></apx-chart>
+      <apx-chart *ngIf="chartOptions" 
+      [series]="chartOptions.series"
+      [chart]="chartOptions.chart"
+      [dataLabels]="chartOptions.dataLabels"
+      [plotOptions]="chartOptions.plotOptions"
+      [xaxis]="chartOptions.xaxis"
+    ></apx-chart>
     </ion-card-content>
   </ion-card>
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">

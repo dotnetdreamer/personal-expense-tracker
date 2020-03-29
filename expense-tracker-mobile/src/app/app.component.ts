@@ -67,6 +67,12 @@ export class AppComponent {
 
       await this._setDefaults();
       try {
+        
+        // await this._navigateTo('/expense/expense-create-or-update');
+        // await this._navigateTo('/expense/expense-listing');
+        // await this._navigateTo('/category');
+        await this._navigateTo('/home');
+
         //first sync then pull
         await this.syncHelperSvc.push();
         await this.syncHelperSvc.pull();
@@ -130,15 +136,10 @@ export class AppComponent {
       // }, 1000);
     });
 
-    this.eventPub.$sub(SyncConstant.EVENT_SYNC_INIT_COMPLETE, async () => {
+    this.eventPub.$sub(SyncConstant.EVENT_SYNC_DATA_PULL_COMPLETE, async () => {
       if(AppConstant.DEBUG) {
-        console.log('AppComponent:Event received: EVENT_SYNC_INIT_COMPLETE');
+        console.log('AppComponent:Event received: EVENT_SYNC_DATA_PULL_COMPLETE');
       }
-
-      // await this._navigateTo('/expense/expense-create-or-update');
-      // await this._navigateTo('/expense/expense-listing');
-      // await this._navigateTo('/category');
-      await this._navigateTo('/home');
 
       const { appVersion } = await (await Device.getInfo());
       this.appVersion = appVersion;

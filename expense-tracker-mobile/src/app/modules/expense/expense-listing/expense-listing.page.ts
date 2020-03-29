@@ -192,9 +192,9 @@ export class ExpenseListingPage extends BasePage implements OnInit, OnDestroy {
 
     //important to add here since the application loads and the view will show but there will be no data...
     //this is needed only when the application runs first time (i.e startup)
-    // this._syncInitSub = this.eventPub.$sub(SyncConstant.EVENT_SYNC_INIT_COMPLETE, async () => {
+    // this._syncInitSub = this.eventPub.$sub(SyncConstant.EVENT_SYNC_DATA_PULL_COMPLETE, async () => {
     //   if(AppConstant.DEBUG) {
-    //     console.log('ExpenseListingPage:Event received: EVENT_SYNC_INIT_COMPLETE');
+    //     console.log('ExpenseListingPage:Event received: EVENT_SYNC_DATA_PULL_COMPLETE');
     //   }
     //   await this._getExpenses();
     // });

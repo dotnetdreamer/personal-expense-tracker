@@ -32,7 +32,7 @@ export class SyncHelperService {
             } catch(e) {
                 reject(e);
             } finally {
-                this.eventPub.$pub(SyncConstant.EVENT_SYNC_INIT_COMPLETE);
+                this.eventPub.$pub(SyncConstant.EVENT_SYNC_DATA_PULL_COMPLETE);
             }
         });
     }
