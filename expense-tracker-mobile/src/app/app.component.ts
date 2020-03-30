@@ -129,7 +129,7 @@ export class AppComponent {
 
     this.eventPub.$sub(SyncConstant.EVENT_SYNC_DATA_PUSH_COMPLETE, async (totalTables) => {
       if(AppConstant.DEBUG) {
-        console.log('HomePage: EVENT_SYNC_DATA_PUSH_COMPLETE: totalTables', totalTables);
+        console.log('AppComponent: EVENT_SYNC_DATA_PUSH_COMPLETE: totalTables', totalTables);
       }
       // setTimeout(() => {
       //   this.isSyncing = false;

@@ -55,6 +55,7 @@ export class DashboardPage extends BasePage implements AfterViewInit, OnDestroy 
   workingCurrency;
 
   private _syncDataPushCompleteSub: Subscription;
+  private _eventCreatedOrUpdatedSub: Subscription;
 
   constructor(private expenseSvc: ExpenseService, private currencySettingSvc: CurrencySettingService) { 
     super();
@@ -94,6 +95,9 @@ export class DashboardPage extends BasePage implements AfterViewInit, OnDestroy 
   ngOnDestroy() {
     if(this._syncDataPushCompleteSub) {
       this._syncDataPushCompleteSub.unsubscribe();
+    }
+    if(this._eventCreatedOrUpdatedSub) {
+      this._eventCreatedOrUpdatedSub.unsubscribe();
     }
   }
 
@@ -165,6 +169,13 @@ export class DashboardPage extends BasePage implements AfterViewInit, OnDestroy 
     this._syncDataPushCompleteSub = this.eventPub.$sub(SyncConstant.EVENT_SYNC_DATA_PULL_COMPLETE, async () => {
       if(AppConstant.DEBUG) {
         console.log('DashboardPage:Event received: EVENT_SYNC_DATA_PULL_COMPLETE');
+      }
+      await this._renderCharts(this.selectedFromDate, this.selectedToDate);
+    });
+
+    this._eventCreatedOrUpdatedSub = this.eventPub.$sub(AppConstant.EVENT_EXPENSE_CREATED_OR_UPDATED, async () => {
+      if(AppConstant.DEBUG) {
+        console.log('DashboardPage:Event received: EVENT_EXPENSE_CREATED_OR_UPDATED');
       }
       await this._renderCharts(this.selectedFromDate, this.selectedToDate);
     });
