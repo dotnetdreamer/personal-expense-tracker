@@ -62,6 +62,10 @@
           </div>
         </ion-item>
       </ion-list>
+      <ion-button shape="round" class="button-custom button-viewall" 
+        (click)="onViewAllExpensesClicked()">
+        {{ 'common.viewall' | localizedresource | async }}
+      </ion-button>
     </ion-card-content>
   </ion-card>
   <ion-card>

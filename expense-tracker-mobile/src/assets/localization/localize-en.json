@@ -14,7 +14,8 @@
         "select": "[ Select ]",
         "areyousure": "Are you sure ?",
         "version": "Version",
-        "nodata": "No data found"
+        "nodata": "No data found",
+        "viewall": "View all"
     },
     "category": {
         "title": "Category",

@@ -12,6 +12,10 @@ page-home-dashboard {
         }
 
         .card-today {
+            position: relative;
+            overflow: visible;
+            min-height: 185px;
+
             ion-card-content {
                 .today-header{
                     display: flex;
@@ -42,14 +46,26 @@ page-home-dashboard {
                         font-size: 1em;
                     }
                 }
+
                 no-data {
                     .data-empty {
                         padding-top: 10px;
+                        padding-bottom: 10px;
 
                         ion-icon {
                             font-size: 50px;
                         }
                     }
+                }
+
+                .button-viewall {
+                    position: absolute;
+                    bottom: -16px;
+                    left: 0;
+                    right: 0;
+                    margin: auto;
+                    width: 80px;
+                    font-size: 0.8em;
                 }
             }
         }

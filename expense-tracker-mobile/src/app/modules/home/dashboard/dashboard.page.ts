@@ -53,7 +53,7 @@ export class DashboardPage extends BasePage implements AfterViewInit, OnDestroy 
   selectedFromDate;
   selectedToDate;
   workingCurrency;
-  
+
   todayExpenses: IExpense[];
   todayDate;
   totalAmountToday = 0;
@@ -95,6 +95,10 @@ export class DashboardPage extends BasePage implements AfterViewInit, OnDestroy 
     setTimeout(() => {
       ev.target.complete();
     }, 300);
+  }
+
+  async onViewAllExpensesClicked() {
+    await this.navigate({ path: '/expense/expense-listing' });
   }
 
   ngOnDestroy() {
