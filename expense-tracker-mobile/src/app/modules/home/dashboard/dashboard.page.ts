@@ -113,7 +113,8 @@ export class DashboardPage extends BasePage implements AfterViewInit, OnDestroy 
   private async _getTodayExpenses() {
     this.todayExpenses = await this.expenseSvc.getExpenseListLocal({ 
       fromDate: this.todayDate, 
-      toDate: this.todayDate 
+      toDate: this.todayDate,
+      pageSize: 3 //only 3 items...
     });
     this.totalAmountToday = this.todayExpenses.reduce((a, b) => a + (+b.amount), 0);
 

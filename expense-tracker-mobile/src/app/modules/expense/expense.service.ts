@@ -160,7 +160,7 @@ export class ExpenseService extends BaseService {
         });
     }
 
-    getExpenses(args?: { fromDate?, toDate? }) {
+    getExpenses(args?: { term?, fromDate?, toDate? }) {
         let body;
 
         if(args && (args.fromDate || args.toDate )) {
@@ -172,26 +172,22 @@ export class ExpenseService extends BaseService {
         });
     }
 
-    getExpenseListLocal(args?: { term?, fromDate?, toDate? }): Promise<IExpense[]> {
+    getExpenseListLocal(args?: { term?, fromDate?, toDate?, pageIndex?, pageSize? }): Promise<IExpense[]> {
         return new Promise(async (resolve, reject) => {
             let results = [];
-            // if(!args) {
-            //     results = await this.dbService.getAll<IExpense[]>(this.schemaService.tables.expense);
-            //     //sor by desc
-            //     results = await this._map(results);
-            //     results = this._sort(results);
 
-            //     resolve(results);
-            //     return;
-            // }
             const db = this.dbService.Db;
             // new ydn.db.IndexValueIterator(store, opt.key, key_range, (pageSize == 0 ? undefined : pageSize), (skip > 0 ? skip: undefined), false);
             //https://github.com/yathit/ydn-db/blob/8d217ba5ff58a1df694b5282e20ebc2c52104197/test/qunit/ver_1_iteration.js#L117
             //(store_name, key_range, reverse)
             const iter = new ydn.db.ValueIterator(this.schemaService.tables.expense);
             
-            // let idx = 0;
+            let idx = 0;
             let req = db.open(x => {
+                if(args && args.pageSize && idx >= args.pageSize) {
+                    req.done();
+                    return;
+                }
                 let v: IExpense = x.getValue();
                 // const objToFind = v.company.locales.find(l => l.languageId == wkLanguage.id);
 
@@ -205,6 +201,18 @@ export class ExpenseService extends BaseService {
                             item = v;
                         }
                     }
+                    if(args.fromDate || args.toDate) {
+                        //change dates to local first if dates are in timezone from server
+                        const me = this._map(v);
+                        //now compare
+                        const createdOn = moment(me.createdOn).format(AppConstant.DEFAULT_DATE_FORMAT);
+                        if (args.fromDate && createdOn >= args.fromDate) {
+                            item = v;
+                        }
+                        if(args.toDate && createdOn <= args.toDate) {
+                            item = v;
+                        }
+                    }
                 } else {
                     item = v;
                 }
@@ -215,11 +223,11 @@ export class ExpenseService extends BaseService {
                 }
 
                 req.done();
-                // idx++;
+                idx++;
                 // console.log(idx);
             }, iter);
             req.always(async () => {
-                results = await this._map(results);
+                results = this._mapAll(results);
                 results = this._sort(results);
                 resolve(results);
             });
@@ -237,6 +245,7 @@ export class ExpenseService extends BaseService {
             body: body
         });
     }
+
     getReportLocal(fromDate: string, toDate: string, totalItems = 10): Promise<IExpenseDashboardReport> {
         return new Promise((resolve, reject) => {
             const db = this.dbService.Db;
@@ -362,17 +371,25 @@ export class ExpenseService extends BaseService {
         return this.dbService.removeAll(this.schemaService.tables.expense);
     }
 
-    private async _map(expenses: Array<IExpense>) {
-        // const promises = [];
-        // for(let exp of expenses) {
-        //     const expPromise = this.categorySvc.getCategoryByIdLocal(exp.categoryId)
-        //     .then(e => exp.category = e);
-        //     promises.push(exp);
-        // }
-        // const exMapeed = await Promise.all(promises);
-        // return exMapeed;
+    private _mapAll(expenses: Array<IExpense>) {
+        expenses = expenses.map(e => {
+            const exp = this._map(e);
+            return exp;
+        });
         return expenses;
     }
+
+    private _map(e: IExpense) {
+        //only convert dates for data that came from server
+        if(!e.markedForAdd && !e.markedForUpdate && !e.markedForDelete) {
+            e.createdOn = moment(e.createdOn).local().format(AppConstant.DEFAULT_DATETIME_FORMAT);
+            if(e.updatedOn) {
+                e.updatedOn = moment(e.updatedOn).local().format(AppConstant.DEFAULT_DATETIME_FORMAT);
+            }
+        }
+        return e;
+    }
+    
 
     private _sort(expenses: Array<IExpense>) {
         expenses.sort((aDate: IExpense, bDate: IExpense) => {

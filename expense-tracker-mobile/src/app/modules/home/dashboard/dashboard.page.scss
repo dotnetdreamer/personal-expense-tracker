@@ -47,6 +47,35 @@ page-home-dashboard {
                     }
                 }
 
+                .expense-item {
+                    min-height: 0;
+                    height: 45px;
+
+                    .icon-container {
+                        width: 30px;
+                        height: 30px;
+
+                        ion-icon {
+                            font-size: 20px;
+                            top: -3px;
+                            position: relative;
+                        }
+                    }
+
+                    .category-description-amount {
+                        .category-description {
+                            .description {
+                                font-size: 0.9em;
+                            }
+                        }
+                        .amount-date {
+                            .amount {
+                                font-size: 0.9em;
+                            }
+                        }
+                    }
+                }
+
                 no-data {
                     .data-empty {
                         padding-top: 10px;
