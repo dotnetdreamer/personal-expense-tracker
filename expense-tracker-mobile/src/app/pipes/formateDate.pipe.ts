@@ -12,12 +12,15 @@ export class FormateDatePipe {
 
     }
 
-    transform(date: string, workingLanguage?: string) {
+    transform(date: string, format?: string, workingLanguage?: string) {
         return new Promise((resolve, reject) => {
             if(!date) {
                 resolve();
             } else {
-                const fd = moment(date).format(AppConstant.DEFAULT_DATE_FORMAT);
+                if(!format) {
+                    format = AppConstant.DEFAULT_DATE_FORMAT;
+                }
+                const fd = moment(date).format(format);
                 resolve(fd);
             }
         });

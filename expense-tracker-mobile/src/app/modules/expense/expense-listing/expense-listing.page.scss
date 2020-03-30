@@ -14,66 +14,7 @@ page-expense-listing {
     .expenses {
         ion-item-sliding {
             ion-item {
-                .expense-item {
-                    display: flex;
-                    align-items: center;
-                    justify-content: space-between;
-                    // padding-left: var(--ion-padding, 16px);
-                    // padding-right: var(--ion-padding, 16px);
-                    min-height: 80px;
-                    padding-top: 10px;
-                    padding-bottom: 10px;
-                    width: 100%;
-
-                    .icon-container {
-                        width: 50px;
-                        height: 50px;
-                        display: flex;
-                        align-items: center;
-                        justify-content: space-between;
-        
-                        ion-icon {
-                            font-size: 28px;
-                        }
-                    }
-        
-                    .category-description-amount {
-                        width: 100%;
-                        display: flex;
-                        align-items: center;
-                        justify-content: space-between;
-        
-                        .category-description {
-                            .description {
-                                font-size: 1em;
-                                margin-bottom: 5px;
-                                white-space: normal;
-                                word-break: break-word;
-                            }
-        
-                            .category {
-                                font-size: 0.8em;
-                            }
-                        }
-            
-                        .amount-date {
-                            text-align: right;
-                            margin-left: 5px;
-                            
-                            .date {
-                                font-size: 0.8em;
-                            }
-                            .amount {
-                                font-size: 1em;
-                                margin-bottom: 5px;
-                            }
-                        }
-                    }
-
-                    &.expense-item-even {
-                        background-color: #f7f7f7;
-                    }
-                }
+                
             }
             
             ion-item-options {

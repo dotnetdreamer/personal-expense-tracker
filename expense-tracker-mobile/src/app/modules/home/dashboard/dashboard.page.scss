@@ -11,17 +11,60 @@ page-home-dashboard {
             }
         }
 
-        .card-total {
-            ion-cart-content {
-                > div {
-                    padding: 0 20px 20px 20px;
+        .card-today {
+            ion-card-content {
+                .today-header{
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    border-bottom: 1px solid black;
+                    padding-bottom: 10px;
 
-                    ion-label {
-                        font-size: 1.2em;
-                        font-weight: bold;
+                    .today-info {
+                        display: flex;
+                        align-items: center;
+                        width: 100%;
+
+                        .date {
+                            width: 60px;
+                            text-align: center;
+                            font-size: 1.8em;
+                            font-weight: bold;
+                        }
+
+                        .full-date {
+                            font-size: 0.9em;
+                            width: calc(100% - 60px);
+                        }
+                    }
+
+                    .today-total {
+                        font-size: 1em;
+                    }
+                }
+                no-data {
+                    .data-empty {
+                        padding-top: 10px;
+
+                        ion-icon {
+                            font-size: 50px;
+                        }
                     }
                 }
             }
+        }
+
+        .card-total {
+            // ion-card-content {
+            //     > div {
+            //         padding: 0 20px 20px 20px;
+
+            //         ion-label {
+            //             font-size: 1.2em;
+            //             font-weight: bold;
+            //         }
+            //     }
+            // }
         }
     }
 }

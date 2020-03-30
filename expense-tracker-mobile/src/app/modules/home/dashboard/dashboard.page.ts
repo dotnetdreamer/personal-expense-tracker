@@ -19,7 +19,7 @@ import {
   ApexNonAxisChartSeries,
   ApexLegend
 } from "ng-apexcharts";
-import { IExpenseDashboardReport } from '../../expense/expense.model';
+import { IExpenseDashboardReport, IExpense } from '../../expense/expense.model';
 
 export type DateChartOptions = {
   series: ApexAxisChartSeries;
@@ -53,6 +53,10 @@ export class DashboardPage extends BasePage implements AfterViewInit, OnDestroy 
   selectedFromDate;
   selectedToDate;
   workingCurrency;
+  
+  todayExpenses: IExpense[];
+  todayDate;
+  totalAmountToday = 0;
 
   private _syncDataPushCompleteSub: Subscription;
   private _eventCreatedOrUpdatedSub: Subscription;
@@ -67,6 +71,7 @@ export class DashboardPage extends BasePage implements AfterViewInit, OnDestroy 
   }
 
   async ngAfterViewInit() {
+    this.todayDate = moment().format(AppConstant.DEFAULT_DATE_FORMAT);
     this.workingCurrency = await this.currencySettingSvc.getWorkingCurrency();
   }
 
@@ -98,6 +103,18 @@ export class DashboardPage extends BasePage implements AfterViewInit, OnDestroy 
     }
     if(this._eventCreatedOrUpdatedSub) {
       this._eventCreatedOrUpdatedSub.unsubscribe();
+    }
+  }
+
+  private async _getTodayExpenses() {
+    this.todayExpenses = await this.expenseSvc.getExpenseListLocal({ 
+      fromDate: this.todayDate, 
+      toDate: this.todayDate 
+    });
+    this.totalAmountToday = this.todayExpenses.reduce((a, b) => a + (+b.amount), 0);
+
+    if(AppConstant.DEBUG) {
+      console.log('DashboardPage: _getTodayExpenses: todayExpenses', this.todayExpenses);
     }
   }
 
@@ -137,7 +154,10 @@ export class DashboardPage extends BasePage implements AfterViewInit, OnDestroy 
       ],
       chart: {
         type: "bar",
-        height: 350
+        height: 350,
+        toolbar: {
+          show: false,
+        },
       },
       plotOptions: {
         bar: {
@@ -170,6 +190,7 @@ export class DashboardPage extends BasePage implements AfterViewInit, OnDestroy 
       if(AppConstant.DEBUG) {
         console.log('DashboardPage:Event received: EVENT_SYNC_DATA_PULL_COMPLETE');
       }
+      await this._getTodayExpenses();
       await this._renderCharts(this.selectedFromDate, this.selectedToDate);
     });
 
@@ -177,6 +198,7 @@ export class DashboardPage extends BasePage implements AfterViewInit, OnDestroy 
       if(AppConstant.DEBUG) {
         console.log('DashboardPage:Event received: EVENT_EXPENSE_CREATED_OR_UPDATED');
       }
+      await this._getTodayExpenses();
       await this._renderCharts(this.selectedFromDate, this.selectedToDate);
     });
   }
