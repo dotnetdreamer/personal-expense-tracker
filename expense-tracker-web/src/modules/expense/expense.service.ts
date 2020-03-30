@@ -64,16 +64,17 @@ export class ExpenseService {
     qb = qb.select("COUNT(exp.id)", "total")
     .addSelect("SUM(exp.amount)", "totalAmount");
 
-    qb = qb.orderBy("total", 'ASC');
-
     let catQb = qb;
     catQb = catQb.addSelect("cat.name", "label");
     catQb = catQb.groupBy("exp.categoryId");
+    catQb = catQb.orderBy("total", 'ASC');
     const categories: any = await catQb.limit(totalItems).getRawMany();
 
     let datQb = qb;
     datQb = datQb.addSelect("date(exp.createdOn)", "label");
     datQb = datQb.groupBy("date(exp.createdOn)");
+    datQb = datQb.orderBy("date(exp.createdOn)", 'DESC');
+
     const dates: any = await datQb.getRawMany();
 
     return {
