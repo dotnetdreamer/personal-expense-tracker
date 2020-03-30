@@ -56,7 +56,7 @@ export class DashboardPage extends BasePage implements AfterViewInit, OnDestroy 
 
   private _syncDataPushCompleteSub: Subscription;
 
-  constructor( private expenseSvc: ExpenseService, private currencySettingSvc: CurrencySettingService) { 
+  constructor(private expenseSvc: ExpenseService, private currencySettingSvc: CurrencySettingService) { 
     super();
     
     this._subscribeToEvents();

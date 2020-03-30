@@ -1,6 +1,7 @@
 import { Injectable } from "@nestjs/common";
 
 import * as brain from 'brain.js';
+import * as natural from 'natural';
 
 import { ExpenseService } from "src/modules/expense/expense.service";
 import { CategoryService } from "src/modules/category/category.service";
@@ -11,7 +12,8 @@ export class MlService {
     constructor(private expenseSvc: ExpenseService, private categorySvc: CategoryService) {
 
     } 
-    async buildAndTrainExpenses(text: string) {
+
+    async buildExpensesTrainingSet() {
         //TODO: limit the data by date
         let expenses = await this.expenseSvc.findAll();
         //map it
@@ -21,7 +23,7 @@ export class MlService {
         });
         const data = await Promise.all(model);
 
-        const TrainingSet = data.map((e) => {
+        const trainingSet = data.map((e) => {
             const catName = e["category"].name;
             const obj = {
               phrase: e.description, 
@@ -30,9 +32,16 @@ export class MlService {
             obj.result[catName] = 1;
             return obj;
         });
-        const dictionary = this._buildWordDictionary(TrainingSet);
 
-        const encodedTrainingSet = TrainingSet.map(dataSet => {
+        return trainingSet;
+    }
+
+    async trainAndPredictExpenseCategory(text: string) {
+        const trainingSet = await this.buildExpensesTrainingSet();
+
+        const dictionary = this._buildWordDictionary(trainingSet);
+
+        const encodedTrainingSet = trainingSet.map(dataSet => {
             const encodedValue = this._encode(dictionary, dataSet.phrase)
             return { input: encodedValue, output: dataSet.result }
         });
@@ -57,8 +66,8 @@ export class MlService {
 
     
     private _encode(dictionary, phrase) {
-        const phraseTokens = phrase.split(' ')
-        const encodedPhrase = dictionary.map(word => phraseTokens.includes(word) ? 1 : 0)
+        const phraseTokens = phrase.split(' ');
+        const encodedPhrase = dictionary.map(word => phraseTokens.includes(word) ? 1 : 0);
 
         return encodedPhrase
     }
