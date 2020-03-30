@@ -24,7 +24,6 @@ export class ExpenseListingPage extends BasePage implements OnInit, OnDestroy {
   sum = 0;
   dates: { selectedDate?, todayDate? } = {};
   workingCurrency = ''; //fix for undefined showing in title
-  isSyncInProgress = false;
 
   private _syncInitSub: Subscription;
   private _expenseCreatedOrUpdatedSub: Subscription;
@@ -124,9 +123,13 @@ export class ExpenseListingPage extends BasePage implements OnInit, OnDestroy {
     }
   }
 
-  async onSyncButtonClicked() {
-    this.isSyncInProgress = true;
+  async doRefresh(ev) {
+    //reset
     this.eventPub.$pub(SyncConstant.EVENT_SYNC_DATA_PUSH, SyncEntity.Expense);
+
+    setTimeout(() => {
+      ev.target.complete();
+    }, 300);
   }
 
   ngOnDestroy() {
@@ -186,7 +189,6 @@ export class ExpenseListingPage extends BasePage implements OnInit, OnDestroy {
       this.expenses = [];
       setTimeout(async () => {
         await this._getExpenses();
-        this.isSyncInProgress = false;
       });
     });
 

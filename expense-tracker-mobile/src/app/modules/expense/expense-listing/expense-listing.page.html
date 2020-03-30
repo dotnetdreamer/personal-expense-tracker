@@ -3,12 +3,6 @@
     <ion-buttons slot="start">
       <ion-back-button></ion-back-button>
     </ion-buttons>
-    <ion-buttons slot="end">
-      <ion-button (click)="onSyncButtonClicked()" [disabled]="isSyncInProgress" 
-         class="animated infinite" [class.spin]="isSyncInProgress">
-        <ion-icon name="refresh"></ion-icon>
-      </ion-button>
-    </ion-buttons>
     <ion-title>{{ sum | currency: (workingCurrency + '&nbsp;')}}</ion-title>
   </ion-toolbar>
   <ion-toolbar class="toolbar-calendar">
@@ -18,6 +12,9 @@
 </ion-header>
 
 <ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
   <ion-searchbar animated inputmode="search" debounce="300"
     [(ngModel)]="searchTerm" 
     (ionChange)="onSearchInputChanged($event)" (ionClear)="onSearchInputCleared($event)"
