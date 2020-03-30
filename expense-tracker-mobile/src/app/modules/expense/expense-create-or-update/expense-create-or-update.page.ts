@@ -29,6 +29,7 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit {
   formGroup: FormGroup;
   categories: ICategory[];
   selectedCategory: ICategory;
+  suggestedCategory: ICategory;
 
   private _attachment: IAttachment;
 
@@ -67,7 +68,7 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit {
   async onSaveClick(args) {
     const exp: IExpense = {
       amount: args.amount,
-      category: this.selectedCategory,
+      category: this.selectedCategory || this.suggestedCategory,
       description: args.description,
       notes: args.notes,
       attachment: this._attachment,
@@ -209,17 +210,26 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit {
     }
   }
 
-  async onDescriptionBlurred(ev) {
-   let description = this.f.description.value;
-   if(description) {
-    description = description.trim();
-    if(description && !this.selectedCategory) {
-      const prediction = await this.mlSvc.predictCategoryForExpenses(description);
-      console.log(prediction);
+  async onDescriptionChanged(ev) {
+    //if user manually select category, do not predict
+    if(this.selectedCategory) {
+      return;
     }
-   }
 
-
+    let description = this.f.description.value;
+    if(description) {
+      description = description.trim();
+      if(description && !this.selectedCategory) {
+        const acceptedPrediction = await this.mlSvc.predictCategoryForExpenses(description);
+        if(AppConstant.DEBUG) {
+          console.log('onDescriptionChanged: acceptedPrediction', acceptedPrediction);
+        }
+        if(acceptedPrediction && acceptedPrediction.category) {
+          this.suggestedCategory = acceptedPrediction.category;
+          this.f.categoryId.setValue(this.suggestedCategory.id);
+        }
+      }
+    }
   }
 
   private async _getCategoryList() {

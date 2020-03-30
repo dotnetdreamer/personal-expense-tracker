@@ -7,9 +7,16 @@ export class MlController {
   constructor(private mlSvc: MlService) {}
 
   @UseInterceptors(ClassSerializerInterceptor)
-  @Get('getExpenseDictionary')
-  async getExpenseDictionary(@Query() params: { text }) {
-    const prediction = await this.mlSvc.buildAndTrainExpenses(params.text);
+  @Get('buildExpensesTrainingSet')
+  async buildExpensesTrainingSet() {
+    const trainingSet = await this.mlSvc.buildExpensesTrainingSet();
+    return trainingSet;
+  }
+
+  @UseInterceptors(ClassSerializerInterceptor)
+  @Get('trainAndPredictExpenseCategory')
+  async trainAndPredictExpenseCategory(@Query() params: { text }) {
+    const prediction = await this.mlSvc.trainAndPredictExpenseCategory(params.text);
     return prediction;
   }
 }
