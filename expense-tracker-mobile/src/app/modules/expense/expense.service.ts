@@ -293,7 +293,6 @@ export class ExpenseService extends BaseService {
                 dates = dates.sort((a, b) => {
                     return moment(b.label).diff(a.label);
                 });
-                console.log(dates);
 
                 result = {
                     categories: categories,
