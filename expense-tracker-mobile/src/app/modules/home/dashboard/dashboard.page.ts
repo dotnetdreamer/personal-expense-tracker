@@ -17,7 +17,7 @@ import {
   ApexXAxis,
   ApexPlotOptions,
   ApexNonAxisChartSeries,
-  ApexResponsive
+  ApexLegend
 } from "ng-apexcharts";
 import { IExpenseDashboardReport } from '../../expense/expense.model';
 
@@ -33,6 +33,7 @@ export type CategoryChartOptions = {
   series: ApexNonAxisChartSeries;
   chart: ApexChart;
   labels: any;
+  legend: ApexLegend;
 };
 
 @Component({
@@ -42,10 +43,10 @@ export type CategoryChartOptions = {
   encapsulation: ViewEncapsulation.None
 })
 export class DashboardPage extends BasePage implements AfterViewInit, OnDestroy {
-  // @ViewChild("categoryChart") categoryChart: ChartComponent;
   // @ViewChild("dateChart") categoryChart: ChartComponent;
-  categoryChartOptions: Partial<CategoryChartOptions>;
+    // @ViewChild("categoryChart") categoryChart: ChartComponent;
   dateChartOptions: Partial<DateChartOptions>;
+  categoryChartOptions: Partial<CategoryChartOptions>;
 
   totalAmount = 0;
   DEFAULT_DATE_FORMAT = AppConstant.DEFAULT_DATE_FORMAT;
@@ -140,7 +141,7 @@ export class DashboardPage extends BasePage implements AfterViewInit, OnDestroy 
         }
       },
       dataLabels: {
-        enabled: false
+        enabled: false,
       },
       xaxis: {
         categories: dateLabels
@@ -150,8 +151,11 @@ export class DashboardPage extends BasePage implements AfterViewInit, OnDestroy 
     this.categoryChartOptions = {
       series: categoryTotalAmounts,
       chart: {
-        // width: 320,
+        height: 320,
         type: "pie"
+      },
+      legend: {
+        position: 'bottom'
       },
       labels: categoryLabels
     };
