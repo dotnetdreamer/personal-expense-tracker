@@ -289,6 +289,12 @@ export class ExpenseService extends BaseService {
                         totalAmount: sum
                     });
                 } 
+                //order by...
+                dates = dates.sort((a, b) => {
+                    return moment(b.label).diff(a.label);
+                });
+                console.log(dates);
+
                 result = {
                     categories: categories,
                     dates: dates
