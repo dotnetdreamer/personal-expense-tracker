@@ -203,9 +203,11 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit {
     if(data) {
       this.selectedCategory = data;
       this.f.categoryId.setValue(this.selectedCategory.id);
-    } else {
-      this.f.categoryId.setValue('');
-    }
+    } 
+    // else {
+    //   this.selectedCategory = null;
+    //   this.f.categoryId.setValue('');
+    // }
   }
 
   async onDescriptionChanged(ev) {

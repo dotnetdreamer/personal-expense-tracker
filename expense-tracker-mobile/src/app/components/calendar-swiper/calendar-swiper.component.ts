@@ -53,11 +53,13 @@ export class CalendarSwiperComponent implements AfterViewInit, OnDestroy {
         const swiper = await this.calendarSwiper.getSwiper();
         const month = swiper.activeIndex;
 
-        const d = new Date();
-        d.setMonth(month);
+        const d = moment().local().set('M', month);
+        // const d = new Date();
+        // d.setMonth(month);
 
-        const start = moment(d).startOf('month').format(AppConstant.DEFAULT_DATE_FORMAT);
-        const end = moment(d).endOf('month').format(AppConstant.DEFAULT_DATE_FORMAT);
+        const start = d.startOf('month').format(AppConstant.DEFAULT_DATE_FORMAT);
+        const end = d.endOf('month').format(AppConstant.DEFAULT_DATE_FORMAT);
+
         this.monthChanged.emit({ 
             start, 
             end, 
