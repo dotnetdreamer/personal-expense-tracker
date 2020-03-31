@@ -56,8 +56,8 @@ export class MlService {
     private _buildWordDictionary(trainingData) {
         const tokenisedArray = trainingData.map(item => {
             const tokens = item.phrase.split(' ')
-            // return tokens.map(token => natural.PorterStemmer.stem(token))
-            return tokens.map(token => token);
+            return tokens.map(token => natural.PorterStemmer.stem(token))
+            // return tokens.map(token => token);
         });
             
         const flattenedArray = [].concat.apply([], tokenisedArray)
