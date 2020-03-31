@@ -14,13 +14,14 @@ page-home-dashboard {
         .card-today {
             position: relative;
             overflow: visible;
-            min-height: 185px;
 
             &.md {
                 margin-bottom: 30px;
             }
 
             ion-card-content {
+                min-height: 185px;
+
                 .today-header{
                     display: flex;
                     align-items: center;
