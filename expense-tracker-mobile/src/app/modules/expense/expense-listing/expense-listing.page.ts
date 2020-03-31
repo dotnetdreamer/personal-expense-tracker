@@ -37,9 +37,7 @@ export class ExpenseListingPage extends BasePage implements OnInit, OnDestroy {
     this._subscribeToEvents();
   }
 
-  async ngOnInit() {
-    await this._getExpenses();
-    
+  async ngOnInit() {    
     this.workingCurrency = await this.currencySettingSvc.getWorkingCurrency();
 
     const fromDate = moment().startOf('M').format(AppConstant.DEFAULT_DATE_FORMAT);
@@ -47,6 +45,8 @@ export class ExpenseListingPage extends BasePage implements OnInit, OnDestroy {
 
     this.dates.todayDate = moment().format(AppConstant.DEFAULT_DATE_FORMAT);
     this.dates.selectedDate = `${fromDate} - ${toDate}`;
+
+    await this._getExpenses();
   }
 
   async onMonthChanged(args: { start, end, month }) {
@@ -147,10 +147,9 @@ export class ExpenseListingPage extends BasePage implements OnInit, OnDestroy {
   }
 
   private async _getExpenses(args?: { term?, fromDate?, toDate? }, forceRefresh = false) {
-    let filters = null;
+    let filters:any = { };
+ 
     if(args && (args.term || args.fromDate || args.toDate)) {
-      filters = {};
-
       if(args.term) {
         filters.term = this.searchTerm;
       }
@@ -161,9 +160,20 @@ export class ExpenseListingPage extends BasePage implements OnInit, OnDestroy {
       }
     }
 
+    //default
+    if(!args || (args && (!args.fromDate || !args.toDate))) {
+      const fromDateUtc = moment().startOf('M').format(AppConstant.DEFAULT_DATE_FORMAT);
+      const toDateUtc = moment().endOf('M').format(AppConstant.DEFAULT_DATE_FORMAT);
+    
+      filters = {
+        fromDate: fromDateUtc,
+        toDate: toDateUtc
+      };
+    }
+
     this.ngZone.run(async () => {
       if(forceRefresh) {
-        this.expenses = await this.expenseSvc.getExpenses(args);
+        this.expenses = await this.expenseSvc.getExpenses(filters);
       } else {
         this.expenses = await this.expenseSvc.getExpenseListLocal(filters);
       }
