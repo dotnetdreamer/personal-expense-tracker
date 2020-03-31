@@ -140,6 +140,9 @@ export class DashboardPage extends BasePage implements AfterViewInit, OnDestroy 
     } else {
       report = await this.expenseSvc.getReportLocal(fromDate, toDate);
     }
+    if(AppConstant.DEBUG) {
+      console.log('DashboardPage: _renderCharts: report', report);
+    }
 
     const resoures = await Promise.all([
       this.localizationSvc.getResource('expense.total')

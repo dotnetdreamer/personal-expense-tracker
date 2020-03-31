@@ -164,6 +164,14 @@ export class ExpenseService extends BaseService {
         let body;
 
         if(args && (args.fromDate || args.toDate )) {
+            //change date to utc first
+            if(args.fromDate) {
+                args.fromDate = moment.utc(args.fromDate).format(AppConstant.DEFAULT_DATE_FORMAT);
+            }
+            if(args.toDate) {
+                args.toDate = moment.utc(args.toDate).format(AppConstant.DEFAULT_DATE_FORMAT);
+            }
+            
             body = { ...args };
         }
         return this.getData<IExpense[]>({
@@ -182,7 +190,7 @@ export class ExpenseService extends BaseService {
             //(store_name, key_range, reverse)
             const iter = new ydn.db.ValueIterator(this.schemaService.tables.expense);
             
-            let idx = 0;
+            // let idx = 0;
             let req = db.open(x => {
                 let v: IExpense = x.getValue();
                 // const objToFind = v.company.locales.find(l => l.languageId == wkLanguage.id);
@@ -199,26 +207,26 @@ export class ExpenseService extends BaseService {
                     }
 
                     if(args.fromDate || args.toDate) {
-                        const createdOnUtc = moment(v.createdOn, AppConstant.DEFAULT_DATE_FORMAT);
-                        console.log(createdOnUtc)
+                        const createdOnUtc = moment(v.createdOn).format(AppConstant.DEFAULT_DATE_FORMAT);
+                        // console.log(createdOnUtc)
 
                         if(args.fromDate && args.toDate) {
                             //change date to utc first
-                            const fromDateCreatedOnUtc = moment.utc(args.fromDate, AppConstant.DEFAULT_DATE_FORMAT);
-                            const toDateCreatedOnUtc = moment.utc(args.toDate, AppConstant.DEFAULT_DATE_FORMAT);
+                            const fromDateCreatedOnUtc = moment.utc(args.fromDate).format(AppConstant.DEFAULT_DATE_FORMAT);
+                            const toDateCreatedOnUtc = moment.utc(args.toDate).format(AppConstant.DEFAULT_DATE_FORMAT);
 
                             if(createdOnUtc >= fromDateCreatedOnUtc && createdOnUtc <= toDateCreatedOnUtc) {
                                 item = v;
                             }
                         } else if (args.fromDate) {
                             //change date to utc first
-                            const fromDateCreatedOnUtc = moment.utc(args.fromDate, AppConstant.DEFAULT_DATE_FORMAT);
+                            const fromDateCreatedOnUtc = moment.utc(args.fromDate).format(AppConstant.DEFAULT_DATE_FORMAT);
                             if(createdOnUtc >= fromDateCreatedOnUtc) {
                                 item = v;
                             }
                         } else if (args.toDate) {
                             //change date to utc first
-                            const toDateCreatedOnUtc = moment.utc(args.toDate, AppConstant.DEFAULT_DATE_FORMAT);
+                            const toDateCreatedOnUtc = moment.utc(args.toDate).format(AppConstant.DEFAULT_DATE_FORMAT);
                             if(createdOnUtc <= toDateCreatedOnUtc) {
                                 item = v;
                             } 
@@ -230,29 +238,35 @@ export class ExpenseService extends BaseService {
 
                 if(item) {
                     //do not show deleted...
-                    //check for pagesize
-                    if(!item.markedForDelete 
-                        && (!args || (args && args.pageSize && idx <= args.pageSize))) {
+                    if(!item.markedForDelete) {
                         results.push(item);
                     }
                 }
 
                 req.done();
-                idx++;
+                // idx++;
                 // console.log(idx);
             }, iter);
             req.always(async () => {
                 results = this._mapAll(results);
-                results = this._sort(results);
+                results = this._sort(results);                    
+                
+                //check for pagesize
+                if(args && args.pageSize && results.length > args.pageSize) {
+                    results = results.slice(0, args.pageSize);
+                }
                 resolve(results);
             });
         });
     }
 
     getReport(fromDate: string, toDate: string, totalItems = 10) {
+        const fromDateUtc = moment.utc(fromDate, AppConstant.DEFAULT_DATE_FORMAT);
+        const toDateUtc = moment.utc(toDate, AppConstant.DEFAULT_DATE_FORMAT);
+
         const body = {
-            fromDate: fromDate,
-            toDate: toDate,
+            fromDate: fromDateUtc,
+            toDate: toDateUtc,
             totalItems: totalItems
         };
         return this.getData<IExpenseDashboardReport>({
@@ -269,11 +283,11 @@ export class ExpenseService extends BaseService {
             const items = [];
             let req = db.open(x => {
                 let e: IExpense = x.getValue();
-                const fromDateUtc = moment.utc(fromDate, AppConstant.DEFAULT_DATE_FORMAT);
-                const toDateUtc = moment.utc(toDate, AppConstant.DEFAULT_DATE_FORMAT);
+                const fromDateUtc = moment.utc(fromDate, AppConstant.DEFAULT_DATE_FORMAT).format(AppConstant.DEFAULT_DATE_FORMAT);
+                const toDateUtc = moment.utc(toDate, AppConstant.DEFAULT_DATE_FORMAT).format(AppConstant.DEFAULT_DATE_FORMAT);
+                const createdOnUtc = moment(e.createdOn, AppConstant.DEFAULT_DATE_FORMAT).format(AppConstant.DEFAULT_DATE_FORMAT);
 
-                if (moment(e.createdOn, AppConstant.DEFAULT_DATE_FORMAT) >= fromDateUtc
-                    && moment(e.createdOn, AppConstant.DEFAULT_DATE_FORMAT)<= toDateUtc) {
+                if (createdOnUtc >= fromDateUtc && createdOnUtc <= toDateUtc) {
                     items.push(e);
                 }
             }, iter);
@@ -293,8 +307,7 @@ export class ExpenseService extends BaseService {
 
                     const sum = (<IExpense[]>catGroup[cat]).reduce((a, b) => a + (+b.amount), 0);
                     categories.push({
-                        // label: catGroup[cat][0].category.name,
-                        label: cat,
+                        label: catGroup[cat][0].category.name,
                         total: catGroup[cat].length,
                         totalAmount: sum
                     });
@@ -348,9 +361,9 @@ export class ExpenseService extends BaseService {
             }
 
             if(item.markedForAdd && !item.createdOn) {
-                item.createdOn = moment().format(AppConstant.DEFAULT_DATE_FORMAT);
+                item.createdOn = moment().format(AppConstant.DEFAULT_DATETIME_FORMAT);
             } else if((item.markedForUpdate || item.markedForDelete) && !item.updatedOn) {
-                item.updatedOn = moment().format(AppConstant.DEFAULT_DATE_FORMAT);
+                item.updatedOn = moment().format(AppConstant.DEFAULT_DATETIME_FORMAT);
             }
 
             //added item can't be marked for update or delete...
@@ -365,9 +378,17 @@ export class ExpenseService extends BaseService {
             const id = await this.attachmentSvc.putLocal(item.attachment);
             item.attachment.id = +id;
         }
-
+        
+        let createdOn;
+        //if there is no time, add it...
+        const crOnTime = moment(item.createdOn).format(AppConstant.DEFAULT_TIME_FORMAT) != '00:00';
+        if(!crOnTime) {
+            createdOn = `${item.createdOn} ${moment().format(AppConstant.DEFAULT_TIME_FORMAT)}`;
+        } else {
+            createdOn = item.createdOn;
+        }
         //to utc
-        item.createdOn = moment(item.createdOn).utc().toISOString();
+        item.createdOn = moment(createdOn).utc().toISOString();
         if(item.updatedOn) {
             item.updatedOn = moment(item.updatedOn).utc().toISOString();
         }
