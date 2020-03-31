@@ -261,8 +261,10 @@ export class ExpenseService extends BaseService {
     }
 
     getReport(fromDate: string, toDate: string, totalItems = 10) {
-        const fromDateUtc = moment.utc(fromDate, AppConstant.DEFAULT_DATE_FORMAT);
-        const toDateUtc = moment.utc(toDate, AppConstant.DEFAULT_DATE_FORMAT);
+        const fromDateUtc = moment.utc(fromDate, AppConstant.DEFAULT_DATE_FORMAT)
+            .format(AppConstant.DEFAULT_DATE_FORMAT);
+        const toDateUtc = moment.utc(toDate, AppConstant.DEFAULT_DATE_FORMAT)
+            .format(AppConstant.DEFAULT_DATE_FORMAT);
 
         const body = {
             fromDate: fromDateUtc,
