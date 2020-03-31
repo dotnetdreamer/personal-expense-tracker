@@ -184,10 +184,6 @@ export class ExpenseService extends BaseService {
             
             let idx = 0;
             let req = db.open(x => {
-                if(args && args.pageSize && idx >= args.pageSize) {
-                    req.done();
-                    return;
-                }
                 let v: IExpense = x.getValue();
                 // const objToFind = v.company.locales.find(l => l.languageId == wkLanguage.id);
 
@@ -201,31 +197,44 @@ export class ExpenseService extends BaseService {
                             item = v;
                         }
                     }
+
                     if(args.fromDate || args.toDate) {
                         const createdOnUtc = moment(v.createdOn, AppConstant.DEFAULT_DATE_FORMAT);
-                        if (args.fromDate) {
+                        console.log(createdOnUtc)
+
+                        if(args.fromDate && args.toDate) {
                             //change date to utc first
                             const fromDateCreatedOnUtc = moment.utc(args.fromDate, AppConstant.DEFAULT_DATE_FORMAT);
-                            if(fromDateCreatedOnUtc >= createdOnUtc) {
+                            const toDateCreatedOnUtc = moment.utc(args.toDate, AppConstant.DEFAULT_DATE_FORMAT);
+
+                            if(createdOnUtc >= fromDateCreatedOnUtc && createdOnUtc <= toDateCreatedOnUtc) {
                                 item = v;
                             }
-                        }
-
-                        if (args.toDate) {
+                        } else if (args.fromDate) {
+                            //change date to utc first
+                            const fromDateCreatedOnUtc = moment.utc(args.fromDate, AppConstant.DEFAULT_DATE_FORMAT);
+                            if(createdOnUtc >= fromDateCreatedOnUtc) {
+                                item = v;
+                            }
+                        } else if (args.toDate) {
                             //change date to utc first
                             const toDateCreatedOnUtc = moment.utc(args.toDate, AppConstant.DEFAULT_DATE_FORMAT);
-                            if(toDateCreatedOnUtc <= createdOnUtc) {
+                            if(createdOnUtc <= toDateCreatedOnUtc) {
                                 item = v;
-                            }
+                            } 
                         }
                     }
                 } else {
                     item = v;
                 }
 
-                if(item && !item.markedForDelete) {
+                if(item) {
                     //do not show deleted...
-                    results.push(item);
+                    //check for pagesize
+                    if(!item.markedForDelete 
+                        && (!args || (args && args.pageSize && idx <= args.pageSize))) {
+                        results.push(item);
+                    }
                 }
 
                 req.done();
