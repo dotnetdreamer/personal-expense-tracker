@@ -202,15 +202,21 @@ export class ExpenseService extends BaseService {
                         }
                     }
                     if(args.fromDate || args.toDate) {
-                        //change dates to local first if dates are in timezone from server
-                        const me = this._map(v);
-                        //now compare
-                        const createdOn = moment(me.createdOn).format(AppConstant.DEFAULT_DATE_FORMAT);
-                        if (args.fromDate && createdOn >= args.fromDate) {
-                            item = v;
+                        const createdOnUtc = moment(v.createdOn, AppConstant.DEFAULT_DATE_FORMAT);
+                        if (args.fromDate) {
+                            //change date to utc first
+                            const fromDateCreatedOnUtc = moment.utc(args.fromDate, AppConstant.DEFAULT_DATE_FORMAT);
+                            if(fromDateCreatedOnUtc >= createdOnUtc) {
+                                item = v;
+                            }
                         }
-                        if(args.toDate && createdOn <= args.toDate) {
-                            item = v;
+
+                        if (args.toDate) {
+                            //change date to utc first
+                            const toDateCreatedOnUtc = moment.utc(args.toDate, AppConstant.DEFAULT_DATE_FORMAT);
+                            if(toDateCreatedOnUtc <= createdOnUtc) {
+                                item = v;
+                            }
                         }
                     }
                 } else {
@@ -254,8 +260,11 @@ export class ExpenseService extends BaseService {
             const items = [];
             let req = db.open(x => {
                 let e: IExpense = x.getValue();
-                if (moment(e.createdOn).format(AppConstant.DEFAULT_DATE_FORMAT) >= fromDate
-                    && moment(e.createdOn).format(AppConstant.DEFAULT_DATE_FORMAT) <= toDate) {
+                const fromDateUtc = moment.utc(fromDate, AppConstant.DEFAULT_DATE_FORMAT);
+                const toDateUtc = moment.utc(toDate, AppConstant.DEFAULT_DATE_FORMAT);
+
+                if (moment(e.createdOn, AppConstant.DEFAULT_DATE_FORMAT) >= fromDateUtc
+                    && moment(e.createdOn, AppConstant.DEFAULT_DATE_FORMAT)<= toDateUtc) {
                     items.push(e);
                 }
             }, iter);
@@ -275,7 +284,8 @@ export class ExpenseService extends BaseService {
 
                     const sum = (<IExpense[]>catGroup[cat]).reduce((a, b) => a + (+b.amount), 0);
                     categories.push({
-                        label: catGroup[cat][0].category.name,
+                        // label: catGroup[cat][0].category.name,
+                        label: cat,
                         total: catGroup[cat].length,
                         totalAmount: sum
                     });
@@ -288,12 +298,15 @@ export class ExpenseService extends BaseService {
 
                 let dates = [];
                 const dateGroup = items.groupBy((i: IExpense) => {
-                    return moment(i.createdOn).format(AppConstant.DEFAULT_DATE_FORMAT);
+                    return moment(i.createdOn).local().format(AppConstant.DEFAULT_DATE_FORMAT);
                 });
                 for(let dat in dateGroup) {
                     const sum = (<IExpense[]>dateGroup[dat]).reduce((a, b) => a + (+b.amount), 0);
+                    // const createdOn = moment(dateGroup[dat][0].createdOn).format(AppConstant.DEFAULT_DATE_FORMAT);
+
                     dates.push({
-                        label: moment(dateGroup[dat][0].createdOn).format(AppConstant.DEFAULT_DATE_FORMAT),
+                        // label: createdOn,
+                        label: dat,
                         total: dateGroup[dat].length,
                         totalAmount: sum
                     });
@@ -320,25 +333,34 @@ export class ExpenseService extends BaseService {
         //defaults
          if(!ignoreDefaults) {
             if(typeof item.markedForAdd === 'undefined' 
-                && typeof item.markedForUpdate === 'undefined' && typeof item.markedForDelete === 'undefined') {
+                && typeof item.markedForUpdate === 'undefined' 
+                && typeof item.markedForDelete === 'undefined') {
                 item.markedForAdd = true;
             }
-            if(item.markedForAdd) {
-                item.createdOn = moment().format(AppConstant.DEFAULT_DATETIME_FORMAT);
-            } else if(item.markedForUpdate || item.markedForDelete) {
-                item.updatedOn = moment().format(AppConstant.DEFAULT_DATETIME_FORMAT);
+
+            if(item.markedForAdd && !item.createdOn) {
+                item.createdOn = moment().format(AppConstant.DEFAULT_DATE_FORMAT);
+            } else if((item.markedForUpdate || item.markedForDelete) && !item.updatedOn) {
+                item.updatedOn = moment().format(AppConstant.DEFAULT_DATE_FORMAT);
             }
+
             //added item can't be marked for update or delete...
             if((item.markedForAdd && item.markedForUpdate) || (item.markedForAdd && item.markedForDelete)) {
                 item.markedForUpdate = false;
                 item.markedForDelete = false;
             }
         }
-        
+
         //push attachment only in case of Add, ignore in edit/delete
         if(item.attachment && item.markedForAdd) {
             const id = await this.attachmentSvc.putLocal(item.attachment);
             item.attachment.id = +id;
+        }
+
+        //to utc
+        item.createdOn = moment(item.createdOn).utc().toISOString();
+        if(item.updatedOn) {
+            item.updatedOn = moment(item.updatedOn).utc().toISOString();
         }
 
         return this.dbService.putLocal(this.schemaService.tables.expense, item)
@@ -381,29 +403,34 @@ export class ExpenseService extends BaseService {
 
     private _map(e: IExpense) {
         //only convert dates for data that came from server
-        if(!e.markedForAdd && !e.markedForUpdate && !e.markedForDelete) {
+        // if(!e.markedForAdd && !e.markedForUpdate && !e.markedForDelete) {
             e.createdOn = moment(e.createdOn).local().format(AppConstant.DEFAULT_DATETIME_FORMAT);
             if(e.updatedOn) {
                 e.updatedOn = moment(e.updatedOn).local().format(AppConstant.DEFAULT_DATETIME_FORMAT);
             }
-        }
+        // }
         return e;
     }
     
 
     private _sort(expenses: Array<IExpense>) {
-        expenses.sort((aDate: IExpense, bDate: IExpense) => {
-            // Turn your strings into dates, and then subtract them
-            // to get a value that is either negative, positive, or zero.
-            const a = moment(`${aDate.createdOn} ${aDate.createdOn}`, AppConstant.DEFAULT_DATETIME_FORMAT);
-            const b = moment(`${bDate.createdOn} ${bDate.createdOn}`, AppConstant.DEFAULT_DATETIME_FORMAT);
+        // expenses.sort((aDate: IExpense, bDate: IExpense) => {
+        //     // Turn your strings into dates, and then subtract them
+        //     // to get a value that is either negative, positive, or zero.
+        //     const a = moment(`${aDate.createdOn} ${aDate.createdOn}`, AppConstant.DEFAULT_DATETIME_FORMAT);
+        //     const b = moment(`${bDate.createdOn} ${bDate.createdOn}`, AppConstant.DEFAULT_DATETIME_FORMAT);
 
-            //The following also takes seconds and milliseconds into account and is a bit shorter.
-            return b.valueOf() - a.valueOf();
+        //     //The following also takes seconds and milliseconds into account and is a bit shorter.
+        //     return b.valueOf() - a.valueOf();
+        // });
+        
+        //by id first
+        expenses.sort((a, b) => b.id - a.id);
+        //then by date
+        expenses = expenses.sort((aDate: IExpense, bDate: IExpense) => {
+            return moment(bDate.createdOn).diff(aDate.createdOn);
         });
 
-        //then by id
-        expenses.sort((a, b) => b.id - a.id);
         return expenses;
     }
 }
