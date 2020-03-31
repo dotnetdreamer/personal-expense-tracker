@@ -115,6 +115,8 @@ export class ExpenseListingPage extends BasePage implements OnInit, OnDestroy {
       const res = await this.helperSvc.presentConfirmDialog();
       if(res) {
         expense.markedForDelete = true;
+        expense.updatedOn = null;
+
         await this.expenseSvc.putLocal(expense);
         
         this.eventPub.$pub(SyncConstant.EVENT_SYNC_DATA_PUSH, SyncEntity.Expense);
@@ -249,7 +251,8 @@ export class ExpenseListingPage extends BasePage implements OnInit, OnDestroy {
               ...expense,
               description: data.description,
               amount: data.amount,
-              markedForUpdate: true
+              markedForUpdate: true,
+              updatedOn: null
             });   
 
             this.eventPub.$pub(SyncConstant.EVENT_SYNC_DATA_PUSH, SyncEntity.Expense);
