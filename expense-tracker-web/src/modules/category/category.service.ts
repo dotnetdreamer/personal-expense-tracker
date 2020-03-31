@@ -31,12 +31,12 @@ export class CategoryService {
       newOrUpdated.isDeleted = false;
     }
 
-    if(newOrUpdated.createdOn && !this.helperSvc.isValidDate(newOrUpdated.createdOn)) {
-      newOrUpdated.createdOn = moment(category.createdOn, AppConstant.DEFAULT_DATETIME_FORMAT).toDate();
-    }
-    if(newOrUpdated.updatedOn && !this.helperSvc.isValidDate(newOrUpdated.updatedOn)) {
-      newOrUpdated.updatedOn = moment(category.updatedOn, AppConstant.DEFAULT_DATETIME_FORMAT).toDate();
-    }
+    // if(newOrUpdated.createdOn && !this.helperSvc.isValidDate(newOrUpdated.createdOn)) {
+    //   newOrUpdated.createdOn = moment(category.createdOn, AppConstant.DEFAULT_DATETIME_FORMAT).toDate();
+    // }
+    // if(newOrUpdated.updatedOn && !this.helperSvc.isValidDate(newOrUpdated.updatedOn)) {
+    //   newOrUpdated.updatedOn = moment(category.updatedOn, AppConstant.DEFAULT_DATETIME_FORMAT).toDate();
+    // }
 
     return this.categoryRepo.save<Category>(newOrUpdated);
   }
@@ -56,7 +56,7 @@ export class CategoryService {
       return;
     }
 
-    const toDate =  moment().format(AppConstant.DEFAULT_DATETIME_FORMAT);
+    const toDate =  moment.utc().format(AppConstant.DEFAULT_DATETIME_FORMAT);
     const categories: ICategoryParams[] = [
       { groupName: '', name: 'General', icon: 'newspaper-outline', createdOn: toDate },
       //Entertainment

@@ -38,8 +38,8 @@ export class ExpenseListingPage extends BasePage implements OnInit, OnDestroy {
   }
 
   async ngOnInit() {
-    //we call this on sync complete at the bottom
-    // await this._getExpenses();
+    await this._getExpenses();
+    
     this.workingCurrency = await this.currencySettingSvc.getWorkingCurrency();
 
     const fromDate = moment().startOf('M').format(AppConstant.DEFAULT_DATE_FORMAT);
@@ -176,12 +176,12 @@ export class ExpenseListingPage extends BasePage implements OnInit, OnDestroy {
   }
 
   private _subscribeToEvents() {
-    this._expenseCreatedOrUpdatedSub = this.eventPub.$sub(AppConstant.EVENT_EXPENSE_CREATED_OR_UPDATED, async (expense: IExpense) => {
-      if(AppConstant.DEBUG) {
-        console.log('ExpenseListingPage: EVENT_EXPENSE_CREATED_OR_UPDATED: expense', expense);
-      }
-      await this._getExpenses();
-    });
+    // this._expenseCreatedOrUpdatedSub = this.eventPub.$sub(AppConstant.EVENT_EXPENSE_CREATED_OR_UPDATED, async (expense: IExpense) => {
+    //   if(AppConstant.DEBUG) {
+    //     console.log('ExpenseListingPage: EVENT_EXPENSE_CREATED_OR_UPDATED: expense', expense);
+    //   }
+    //   await this._getExpenses();
+    // });
 
     this._syncDataPushCompleteSub = this.eventPub.$sub(SyncConstant.EVENT_SYNC_DATA_PUSH_COMPLETE, async () => {
       if(AppConstant.DEBUG) {

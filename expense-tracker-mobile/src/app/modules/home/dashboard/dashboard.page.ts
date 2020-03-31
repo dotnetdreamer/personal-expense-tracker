@@ -59,6 +59,7 @@ export class DashboardPage extends BasePage implements AfterViewInit, OnDestroy 
   totalAmountToday = 0;
 
   private _syncDataPushCompleteSub: Subscription;
+  private _syncDataPullCompleteSub: Subscription;
   private _eventCreatedOrUpdatedSub: Subscription;
 
   constructor(private expenseSvc: ExpenseService, private currencySettingSvc: CurrencySettingService) { 
@@ -102,6 +103,9 @@ export class DashboardPage extends BasePage implements AfterViewInit, OnDestroy 
   }
 
   ngOnDestroy() {
+    if(this._syncDataPullCompleteSub) {
+      this._syncDataPullCompleteSub.unsubscribe();
+    }
     if(this._syncDataPushCompleteSub) {
       this._syncDataPushCompleteSub.unsubscribe();
     }
@@ -191,7 +195,7 @@ export class DashboardPage extends BasePage implements AfterViewInit, OnDestroy 
   }
 
   private _subscribeToEvents() {
-    this._syncDataPushCompleteSub = this.eventPub.$sub(SyncConstant.EVENT_SYNC_DATA_PULL_COMPLETE, async () => {
+    this._syncDataPullCompleteSub = this.eventPub.$sub(SyncConstant.EVENT_SYNC_DATA_PULL_COMPLETE, async () => {
       if(AppConstant.DEBUG) {
         console.log('DashboardPage:Event received: EVENT_SYNC_DATA_PULL_COMPLETE');
       }
@@ -206,5 +210,15 @@ export class DashboardPage extends BasePage implements AfterViewInit, OnDestroy 
       await this._getTodayExpenses();
       await this._renderCharts(this.selectedFromDate, this.selectedToDate);
     });
+
+    //we add item...after successfuly sync, reload to hide that spinner icon from each expense item
+    this._syncDataPushCompleteSub = this.eventPub.$sub(SyncConstant.EVENT_SYNC_DATA_PUSH_COMPLETE, async () => {
+      if(AppConstant.DEBUG) {
+        console.log('DashboardPage:Event received: EVENT_SYNC_DATA_PUSH_COMPLETE');
+      }
+      await this._getTodayExpenses();
+      await this._renderCharts(this.selectedFromDate, this.selectedToDate);
+    });
+    
   }
 }

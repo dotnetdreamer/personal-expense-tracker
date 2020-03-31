@@ -81,6 +81,8 @@ export class CategoryPage extends BasePage implements OnInit {
       const res = await this.helperSvc.presentConfirmDialog();
       if(res) {
         category.markedForDelete = true;
+        category.updatedOn = null;
+
         await this.categorySvc.putLocal(category);  
 
         this.eventPub.$pub(SyncConstant.EVENT_SYNC_DATA_PUSH, SyncEntity.Category);
@@ -160,6 +162,7 @@ export class CategoryPage extends BasePage implements OnInit {
             if(category) {
               cat.id = category.id;
               cat.markedForUpdate = true;
+              category.updatedOn = null;
             }
             await this.categorySvc.putLocal(cat);   
 

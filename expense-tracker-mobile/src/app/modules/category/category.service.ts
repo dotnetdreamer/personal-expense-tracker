@@ -162,16 +162,24 @@ export class CategoryService extends BaseService {
                 && typeof item.markedForUpdate === 'undefined' && typeof item.markedForDelete === 'undefined') {
                 item.markedForAdd = true;
             }
-            if(item.markedForAdd) {
-                item.createdOn = moment().format(AppConstant.DEFAULT_DATETIME_FORMAT);
-            } else if(item.markedForUpdate || item.markedForDelete) {
-                item.updatedOn = moment().format(AppConstant.DEFAULT_DATETIME_FORMAT);
+
+            if(item.markedForAdd && !item.createdOn) {
+                item.createdOn = moment().format(AppConstant.DEFAULT_DATE_FORMAT);
+            } else if((item.markedForUpdate || item.markedForDelete) && !item.updatedOn) {
+                item.updatedOn = moment().format(AppConstant.DEFAULT_DATE_FORMAT);
             }
+
             //added item can't be marked for update or delete...
             if((item.markedForAdd && item.markedForUpdate) || (item.markedForAdd && item.markedForDelete)) {
                 item.markedForUpdate = false;
                 item.markedForDelete = false;
             }
+        }
+
+        //to utc
+        item.createdOn = moment(item.createdOn).utc().toISOString();
+        if(item.updatedOn) {
+            item.updatedOn = moment(item.updatedOn).utc().toISOString();
         }
 
         return this.dbService.putLocal(this.schemaService.tables.category, item).then((affectedRows) => {

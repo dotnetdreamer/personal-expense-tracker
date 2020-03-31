@@ -74,7 +74,7 @@ export class AppComponent {
         await this._navigateTo('/home');
 
         //first sync then pull
-        await this.syncHelperSvc.push();
+        // await this.syncHelperSvc.push();
         await this.syncHelperSvc.pull();
       } catch (e) {
         //ignore

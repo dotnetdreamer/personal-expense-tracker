@@ -31,12 +31,12 @@ export class AttachmentService {
       newOrUpdated.isDeleted = false;
     }
 
-    if(newOrUpdated.createdOn && !this.helperSvc.isValidDate(newOrUpdated.createdOn)) {
-      newOrUpdated.createdOn = moment(attachment.createdOn, AppConstant.DEFAULT_DATETIME_FORMAT).toDate();
-    }
-    if(newOrUpdated.updatedOn && !this.helperSvc.isValidDate(newOrUpdated.updatedOn)) {
-      newOrUpdated.updatedOn = moment(attachment.updatedOn, AppConstant.DEFAULT_DATETIME_FORMAT).toDate();
-    }
+    // if(newOrUpdated.createdOn && !this.helperSvc.isValidDate(newOrUpdated.createdOn)) {
+    //   newOrUpdated.createdOn = moment(attachment.createdOn, AppConstant.DEFAULT_DATETIME_FORMAT).toDate();
+    // }
+    // if(newOrUpdated.updatedOn && !this.helperSvc.isValidDate(newOrUpdated.updatedOn)) {
+    //   newOrUpdated.updatedOn = moment(attachment.updatedOn, AppConstant.DEFAULT_DATETIME_FORMAT).toDate();
+    // }
 
     return this.attachmentRepo.save<Attachment>(newOrUpdated);
   }
