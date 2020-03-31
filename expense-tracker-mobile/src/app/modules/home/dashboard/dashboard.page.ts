@@ -10,16 +10,22 @@ import { Subscription } from 'rxjs';
 import { CurrencySettingService } from '../../currency/currency-setting.service';
 
 import {
-  ApexAxisChartSeries,
-  ApexChart,
-  ChartComponent,
-  ApexDataLabels,
-  ApexXAxis,
-  ApexPlotOptions,
-  ApexNonAxisChartSeries,
-  ApexLegend
+  ApexAxisChartSeries, ApexChart, ApexDataLabels, ApexXAxis, ApexPlotOptions,
+  ApexNonAxisChartSeries, ApexLegend, ApexYAxis, ApexGrid, ApexStroke, ApexTitleSubtitle
 } from "ng-apexcharts";
 import { IExpenseDashboardReport, IExpense } from '../../expense/expense.model';
+
+export type ChartOptions = {
+  series: ApexAxisChartSeries;
+  chart: ApexChart;
+  xaxis: ApexXAxis;
+  yaxis: ApexYAxis;
+  dataLabels: ApexDataLabels;
+  grid: ApexGrid;
+  stroke: ApexStroke;
+  title: ApexTitleSubtitle;
+  legend: ApexLegend;
+};
 
 export type DateChartOptions = {
   series: ApexAxisChartSeries;
@@ -45,6 +51,7 @@ export type CategoryChartOptions = {
 export class DashboardPage extends BasePage implements AfterViewInit, OnDestroy {
   // @ViewChild("dateChart") categoryChart: ChartComponent;
     // @ViewChild("categoryChart") categoryChart: ChartComponent;
+  totalChartOptions: Partial<ChartOptions>;
   dateChartOptions: Partial<DateChartOptions>;
   categoryChartOptions: Partial<CategoryChartOptions>;
 
@@ -157,6 +164,48 @@ export class DashboardPage extends BasePage implements AfterViewInit, OnDestroy 
     const categoryTotalAmounts = categories.map(r => r.totalAmount);
     const categoryLabels = categories.map(r => r.label);
 
+    this.totalChartOptions = {
+      series: [
+        {
+          name: resoures[0],
+          data: categoryTotalAmounts
+        }
+      ],
+      chart: {
+        height: 90,
+        // width: 150,
+        type: "line",
+        background: 'transparent',
+        zoom: {
+          enabled: false
+        },
+        toolbar: {
+          show: false
+        }
+      },
+      legend: {
+        show: false
+      },
+      dataLabels: {
+        enabled: false
+      },
+      stroke: {
+        curve: "straight"
+      },
+      grid: {
+        show: false,
+      },
+      yaxis: {
+        show: false
+      },
+      xaxis: {
+        labels: {
+          show: false
+        },
+        categories: categoryLabels
+      }
+    };
+ 
     this.dateChartOptions = {
       series: [
         {

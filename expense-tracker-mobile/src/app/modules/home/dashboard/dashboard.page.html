@@ -20,12 +20,28 @@
       (ionChange)="onDateSelectionChanged($event, 'toDate')"></ion-datetime>
   </div>
   <ion-card class="card-total">
-    <ion-card-header>
-      <ion-card-title>{{'expense.total' | localizedresource | async }}</ion-card-title>
-    </ion-card-header>
+    <!-- <ion-card-header>
+      <ion-card-title></ion-card-title>
+    </ion-card-header> -->
     <ion-card-content>
-      <div>
-        <ion-label>{{ (totalAmount || 0) | currency: (workingCurrency + '&nbsp;')}}</ion-label>
+      <div class="total-with-chart">
+        <div class="total-container">
+          <div class="total-label">{{'expense.total' | localizedresource | async }}</div>
+          <ion-label>{{ (totalAmount || 0) | currency: (workingCurrency + '&nbsp;')}}</ion-label>
+        </div>
+        <div>
+          <apx-chart *ngIf="totalChartOptions" 
+            [series]="totalChartOptions.series"
+            [chart]="totalChartOptions.chart"
+            [xaxis]="totalChartOptions.xaxis"
+            [yaxis]="totalChartOptions.yaxis"
+            [dataLabels]="totalChartOptions.dataLabels"
+            [grid]="totalChartOptions.grid"
+            [stroke]="totalChartOptions.stroke"
+            [title]="totalChartOptions.title"
+            [legend]="totalChartOptions.legend"
+        ></apx-chart>
+        </div>
       </div>
     </ion-card-content>
   </ion-card>

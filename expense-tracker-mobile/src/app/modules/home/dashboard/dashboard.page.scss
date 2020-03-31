@@ -11,6 +11,30 @@ page-home-dashboard {
             }
         }
 
+        .card-total {
+            ion-card-content {
+                padding-top: 10px;
+                padding-bottom: 0;
+
+                .total-with-chart {
+                    display: flex;
+                    justify-content: space-between;
+
+                    .total-container {
+                        display: flex;
+                        justify-content: center;
+                        flex-direction: column;
+                        margin-right: 20px;
+
+                        .total-label {
+                            font-size: 2em;
+                            font-weight: bold;
+                        }
+                    }
+                }
+            }
+        }
+
         .card-today {
             position: relative;
             overflow: visible;
