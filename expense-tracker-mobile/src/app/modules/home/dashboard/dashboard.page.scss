@@ -16,6 +16,10 @@ page-home-dashboard {
             overflow: visible;
             min-height: 185px;
 
+            &.md {
+                margin-bottom: 30px;
+            }
+
             ion-card-content {
                 .today-header{
                     display: flex;
