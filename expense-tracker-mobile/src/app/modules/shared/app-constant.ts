@@ -1,9 +1,11 @@
 
+import { environment } from '../../../environments/environment';
+
 export class AppConstant {
     public static readonly DEBUG = true;
 
-    // public static readonly BASE_URL = "https://nest.dotnetdreamer2.net/";
-    public static readonly BASE_URL = "http://localhost:3000/";
+    public static readonly BASE_URL = !environment.production 
+        ? "http://localhost:3000/" : "https://nest.dotnetdreamer2.net/";
     public static readonly BASE_API_URL = `${AppConstant.BASE_URL}`;
     public static readonly DB_NAME = "expense-tracker";
 
