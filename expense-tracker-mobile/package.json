@@ -31,6 +31,7 @@
     "@ionic/angular": "^5.0.7",
     "apexcharts": "^3.17.0",
     "brain.js": "^2.0.0-alpha.12",
+    "capacitor-sqlite": "^1.5.2-1",
     "core-js": "~3.6.4",
     "ionicons": "^5.0.0",
     "moment": "^2.24.0",
