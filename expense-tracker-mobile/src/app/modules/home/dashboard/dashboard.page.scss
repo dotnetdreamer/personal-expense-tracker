@@ -152,5 +152,11 @@ page-home-dashboard {
                 min-height: 300px;
             }
         }
+
+        .card-category-spending {
+            ion-card-content {
+                min-height: 250px;
+            }
+        }
     }
 }

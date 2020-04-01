@@ -98,11 +98,11 @@
     ></apx-chart>
     </ion-card-content>
   </ion-card>
-  <ion-card>
+  <ion-card class="card-category-spending">
     <ion-card-header>
       <ion-card-title>{{'home.dashboard.spending_by_category' | localizedresource | async }}</ion-card-title>
     </ion-card-header>
-    <ion-card-content>
+    <ion-card-content [class.skeleton-loading]="!categoryChartOptions">
       <apx-chart #categoryChart *ngIf="categoryChartOptions" 
       [series]="categoryChartOptions.series"
       [chart]="categoryChartOptions.chart"

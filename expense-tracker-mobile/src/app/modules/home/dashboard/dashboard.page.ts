@@ -99,7 +99,21 @@ export class DashboardPage extends BasePage implements AfterViewInit, OnDestroy 
     this.selectedFromDate = moment().add(-7, 'd').format(AppConstant.DEFAULT_DATE_FORMAT);
     this.selectedToDate = moment().format(AppConstant.DEFAULT_DATE_FORMAT);
 
+    this.todayExpenses = [];
+    this.totalAmountToday = 0;
+    setTimeout(async () => {
+      await this._getTodayExpenses();
+    });
+
+    this.totalAmount = 0;
+    this.totalChartOptions.series = [];
+    this.totalChartOptions.xaxis.categories = [];
+    this.dateChartOptions.series = [];
+    this.dateChartOptions.xaxis.categories = [];
+    this.categoryChartOptions.series = [];
+    this.categoryChartOptions.labels = [];
     await this._renderCharts(this.selectedFromDate, this.selectedToDate);
+
     setTimeout(() => {
       ev.target.complete();
     }, 300);
@@ -158,7 +172,7 @@ export class DashboardPage extends BasePage implements AfterViewInit, OnDestroy 
         dates: []
       }
     }
-    
+
     const resoures = await Promise.all([
       this.localizationSvc.getResource('expense.total')
     ]);
