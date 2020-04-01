@@ -9,9 +9,15 @@ import { AppConstant } from 'src/app/modules/shared/app-constant';
     encapsulation: ViewEncapsulation.None,
     styleUrls: ['./calendar-swiper.scss'],
     template: `
+    <ion-button fill="clear">
+        <ion-icon name="arrow-back"></ion-icon>
+    </ion-button>
     <ion-slides #calendarSwiper [options]="slideOpts" 
         (ionSlideDidChange)="onIonSlideDidChange($event)" *ngIf="viewLoaded">
     </ion-slides>
+    <ion-button fill="clear">
+        <ion-icon name="arrow-forward"></ion-icon>
+    </ion-button>
     `
 })
 export class CalendarSwiperComponent implements AfterViewInit, OnDestroy {
