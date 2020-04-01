@@ -29,7 +29,7 @@
           <div class="total-label">{{'expense.total' | localizedresource | async }}</div>
           <ion-label>{{ (totalAmount || 0) | currency: (workingCurrency + '&nbsp;')}}</ion-label>
         </div>
-        <div>
+        <div class="total-chart-container" [class.skeleton-loading]="!totalChartOptions">
           <apx-chart *ngIf="totalChartOptions" 
             [series]="totalChartOptions.series"
             [chart]="totalChartOptions.chart"
@@ -46,7 +46,7 @@
     </ion-card-content>
   </ion-card>
   <ion-card class="card-today">
-    <ion-card-content>
+    <ion-card-content [class.skeleton-loading]="!todayExpenses">
       <div class="today-header"> 
         <div class="today-info">
           <div class="date">{{ todayDate | formateDate: 'D' | async }}</div>
@@ -84,11 +84,11 @@
       </ion-button>
     </ion-card-content>
   </ion-card>
-  <ion-card>
+  <ion-card class="card-date-spending">
     <ion-card-header>
       <ion-card-title>{{'home.dashboard.spending_by_date' | localizedresource | async }}</ion-card-title>
     </ion-card-header>
-    <ion-card-content>
+    <ion-card-content [class.skeleton-loading]="!dateChartOptions">
       <apx-chart #dateChart *ngIf="dateChartOptions" 
       [series]="dateChartOptions.series"
       [chart]="dateChartOptions.chart"

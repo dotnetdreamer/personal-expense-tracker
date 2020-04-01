@@ -58,3 +58,27 @@
         background-color: #f7f7f7;
     }
 }
+
+
+.skeleton-loading {
+    animation: loadingprd 1.5s linear infinite forwards;
+    background: no-repeat #f1f1f1;
+    background-image: -webkit-linear-gradient(left,#f1f1f1 0,#e1e1e1 20%,#f1f1f1 40%,#f1f1f1 100%);    
+}
+@-webkit-keyframes loadingprd {
+    0% {
+        background-position: -468px 0
+    }
+    
+    to {
+        background-position: 468px 0
+    }
+}  
+@keyframes loadingprd {
+    0% {
+        background-position: -468px 0
+    }
+    to {
+        background-position: 468px 0
+    }
+}

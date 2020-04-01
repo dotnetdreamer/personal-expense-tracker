@@ -13,8 +13,8 @@ page-home-dashboard {
 
         .card-total {
             ion-card-content {
-                padding-top: 10px;
-                padding-bottom: 0;
+                padding-top: 5px;
+                padding-bottom: 5px;
 
                 .total-with-chart {
                     display: flex;
@@ -30,6 +30,11 @@ page-home-dashboard {
                             font-size: 2em;
                             font-weight: bold;
                         }
+                    }
+
+                    .total-chart-container {
+                        min-height: 45px;
+                        min-width: 200px;
                     }
                 }
             }
@@ -140,6 +145,12 @@ page-home-dashboard {
             //         }
             //     }
             // }
+        }
+
+        .card-date-spending {
+            ion-card-content {
+                min-height: 300px;
+            }
         }
     }
 }

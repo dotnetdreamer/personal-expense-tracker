@@ -140,17 +140,25 @@ export class DashboardPage extends BasePage implements AfterViewInit, OnDestroy 
     const selectedToDateMonth = +moment(toDate, AppConstant.DEFAULT_DATE_FORMAT).format('M');
 
     let report: IExpenseDashboardReport;
-    //if selected month is not same as current month, then we don't have entries local..
-    //fetch it from online...
-    if(selectedFromDateMonth != currentMonth || selectedToDateMonth != currentMonth) {
-      report = await this.expenseSvc.getReport(fromDate, toDate);
-    } else {
-      report = await this.expenseSvc.getReportLocal(fromDate, toDate);
+    try {
+      //if selected month is not same as current month, then we don't have entries local..
+      //fetch it from online...
+      if(selectedFromDateMonth != currentMonth || selectedToDateMonth != currentMonth) {
+        report = await this.expenseSvc.getReport(fromDate, toDate);
+      } else {
+        report = await this.expenseSvc.getReportLocal(fromDate, toDate);
+      }
+      if(AppConstant.DEBUG) {
+        console.log('DashboardPage: _renderCharts: report', report);
+      }
+    } catch(e) {
+      //hide skeleton screen
+      report = {
+        categories: [],
+        dates: []
+      }
     }
-    if(AppConstant.DEBUG) {
-      console.log('DashboardPage: _renderCharts: report', report);
-    }
-
+    
     const resoures = await Promise.all([
       this.localizationSvc.getResource('expense.total')
     ]);
@@ -205,7 +213,7 @@ export class DashboardPage extends BasePage implements AfterViewInit, OnDestroy 
         categories: categoryLabels
       }
     };
- 
+
     this.dateChartOptions = {
       series: [
         {
@@ -232,7 +240,7 @@ export class DashboardPage extends BasePage implements AfterViewInit, OnDestroy 
         categories: dateLabels
       }
     };
-   
+  
     this.categoryChartOptions = {
       series: categoryTotalAmounts,
       chart: {
