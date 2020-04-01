@@ -6,8 +6,31 @@ page-home-dashboard {
             justify-content: center;
             align-items: center;
 
-            ion-datetime {
-                --padding-end: 20px;
+            .filter-item-separator {
+                font-size: 10px;
+                position: relative;
+                top: -3px;
+                margin: 0 10px;
+            }
+
+            .filter-item {
+                display: flex;
+                align-items: center;
+            
+                ion-icon {
+                    &[name='calendar-outline'] {
+                        font-size: 14px;
+                        position: relative;
+                        top: -2px;
+                        margin: 2px;
+                    }
+                }
+                ion-datetime {
+                    --padding-start: 0;
+                    --padding-end: 0;
+                    --padding-top: 0;
+                    --padding-bottom: 0;
+                }
             }
         }
 

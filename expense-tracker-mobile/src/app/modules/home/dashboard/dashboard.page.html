@@ -12,12 +12,18 @@
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
   <div class="date-filters">
-    <ion-datetime 
-      [displayFormat]="DEFAULT_DATE_FORMAT" [value]="selectedFromDate"  
-        (ionChange)="onDateSelectionChanged($event, 'fromDate')"></ion-datetime>
-    &nbsp;-&nbsp;
-    <ion-datetime [value]="selectedToDate" [displayFormat]="DEFAULT_DATE_FORMAT" 
+    <div class="filter-item">
+      <ion-icon name="calendar-outline"></ion-icon>
+      <ion-datetime 
+        [displayFormat]="DEFAULT_DATE_FORMAT" [value]="selectedFromDate"  
+          (ionChange)="onDateSelectionChanged($event, 'fromDate')"></ion-datetime>
+    </div>
+    <div class="filter-item-separator">-</div>
+    <div class="filter-item">
+      <ion-icon name="calendar-outline"></ion-icon>
+      <ion-datetime [value]="selectedToDate" [displayFormat]="DEFAULT_DATE_FORMAT" 
       (ionChange)="onDateSelectionChanged($event, 'toDate')"></ion-datetime>
+    </div>
   </div>
   <ion-card class="card-total">
     <!-- <ion-card-header>
