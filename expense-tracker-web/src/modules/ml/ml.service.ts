@@ -2,10 +2,12 @@ import { Injectable } from "@nestjs/common";
 
 import * as brain from 'brain.js';
 import * as natural from 'natural';
+import * as fs from 'fs';
 
 import { ExpenseService } from "src/modules/expense/expense.service";
 import { CategoryService } from "src/modules/category/category.service";
 import { Expense } from "src/modules/expense/expense.entity";
+import { AppConstant } from "../shared/app-constant";
 
 @Injectable()
 export class MlService {
@@ -14,7 +16,6 @@ export class MlService {
     } 
 
     async buildExpensesTrainingSet() {
-        //TODO: limit the data by date
         let expenses = await this.expenseSvc.findAll();
         //map it
         const model = expenses.map(async (e) => {
@@ -25,32 +26,34 @@ export class MlService {
 
         const trainingSet = data.map((e) => {
             const catName = e["category"].name;
-            const obj = {
-              phrase: e.description, 
-              result: { }
+            const obj: brain.IRNNTrainingData = {
+                input: e.description, 
+                output: catName
             };
-            obj.result[catName] = 1;
             return obj;
         });
 
         return trainingSet;
     }
 
-    async trainAndPredictExpenseCategory(text: string) {
-        const trainingSet = await this.buildExpensesTrainingSet();
-
-        const dictionary = this._buildWordDictionary(trainingSet);
-
-        const encodedTrainingSet = trainingSet.map(dataSet => {
-            const encodedValue = this._encode(dictionary, dataSet.phrase)
-            return { input: encodedValue, output: dataSet.result }
-        });
-
-        const network = new brain.NeuralNetwork();
-        network.train(encodedTrainingSet);
+    async trainExpenseCategoryMl() {
+        // create configuration for training
+        const config = {
+            iterations: 1500,
+            log: false,
+            logPeriod: 50,
+            layers: [10]
+        };
         
-        const encoded = this._encode(dictionary, text)
-        return network.run(encoded);
+        const data = await this.buildExpensesTrainingSet();
+
+        const network = new brain.recurrent.LSTM();
+        network.train(data, config);
+
+        const json = network.toJSON();
+        const jsonStr = JSON.stringify(json);
+        
+        fs.writeFileSync(`${AppConstant.UPLOADED_PATH_ML_WITH_FILE_NAME}`, jsonStr, 'utf8');
     }
         
     private _buildWordDictionary(trainingData) {

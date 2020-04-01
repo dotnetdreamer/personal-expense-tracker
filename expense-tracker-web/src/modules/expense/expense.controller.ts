@@ -117,7 +117,7 @@ export class ExpenseController {
       const attachment = await this.attachmentSvc.findOne(mExp.attachmentId);
       mExp["attachment"] = {
         ...attachment,
-        attachment: `${AppConstant.UPLOADED_PATH}/${attachment.guid}.${attachment.extension}`
+        attachment: `${AppConstant.UPLOADED_PATH_FILES}/${attachment.guid}.${attachment.extension}`
       };
     }
 

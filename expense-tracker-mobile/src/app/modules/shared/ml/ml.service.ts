@@ -4,63 +4,47 @@ import * as brain from 'brain.js';
 import { ExpenseService } from '../../expense/expense.service';
 import { CategoryService } from '../../category/category.service';
 import { ICategory } from '../../category/category.model';
+import { BaseService } from '../base.service';
 
 @Injectable({
     providedIn: 'root'
 })
 //https://tech.holidayextras.com/build-a-phrase-classifier-with-javascript-b6d4821de447
 //https://github.com/TomVance/simple_phrase_classifier
-export class MlService {
-    constructor(private expenseSvc: ExpenseService, private categorySvc: CategoryService) {
+export class MlService extends BaseService {
 
+    constructor(private expenseSvc: ExpenseService, private categorySvc: CategoryService) {
+        super();
     }
 
-    async predictCategoryForExpenses(text): Promise<{ category: ICategory, score: number }> {
-        let expenses: any = await import('../../../../assets/expenses.json');
-        const TrainingSet: any[] = expenses.default;
+    async predictCategoryForExpenses(text): Promise<ICategory> {
+        let netString: any = await import('../../../../assets/trained-net-category.json');
+        let data = netString.default;
 
-        //Important: use the following to train more data from server
-        // const data = await this.expenseSvc.getExpenseListLocal();
-        // const TrainingSet = data.map((e) => {
-        //     const catName = e.category.name;
-        //     const obj = {
-        //       phrase: e.description, 
-        //       result: { }
-        //     }; 
-        //     obj.result[catName] = 1;
-        //     return obj;
-        // });
-        // console.log(JSON.stringify(TrainingSet));
+        const network = new brain.recurrent.LSTM();
+        network.fromJSON(data);
 
-        const dictionary = this._buildWordDictionary(TrainingSet);
+        const predictedCategory = network.run<string>(text);
 
-        const encodedTrainingSet = TrainingSet.map(dataSet => {
-            const encodedValue = this._encode(dictionary, dataSet.phrase)
-            return { input: encodedValue, output: dataSet.result }
-        });
-        
-        const network = new brain.NeuralNetwork();
-        network.train(encodedTrainingSet);
+        // // //sorted by prediction
+        // // const sortedPred = Object.entries(predictions).sort((a, b) => a[1] - b[1]);
 
-        const encoded = this._encode(dictionary, text)
-        const predictions = network.run(encoded);
-
-        //sorted by prediction
-        const sortedPred = Object.entries(predictions).sort((a, b) => a[1] - b[1]);
-
-        //get the highest scored prediction
-        const acceptedPrediction = sortedPred[sortedPred.length - 1];
-        const predictedCategory = acceptedPrediction[0];
+        // // //get the highest scored prediction
+        // // const acceptedPrediction = sortedPred[sortedPred.length - 1];
+        // // const predictedCategory = acceptedPrediction[0];
 
         //find category
         //TODO: fetch category name from local instead of all
         const categories = await this.categorySvc.getCategoryListLocal();
-        const selectedCategory = categories.filter(c => c.name.toLowerCase().includes(predictedCategory.toLowerCase()))[0];
+        let selectedCategory: ICategory;
+        if(predictedCategory) {
+            selectedCategory = categories.filter(c => c.name.toLowerCase().includes(predictedCategory.toLowerCase()))[0];
+        } else {
+            //general
+            // selectedCategory = categories.filter(c => c.groupName.toLowerCase() == 'general')[0];
+        }
 
-        return {
-            category: selectedCategory,
-            score: acceptedPrediction[1]
-        };
+        return selectedCategory;
     }
 
     private _buildWordDictionary (trainingData) {
