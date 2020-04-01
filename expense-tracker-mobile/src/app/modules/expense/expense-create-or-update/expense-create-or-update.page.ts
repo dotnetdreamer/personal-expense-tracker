@@ -220,13 +220,18 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit {
     if(description) {
       description = description.trim();
       if(description && !this.selectedCategory) {
-        const category = await this.mlSvc.predictCategoryForExpenses(description);
-        if(AppConstant.DEBUG) {
-          console.log('onDescriptionChanged: acceptedPrediction', category);
-        }
-        if(category) {
-          this.suggestedCategory = category;
-          this.f.categoryId.setValue(this.suggestedCategory.id);
+        try {
+          const category = await this.mlSvc.predictCategoryForExpenses(description);
+          if(AppConstant.DEBUG) {
+            console.log('onDescriptionChanged: acceptedPrediction', category);
+          }
+          
+          if(category) {
+            this.suggestedCategory = category;
+            this.f.categoryId.setValue(this.suggestedCategory.id);
+          }
+        } catch(e) {
+          //ignore...
         }
       }
     }
