@@ -9,13 +9,13 @@ import { AppConstant } from 'src/app/modules/shared/app-constant';
     encapsulation: ViewEncapsulation.None,
     styleUrls: ['./calendar-swiper.scss'],
     template: `
-    <ion-button fill="clear">
+    <ion-button fill="clear" (click)="onNextPrevButtonClicked('prev')">
         <ion-icon name="arrow-back"></ion-icon>
     </ion-button>
     <ion-slides #calendarSwiper [options]="slideOpts" 
         (ionSlideDidChange)="onIonSlideDidChange($event)" *ngIf="viewLoaded">
     </ion-slides>
-    <ion-button fill="clear">
+    <ion-button fill="clear" (click)="onNextPrevButtonClicked('next')">
         <ion-icon name="arrow-forward"></ion-icon>
     </ion-button>
     `
@@ -49,6 +49,14 @@ export class CalendarSwiperComponent implements AfterViewInit, OnDestroy {
         setTimeout(async () => {
             await this._init();
         });
+    }
+
+    async onNextPrevButtonClicked(actionType: 'next' | 'prev') {
+        if(actionType == 'next') {
+            this.calendarSwiper.slideNext();
+        } else if(actionType == 'prev') {
+            this.calendarSwiper.slidePrev();
+        }
     }
 
     async onIonSlideDidChange(ev: CustomEvent) {
