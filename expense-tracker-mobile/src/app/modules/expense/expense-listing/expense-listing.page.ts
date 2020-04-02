@@ -65,9 +65,7 @@ export class ExpenseListingPage extends BasePage implements OnInit, OnDestroy {
         from: args.start,
         to: args.end
       };
-      const currentMonth = moment().format('M');
-      //if changed month is not same as current month, then we don't have entries local..
-      await this._getExpenses({ term: this.searchTerm }, currentMonth == args.month);
+      await this._getExpenses({ term: this.searchTerm });
     } catch (e) {
       await this.helperSvc.presentToast(e, false);
     } finally {
@@ -143,7 +141,7 @@ export class ExpenseListingPage extends BasePage implements OnInit, OnDestroy {
     }
   }
 
-  private async _getExpenses(args?: { term? }, forceRefresh = false) {
+  private async _getExpenses(args?: { term? }) {
     let filters:any = {
       fromDate: this.dates.selectedDate.from,
       toDate: this.dates.selectedDate.to
@@ -154,7 +152,12 @@ export class ExpenseListingPage extends BasePage implements OnInit, OnDestroy {
     }
 
     this.ngZone.run(async () => {
-      if(forceRefresh) {
+      const currentMonth = moment().format('M');
+      const fromDateMonth = moment(filters.fromDate).format('M');
+      const toDateMonth = moment(filters.toDate).format('M');
+
+      //if changed month is not same as current month, then we don't have entries local..
+      if(currentMonth != fromDateMonth || currentMonth != toDateMonth) {
         this.expenses = await this.expenseSvc.getExpenses(filters);
       } else {
         this.expenses = await this.expenseSvc.getExpenseListLocal(filters);

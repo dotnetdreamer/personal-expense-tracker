@@ -35,7 +35,7 @@
           <div class="category-description-amount">
             <div class="category-description">
               <div class="description" [innerHTML]="(item.description | slice:0:40) | highlightsearch: searchTerm"></div>
-              <div class="category">{{item.category?.name}}</div>
+              <div class="category" [innerHTML]=" item.category?.name | highlightsearch: searchTerm"></div>
             </div>
             <div class="amount-date">
               <div class="amount">{{item.amount}}&nbsp;{{workingCurrency}}</div>

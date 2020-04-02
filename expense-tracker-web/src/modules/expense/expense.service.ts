@@ -24,7 +24,14 @@ export class ExpenseService {
     let qb = await getRepository(Expense)
       .createQueryBuilder('exp'); 
       
-    if(args && (args.fromDate || args.toDate)) {
+    if(args && (args.term || args.fromDate || args.toDate)) {
+      if(args.term) {
+        const term = args.term.trim().toLowerCase();
+        qb = qb.innerJoinAndSelect(Category, "cat", "cat.id == exp.categoryId");
+        qb = qb.where('exp.description like :term', { term: `%${term}%` })
+          .orWhere('cat.name like :categoryTerm', { categoryTerm: `%${term}`});
+      }
+
       if(args.fromDate) {
         // const fromDate =  moment(args.fromDate, AppConstant.DEFAULT_DATE_FORMAT).toDate();
         const fromDate = args.fromDate;
