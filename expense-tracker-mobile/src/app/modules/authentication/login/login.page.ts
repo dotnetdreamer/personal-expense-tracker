@@ -5,18 +5,21 @@ import { AuthenticationGoogleService } from '../authentication-google.service';
 import { UserSettingService } from '../user-setting.service';
 import { EventPublisher } from '../../shared/event-publisher';
 import { UserConstant } from '../user-constant';
+import { BasePage } from '../../shared/base.page';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.page.html',
   styleUrls: ['./login.page.scss'],
 })
-export class LoginPage implements OnInit, AfterViewInit {
+export class LoginPage extends BasePage implements OnInit, AfterViewInit {
   @ViewChild('gSigninButton') gSigninButton: ElementRef;
 
   constructor(private gAuthService: AuthenticationGoogleService
     , private userSettingSvc: UserSettingService
-    , private eventPub: EventPublisher) { }
+    , private eventPub: EventPublisher) { 
+      super();
+    }
 
   ngOnInit() {
   }
@@ -24,7 +27,10 @@ export class LoginPage implements OnInit, AfterViewInit {
   async ngAfterViewInit() {
     this.gAuthService.init(this.gSigninButton.nativeElement
       , async (gUserProfile) => {
-        await this._handleLogin({ 
+        const loader = await this.helperSvc.loader;
+        await loader.present();
+
+        await this._handleLoginResponse({ 
           loginType: LoginType.GOOGLE, 
           user: gUserProfile 
         });
@@ -32,13 +38,8 @@ export class LoginPage implements OnInit, AfterViewInit {
         console.log(e);
       });
   }
-
-  async onGoogleSigninClicked(gSigninButton) {
-    // await this.googleAuthSvc.init(this.gSigninButton.nativeElement);
-  }
-
   
-  private async _handleLogin(args: ILoginParams) {
+  private async _handleLoginResponse(args: ILoginParams, loader?: HTMLIonLoadingElement) {
     const promises = [];
 
     let profilePromise = this.gAuthService.putUserProfileLocal(args.user);
@@ -59,9 +60,19 @@ export class LoginPage implements OnInit, AfterViewInit {
       promises.push(currentUserPromise);
     }
 
-    await Promise.all(promises);
-    
-    //fire the user loggedin event
-    this.eventPub.$pub(UserConstant.EVENT_USER_LOGGEDIN, args.user);
+    try {
+      await Promise.all(promises);
+      
+      //fire the user loggedin event
+      this.eventPub.$pub(UserConstant.EVENT_USER_LOGGEDIN, args.user);
+
+      await this.navigateToHome();
+    } catch(e) {
+      throw e;
+    } finally {
+      if(loader) {
+        await loader.dismiss();
+      }
+    }
   }
 }

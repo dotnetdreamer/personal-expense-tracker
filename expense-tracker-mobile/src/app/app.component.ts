@@ -16,6 +16,9 @@ import { HelperService } from './modules/shared/helper.service';
 import { CurrencySettingService } from './modules/currency/currency-setting.service';
 import { CurrencyConstant } from './modules/currency/currency-constant';
 import { CheckForUpdateService } from './modules/shared/update-service';
+import { UserConstant } from './modules/authentication/user-constant';
+import { IUser } from './modules/authentication/authentication.model';
+import { AuthenticationService } from './modules/authentication/authentication.service';
 
 @Component({
   selector: 'app-root',
@@ -26,6 +29,7 @@ import { CheckForUpdateService } from './modules/shared/update-service';
 export class AppComponent {
   workingLanguage;
   appVersion;
+  currentUser: IUser;
 
   constructor( private router: Router, @Inject(DOCUMENT) private document: Document
   , private renderer: Renderer2, private platform: Platform
@@ -33,6 +37,7 @@ export class AppComponent {
     , protected currencySettingSvc: CurrencySettingService
     , private appSettingSvc: AppSettingService, private syncHelperSvc: SyncHelperService
     , private categorySvc: CategoryService, private helperSvc: HelperService
+    , private authSvc: AuthenticationService
   ) {
     this.initializeApp();
   }
@@ -66,19 +71,6 @@ export class AppComponent {
       }
 
       await this._setDefaults();
-      try {
-        
-        // await this._navigateTo('/expense/expense-create-or-update');
-        // await this._navigateTo('/expense/expense-listing');
-        // await this._navigateTo('/category');
-        await this._navigateTo('/home');
-
-        //first sync then pull
-        // await this.syncHelperSvc.push();
-        await this.syncHelperSvc.pull();
-      } catch (e) {
-        //ignore
-      }
     });
 
     this.eventPub.$sub(AppConstant.EVENT_LANGUAGE_CHANGED, async (params) => {
@@ -148,10 +140,22 @@ export class AppComponent {
         SplashScreen.hide();
       } catch(e) { }
     });
+
+    this.eventPub.$sub(UserConstant.EVENT_USER_LOGGEDIN, async (user: IUser) => {
+      if(AppConstant.DEBUG) {
+        console.log('AppComponent: EVENT_USER_LOGGEDIN: user', user);
+      }
+      this.currentUser = user;
+    });
   }
 
   private async _setDefaults() {
-    let wkl = await this.appSettingSvc.getWorkingLanguage();
+    const res = await Promise.all([
+      this.authSvc.getUserProfileLocal()
+      , this.appSettingSvc.getWorkingLanguage(), this.currencySettingSvc.getWorkingCurrency()
+    ]);
+
+    let wkl = res[1];
     if(!wkl) {
       wkl = 'en';
       await this.appSettingSvc.putWorkingLanguage(wkl);
@@ -159,13 +163,34 @@ export class AppComponent {
     this.eventPub.$pub(AppConstant.EVENT_LANGUAGE_CHANGED, { wkLangauge: wkl, reload: false });
     this.workingLanguage = wkl;
 
-    let wkc = await this.currencySettingSvc.getWorkingCurrency();
+    let wkc = await res[2];
     if(!wkc) {
       wkc = 'AED';
       await this.currencySettingSvc.putWorkingCurrency(wkc);
     }
     this.eventPub.$pub(CurrencyConstant.EVENT_CURRENCY_CHANGED, { wkCurrency: wkc, reload: false });
 
+    //user
+    const cUser = res[0];
+    if(cUser) {
+      this.eventPub.$pub(UserConstant.EVENT_USER_LOGGEDIN, cUser);
+      await this._navigateTo('/home');
+    } else {
+      await this._navigateTo('/authentication/login');
+    }
+
+    try {
+      // await this._navigateTo('/expense/expense-create-or-update');
+      // await this._navigateTo('/expense/expense-listing');
+      // await this._navigateTo('/category');
+      // await this._navigateTo('/home');
+
+      //first sync then pull
+      // await this.syncHelperSvc.push();
+      await this.syncHelperSvc.pull();
+    } catch (e) {
+      //ignore
+    }
   }
 
   private async _navigateTo(path, args?, replaceUrl = false) {
