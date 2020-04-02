@@ -6,7 +6,6 @@ import * as moment from 'moment';
 import { BaseService } from '../shared/base.service';
 import { IAttachment } from './attachment.model';
 import { AppConstant } from '../shared/app-constant';
-import { MediaOptionType } from '../shared/media/media.model';
 
 declare const ydn: any;
 
