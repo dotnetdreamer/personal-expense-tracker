@@ -6,7 +6,7 @@
     <ion-title>{{ sum | currency: (workingCurrency + '&nbsp;')}}</ion-title>
   </ion-toolbar>
   <ion-toolbar class="toolbar-calendar">
-    <ion-label>{{ dates?.selectedDate }}</ion-label>
+    <ion-label>{{ dates?.selectedDate?.from }}&nbsp;-&nbsp;{{ dates?.selectedDate?.to }}</ion-label>
     <calendar-swiper (monthChanged)="onMonthChanged($event)"></calendar-swiper>
   </ion-toolbar>
 </ion-header>
@@ -15,7 +15,7 @@
   <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
-  <ion-searchbar animated inputmode="search" debounce="300"
+  <ion-searchbar animated inputmode="search" debounce="500"
     [(ngModel)]="searchTerm" 
     (ionChange)="onSearchInputChanged($event)" (ionClear)="onSearchInputCleared($event)"
     [placeholder]="'search.title' | localizedresource | async"></ion-searchbar>
@@ -34,7 +34,7 @@
           </div>
           <div class="category-description-amount">
             <div class="category-description">
-              <div class="description">{{item.description | slice:0:40 }}{{item.description.length > 40 ? '...' : ''}}</div>
+              <div class="description" [innerHTML]="(item.description | slice:0:40) | highlightsearch: searchTerm"></div>
               <div class="category">{{item.category?.name}}</div>
             </div>
             <div class="amount-date">

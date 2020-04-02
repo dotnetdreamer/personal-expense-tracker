@@ -22,7 +22,7 @@ export class ExpenseListingPage extends BasePage implements OnInit, OnDestroy {
   expenses: Array<IExpense> = [];
   searchTerm: string;
   sum = 0;
-  dates: { selectedDate?, todayDate? } = {};
+  dates: { selectedDate?: { from, to }, todayDate? } = {};
   workingCurrency = ''; //fix for undefined showing in title
 
   private _syncInitSub: Subscription;
@@ -44,7 +44,10 @@ export class ExpenseListingPage extends BasePage implements OnInit, OnDestroy {
     const toDate = moment().endOf('M').format(AppConstant.DEFAULT_DATE_FORMAT);
 
     this.dates.todayDate = moment().format(AppConstant.DEFAULT_DATE_FORMAT);
-    this.dates.selectedDate = `${fromDate} - ${toDate}`;
+    this.dates.selectedDate =  {
+      from: fromDate,
+      to: toDate
+    };
 
     await this._getExpenses();
   }
@@ -58,19 +61,13 @@ export class ExpenseListingPage extends BasePage implements OnInit, OnDestroy {
     await loader.present();
 
     try {
-      this.dates.selectedDate = `${args.start} - ${args.end}`;
+      this.dates.selectedDate =  {
+        from: args.start,
+        to: args.end
+      };
       const currentMonth = moment().format('M');
       //if changed month is not same as current month, then we don't have entries local..
-      //fetch it from online...
-      if(currentMonth == args.month) {
-        await this._getExpenses({ term: this.searchTerm });
-      } else {
-        await this._getExpenses({ 
-          term: this.searchTerm, 
-          fromDate: args.start, 
-          toDate: args.end
-        }, true);
-      }
+      await this._getExpenses({ term: this.searchTerm }, currentMonth == args.month);
     } catch (e) {
       await this.helperSvc.presentToast(e, false);
     } finally {
@@ -82,7 +79,7 @@ export class ExpenseListingPage extends BasePage implements OnInit, OnDestroy {
 
   async onSearchInputChanged(args: CustomEvent) {
     if(!this.searchTerm || this.searchTerm?.length < 3) {
-      await this._getExpenses();
+      // await this._getExpenses();
       return;
     }
 
@@ -146,29 +143,14 @@ export class ExpenseListingPage extends BasePage implements OnInit, OnDestroy {
     }
   }
 
-  private async _getExpenses(args?: { term?, fromDate?, toDate? }, forceRefresh = false) {
-    let filters:any = { };
+  private async _getExpenses(args?: { term? }, forceRefresh = false) {
+    let filters:any = {
+      fromDate: this.dates.selectedDate.from,
+      toDate: this.dates.selectedDate.to
+    };
  
-    if(args && (args.term || args.fromDate || args.toDate)) {
-      if(args.term) {
-        filters.term = this.searchTerm;
-      }
-
-      if(args.fromDate && args.toDate) {
-        filters.fromDate = args.fromDate;
-        filters.toDate = args.toDate;
-      }
-    }
-
-    //default
-    if(!args || (args && (!args.fromDate || !args.toDate))) {
-      const fromDateUtc = moment().startOf('M').format(AppConstant.DEFAULT_DATE_FORMAT);
-      const toDateUtc = moment().endOf('M').format(AppConstant.DEFAULT_DATE_FORMAT);
-    
-      filters = {
-        fromDate: fromDateUtc,
-        toDate: toDateUtc
-      };
+    if(args && args.term) {
+      filters.term = args.term;
     }
 
     this.ngZone.run(async () => {

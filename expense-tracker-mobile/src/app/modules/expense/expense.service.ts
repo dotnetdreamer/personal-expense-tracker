@@ -220,14 +220,6 @@ export class ExpenseService extends BaseService {
                 // const cLocaledName: string = objToFind.name.toLowerCase();
                 let item: IExpense;
                 if(args) {
-                    if(args.term) {
-                        const term = args.term.toLowerCase();
-                        if(v.description.toLowerCase().startsWith(term) 
-                            || (v.category.name.toLowerCase().startsWith(term))) {
-                            item = v;
-                        }
-                    }
-
                     if(args.fromDate || args.toDate) {
                         const createdOnUtc = moment(v.createdOn).format(AppConstant.DEFAULT_DATE_FORMAT);
                         // console.log(createdOnUtc)
@@ -237,7 +229,8 @@ export class ExpenseService extends BaseService {
                             const fromDateCreatedOnUtc = moment.utc(args.fromDate).format(AppConstant.DEFAULT_DATE_FORMAT);
                             const toDateCreatedOnUtc = moment.utc(args.toDate).format(AppConstant.DEFAULT_DATE_FORMAT);
 
-                            if(createdOnUtc >= fromDateCreatedOnUtc && createdOnUtc <= toDateCreatedOnUtc) {
+                            if(createdOnUtc >= fromDateCreatedOnUtc 
+                                && createdOnUtc <= toDateCreatedOnUtc) {
                                 item = v;
                             }
                         } else if (args.fromDate) {
@@ -252,6 +245,16 @@ export class ExpenseService extends BaseService {
                             if(createdOnUtc <= toDateCreatedOnUtc) {
                                 item = v;
                             } 
+                        }
+                    }
+
+                    if(args.term) {
+                        const term = args.term.toLowerCase();
+                        const desc = item ? item.description.toLowerCase() : v.description.toLowerCase();
+                        const catName = item ? item.category.name.toLowerCase() : v.category.name.toLowerCase();
+                        
+                        if(!desc.includes(term) && !(catName.includes(term))) {
+                            item = null;
                         }
                     }
                 } else {
