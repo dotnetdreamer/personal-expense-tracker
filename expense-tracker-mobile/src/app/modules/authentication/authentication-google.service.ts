@@ -1,5 +1,6 @@
 import { AuthenticationService } from './authentication.service';
 import { Injectable } from '@angular/core';
+import { IUser } from './authentication.model';
 
 
 //added in index.html
@@ -14,7 +15,10 @@ export class AuthenticationGoogleService extends AuthenticationService {
     }
 
     //https://developers.google.com/identity/sign-in/web/build-button
-    init(googleBtnElement, successCallback, errorCallback): Promise<void> {
+    init(googleBtnElement
+        , successCallback: (params: IUser) => void
+        , errorCallback: (params: { error: 'popup_closed_by_user' }) => void
+    ): Promise<void> {
         //google secret: FSf6IfmSSg_T9_T2D3TAlTIh
         if(this._auth2) {
             // Sign in the user if they are currently signed in.
@@ -70,10 +74,10 @@ export class AuthenticationGoogleService extends AuthenticationService {
         const email = gUser.getBasicProfile().getEmail();
         const photo = gUser.getBasicProfile().getImageUrl();
         
-        const gUserProfile = {
-          id: id,
+        const gUserProfile: IUser = {
+          uuid: id,
           name: name,
-          email: email,
+          email: email.toLowerCase(),
           photo: photo
         };
         return gUserProfile;
