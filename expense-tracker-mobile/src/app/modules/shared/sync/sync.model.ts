@@ -1,4 +1,4 @@
 export enum SyncEntity {
-    Category = "Category",
-    Expense = "Expense"
+    Category = "category",
+    Expense = "expense"
 }
