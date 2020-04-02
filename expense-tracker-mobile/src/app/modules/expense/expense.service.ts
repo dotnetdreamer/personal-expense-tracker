@@ -116,7 +116,7 @@ export class ExpenseService extends BaseService {
                     }
                 }
 
-                //if if any of them succeeded
+                //if any of them succeeded
                 // reject(e);
                 // return;
             }

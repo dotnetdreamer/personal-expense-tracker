@@ -18,7 +18,6 @@ export class SyncHelperService {
         , private attachmentSvc: AttachmentService) {
     }
 
-
     pull() {
         return new Promise(async (resolve, reject) => {
             const promises: Array<Promise<any>> = [];
