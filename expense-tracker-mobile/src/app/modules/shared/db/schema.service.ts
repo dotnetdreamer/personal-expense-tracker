@@ -8,6 +8,7 @@ export class SchemaService {
     private _category = "category";
     private _expense = "expense";
     private _attachment = "attachment";
+    private _user = "user";
 
     schema = {
         stores: [
@@ -111,6 +112,25 @@ export class SchemaService {
                     name: 'markedForDelete', 
                     type: 'TEXT'  
                 }]
+            }, {
+                name: this._user,
+                columns: [{ 
+                    name: 'email', 
+                    isPrimaryKey: true, 
+                    type: 'INTEGER'
+                }, {
+                    name: 'name',
+                    type: 'TEXT'
+                }, {
+                    name: 'photo',
+                    type: 'TEXT'
+                }, {
+                    name: 'mobile',
+                    type: 'TEXT'
+                }, {
+                    name: 'uuid',
+                    type: 'TEXT'
+                }]
             }
         ]
     };
@@ -118,7 +138,8 @@ export class SchemaService {
         setting: this._setting,
         category: this._category,
         expense: this._expense,
-        attachment: this._attachment
+        attachment: this._attachment,
+        user: this._user
     };
 
     constructor() {
