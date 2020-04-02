@@ -1,39 +1,42 @@
 page-home-dashboard {
-    ion-content {
-        .date-filters {
-            margin-top: 10px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-
-            .filter-item-separator {
-                font-size: 10px;
-                position: relative;
-                top: -3px;
-                margin: 0 10px;
-            }
-
-            .filter-item {
+    ion-header {
+        ion-toolbar {
+            .date-filters {
+                margin-top: 10px;
                 display: flex;
+                justify-content: center;
                 align-items: center;
-            
-                ion-icon {
-                    &[name='calendar-outline'] {
-                        font-size: 14px;
-                        position: relative;
-                        top: -2px;
-                        margin: 2px;
-                    }
+
+                .filter-item-separator {
+                    font-size: 10px;
+                    position: relative;
+                    top: -3px;
+                    margin: 0 10px;
                 }
-                ion-datetime {
-                    --padding-start: 0;
-                    --padding-end: 0;
-                    --padding-top: 0;
-                    --padding-bottom: 0;
+
+                .filter-item {
+                    display: flex;
+                    align-items: center;
+                
+                    ion-icon {
+                        &[name='calendar-outline'] {
+                            font-size: 14px;
+                            position: relative;
+                            top: -2px;
+                            margin: 2px;
+                        }
+                    }
+                    ion-datetime {
+                        --padding-start: 0;
+                        --padding-end: 0;
+                        --padding-top: 0;
+                        --padding-bottom: 0;
+                    }
                 }
             }
         }
-
+    }
+    ion-content {
         .card-total {
             ion-card-content {
                 padding-top: 5px;

@@ -59,6 +59,22 @@
     }
 }
 
+ion-menu, 
+page-home-dashboard {
+    ion-header {
+        &.no-border {
+            &:after {
+                display: none;
+            }    
+        }
+
+        ion-toolbar {
+            &:last-child {
+                --border-width: 0 !important;
+            }
+        }
+    }
+}
 
 .skeleton-loading {
     animation: loadingprd 1.5s linear infinite forwards;

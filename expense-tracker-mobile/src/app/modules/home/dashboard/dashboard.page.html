@@ -1,8 +1,28 @@
-<ion-header>
+<ion-header class="no-border">
   <ion-toolbar>
     <!-- <ion-title>{{'dashboard.title' | localizedresource | async}}</ion-title> -->
     <ion-buttons slot="start">
       <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <div class="date-filters">
+      <div class="filter-item">
+        <ion-icon name="calendar-outline"></ion-icon>
+        <ion-datetime 
+          [displayFormat]="DEFAULT_DATE_FORMAT" [value]="selectedFromDate"  
+            (ionChange)="onDateSelectionChanged($event, 'fromDate')"></ion-datetime>
+      </div>
+      <div class="filter-item-separator">-</div>
+      <div class="filter-item">
+        <ion-icon name="calendar-outline"></ion-icon>
+        <ion-datetime [value]="selectedToDate" [displayFormat]="DEFAULT_DATE_FORMAT" 
+        (ionChange)="onDateSelectionChanged($event, 'toDate')"></ion-datetime>
+      </div>
+    </div>
+    <!-- only here to center the date filters-->
+    <ion-buttons slot="end" style="visibility: hidden;">
+      <ion-button>
+        <ion-icon slot="icon-only" name="more"></ion-icon>
+      </ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
@@ -11,20 +31,6 @@
   <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
-  <div class="date-filters">
-    <div class="filter-item">
-      <ion-icon name="calendar-outline"></ion-icon>
-      <ion-datetime 
-        [displayFormat]="DEFAULT_DATE_FORMAT" [value]="selectedFromDate"  
-          (ionChange)="onDateSelectionChanged($event, 'fromDate')"></ion-datetime>
-    </div>
-    <div class="filter-item-separator">-</div>
-    <div class="filter-item">
-      <ion-icon name="calendar-outline"></ion-icon>
-      <ion-datetime [value]="selectedToDate" [displayFormat]="DEFAULT_DATE_FORMAT" 
-      (ionChange)="onDateSelectionChanged($event, 'toDate')"></ion-datetime>
-    </div>
-  </div>
   <ion-card class="card-total">
     <!-- <ion-card-header>
       <ion-card-title></ion-card-title>
