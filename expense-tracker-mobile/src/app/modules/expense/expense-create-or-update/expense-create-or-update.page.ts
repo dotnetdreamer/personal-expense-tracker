@@ -30,6 +30,7 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit {
   categories: ICategory[];
   selectedCategory: ICategory;
   suggestedCategory: ICategory;
+  todayDate;
 
   private _attachment: IAttachment;
 
@@ -41,13 +42,15 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit {
     super();
 
     const cDate = moment().format(AppConstant.DEFAULT_DATE_FORMAT);
+    this.todayDate = cDate;
+
     this.formGroup = this.formBuilder.group({
       categoryId: ['', Validators.required],
       description: ['', Validators.required],
       notes: [''],
       attachment: [''],
       amount:['', Validators.required], 
-      date: [cDate, Validators.required]
+      date: [this.todayDate, Validators.required]
     });
   }
 
@@ -94,6 +97,13 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit {
     // else {
       // await this.navigate({ path: '/expense/expense-listing', extras: { replaceUrl: true }});
     // }
+  }
+
+  onCreatedDateChanged(ev: CustomEvent) {
+    const val = ev.detail.value;
+    //format
+    const fDate = moment(val).format(AppConstant.DEFAULT_DATE_FORMAT);
+    this.f.date.setValue(fDate);
   }
 
   async onAttachmentChanged($event) {

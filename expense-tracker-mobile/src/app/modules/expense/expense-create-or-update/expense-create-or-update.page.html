@@ -42,7 +42,8 @@
     <ion-list>
       <ion-item lines="none">
         <ion-icon name="calendar-outline"></ion-icon>
-        <ion-datetime formControlName="date" display-format="YYYY-MM-DD"></ion-datetime>
+        <ion-datetime [value]="todayDate" display-format="YYYY-MM-DD" 
+          (ionChange)="onCreatedDateChanged($event)"></ion-datetime>
       </ion-item>
     </ion-list>
     <ion-list>
