@@ -219,7 +219,7 @@ export class ExpenseListingPage extends BasePage implements OnInit, OnDestroy {
         },
         {
           name: 'amount',
-          type: 'tel',
+          type: 'number',
           value: expense.amount,
           placeholder: resources[2]
         }
