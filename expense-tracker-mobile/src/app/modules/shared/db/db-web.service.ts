@@ -19,10 +19,11 @@ export class DbWebService implements DbService {
     constructor(private schemaService: SchemaService, private eventPublisher: EventPublisher) {
         const schema = { stores: [] };
         schemaService.schema.stores.forEach(s => {
+            const pkCol = s.columns.filter(c => c.isPrimaryKey)[0];
             schema.stores.push({
                 name: s.name,
-                keyPath: s.columns.filter(c => c.isPrimaryKey)[0].name,
-                autoIncrement: true
+                keyPath: pkCol.name,
+                autoIncrement: pkCol.name == 'NUMBER'
             });
         });
         this.db = new ydn.db.Storage(this.dbName, schema);
