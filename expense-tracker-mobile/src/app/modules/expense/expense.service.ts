@@ -94,16 +94,38 @@ export class ExpenseService extends BaseService {
                     body: unSycedLocal
                 });
             } catch(e) {
-                reject(e);
-                return;
+                //try syncing 1 item at a time...
+                for(let i=0; i < unSycedLocal.length; i++) {
+                    const usItem = unSycedLocal[i];
+                    try {
+                        const returnedItems = await this.postData<any[]>({
+                            url: `${this.BASE_URL}/sync`,
+                            body: [usItem]  //server expect an array...
+                        });
+                        if(!items) {
+                            items = [];
+                        }
+                        items.push(returnedItems[0]);
+                    } catch(e) {
+                        //remove it from queue
+                        const index = unSycedLocal.indexOf(usItem);
+                        unSycedLocal.splice(index, 1);
+                        //reset i, as it didn't succeed
+                        i--;
+                        continue;
+                    }
+                }
+
+                //if if any of them succeeded
+                // reject(e);
+                // return;
             }
-            
+
             //something bad happend or in case of update, we don't need to update server ids
             if(items == null) {
                 resolve();
                 return;
             }
-
             
             try {
                 const promises = [];
