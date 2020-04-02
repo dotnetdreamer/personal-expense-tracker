@@ -6,6 +6,7 @@ import { EventPublisher } from '../event-publisher';
 import { SyncConstant } from './sync-constant';
 import { ExpenseService } from '../../expense/expense.service';
 import { AppConstant } from '../app-constant';
+import { AttachmentService } from '../../attachment/attachment.service';
 
 
 @Injectable({
@@ -13,7 +14,8 @@ import { AppConstant } from '../app-constant';
 })
 export class SyncHelperService {
     constructor(private eventPub: EventPublisher
-        , private categorySvc: CategoryService, private expenseSvc: ExpenseService) {
+        , private categorySvc: CategoryService, private expenseSvc: ExpenseService
+        , private attachmentSvc: AttachmentService) {
     }
 
 
@@ -45,6 +47,9 @@ export class SyncHelperService {
                     case SyncEntity.Category:
                         promises.push(this.categorySvc.push());
                     break;
+                    case SyncEntity.Attachment:
+                        promises.push(this.attachmentSvc.push());
+                    break;
                     case SyncEntity.Expense:
                         promises.push(this.expenseSvc.push());
                     break;
@@ -54,6 +59,8 @@ export class SyncHelperService {
             } else {   //sync all
                 //category
                 promises.push(this.categorySvc.push());
+                //attachment
+                promises.push(this.attachmentSvc.push());
                 //expense
                 promises.push(this.expenseSvc.push());
             }
