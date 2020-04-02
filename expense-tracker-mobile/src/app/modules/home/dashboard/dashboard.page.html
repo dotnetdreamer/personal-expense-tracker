@@ -39,7 +39,7 @@
       <div class="total-with-chart">
         <div class="total-container">
           <div class="total-label">{{'expense.total' | localizedresource | async }}</div>
-          <ion-label>{{ (totalAmount || 0) | currency: (workingCurrency + '&nbsp;')}}</ion-label>
+          <ion-label *ngIf="totalAmount">{{ (totalAmount || 0) | currency: (workingCurrency + '&nbsp;')}}</ion-label>
         </div>
         <div class="total-chart-container" [class.skeleton-loading]="!totalChartOptions">
           <apx-chart *ngIf="totalChartOptions" 
