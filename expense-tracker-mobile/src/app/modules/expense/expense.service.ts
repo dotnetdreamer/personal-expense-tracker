@@ -188,10 +188,13 @@ export class ExpenseService extends BaseService {
         if(args && (args.fromDate || args.toDate )) {
             //change date to utc first
             if(args.fromDate) {
-                args.fromDate = moment.utc(args.fromDate).format(AppConstant.DEFAULT_DATE_FORMAT);
+                const fromDate = moment(args.fromDate).endOf('D').utc().format(AppConstant.DEFAULT_DATETIME_FORMAT);
+                args.fromDate = fromDate;
             }
             if(args.toDate) {
-                args.toDate = moment.utc(args.toDate).format(AppConstant.DEFAULT_DATE_FORMAT);
+                //if there is no time, add it...
+                const toDate = moment(args.toDate).endOf('D').utc().format(AppConstant.DEFAULT_DATETIME_FORMAT);
+                args.toDate = toDate;
             }
             
             body = { ...args };

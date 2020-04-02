@@ -27,25 +27,22 @@ export class ExpenseService {
     if(args && (args.term || args.fromDate || args.toDate)) {
       if(args.term) {
         const term = args.term.trim().toLowerCase();
-        qb = qb.innerJoinAndSelect(Category, "cat", "cat.id == exp.categoryId");
-        qb = qb.where('exp.description like :term', { term: `%${term}%` })
-          .orWhere('cat.name like :categoryTerm', { categoryTerm: `%${term}`});
+        qb = qb.innerJoinAndSelect(Category, "cat", "cat.id = exp.categoryId");
+        qb = qb.andWhere('(exp.description like :term', { term: `%${term}%` })
+          .orWhere('cat.name like :categoryTerm)', { categoryTerm: `%${term}`});
       }
 
       if(args.fromDate) {
         // const fromDate =  moment(args.fromDate, AppConstant.DEFAULT_DATE_FORMAT).toDate();
         const fromDate = args.fromDate;
-        qb = qb.andWhere('date(exp.createdOn) >= :createdOnFrom', { createdOnFrom: fromDate });
+        qb = qb.andWhere('exp.createdOn >= :createdOnFrom', { createdOnFrom: fromDate });
       }
       if(args.toDate) {
-        // const toDate = moment(args.toDate, AppConstant.DEFAULT_DATE_FORMAT)
-        //   .utc()
-        //   .format(AppConstant.DEFAULT_DATE_FORMAT);
-        const toDate =  args.toDate;
-        qb = qb.andWhere('date(exp.createdOn) <= :createdOnToDate', { createdOnToDate: toDate });
+        const toDate =  args.toDate; 
+        qb = qb.andWhere('exp.createdOn <= :createdOnToDate', { createdOnToDate: toDate });
       }
 
-      // console.log(qb.getQuery())
+      console.log(qb.getQuery())
       
 
     }
