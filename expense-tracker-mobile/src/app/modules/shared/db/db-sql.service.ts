@@ -134,9 +134,10 @@ export class DbSqlService implements DbService {
         return new Promise(async (resolve, reject) => {
             //get primary key field form schema
             const table:any = this.schemaSvc.schema.stores.filter(s => s.name === store)[0];
-            const pk = (table.columns.filter(c => c.isPrimaryKey)[0]).name;
+            const pk = (table.columns.filter(c => c.isPrimaryKey)[0]);
+            const pkName = pk.name;
 
-            let sql = `SELECT * FROM ${store} WHERE ${pk} = '${key}' LIMIT 1`;
+            let sql = `SELECT * FROM ${store} WHERE ${pkName} = '${key}' LIMIT 1`;
             try {
                 let data;
                 const { values } = await this._db.query({ statement:sql, values:[] });
@@ -201,6 +202,8 @@ export class DbSqlService implements DbService {
                 sql += `(`;
 
                 for(let col of schema.columns) {
+                    //TODO: for user table, need to fix primary key
+                    // const ikPkTypeNumber = col['type'] == 'INTEGER';
                     sql += `${col.name}${col.type ? ' ' + col.type : ''}${col['isPrimaryKey'] ? ' PRIMARY KEY' : ''},`;
                 }
 
