@@ -35,7 +35,8 @@
                 "input": "src/assets/icons",
                 "output": "./svg"
               },
-              "src/manifest.webmanifest"
+              "src/manifest.webmanifest",
+              "src/.htaccess"
             ],
             "styles": [
               {
