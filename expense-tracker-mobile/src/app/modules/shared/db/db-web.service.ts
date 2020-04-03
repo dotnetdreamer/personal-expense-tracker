@@ -23,7 +23,7 @@ export class DbWebService implements DbService {
             schema.stores.push({
                 name: s.name,
                 keyPath: pkCol.name,
-                autoIncrement: pkCol.name == 'NUMBER'
+                autoIncrement: pkCol.name == 'INTEGER'
             });
         });
         this.db = new ydn.db.Storage(this.dbName, schema);
