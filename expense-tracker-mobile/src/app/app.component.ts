@@ -17,8 +17,9 @@ import { CurrencySettingService } from './modules/currency/currency-setting.serv
 import { CurrencyConstant } from './modules/currency/currency-constant';
 import { CheckForUpdateService } from './modules/shared/update-service';
 import { UserConstant } from './modules/authentication/user-constant';
-import { IUser, IUserProfile } from './modules/authentication/authentication.model';
+import { IUser, IUserProfile, LoginType } from './modules/authentication/authentication.model';
 import { AuthenticationService } from './modules/authentication/authentication.service';
+import { UserSettingService } from './modules/authentication/user-setting.service';
 
 @Component({
   selector: 'app-root',
@@ -37,7 +38,7 @@ export class AppComponent {
     , protected currencySettingSvc: CurrencySettingService
     , private appSettingSvc: AppSettingService, private syncHelperSvc: SyncHelperService
     , private categorySvc: CategoryService, private helperSvc: HelperService
-    , private authSvc: AuthenticationService
+    , private authSvc: AuthenticationService, private userSettingSvc: UserSettingService
   ) {
     this.initializeApp();
   }
@@ -151,18 +152,52 @@ export class AppComponent {
       } catch(e) { }
     });
 
-    this.eventPub.$sub(UserConstant.EVENT_USER_LOGGEDIN, async (user: IUserProfile) => {
+    this.eventPub.$sub(UserConstant.EVENT_USER_LOGGEDIN
+      , async (params: { user: IUserProfile, redirectToHome: boolean, pull: boolean }) => {
       if(AppConstant.DEBUG) {
-        console.log('AppComponent: EVENT_USER_LOGGEDIN: user', user);
+        console.log('AppComponent: EVENT_USER_LOGGEDIN: params', params);
       }
-      this.currentUser = user;
+
+      this.currentUser = params.user;
+      if(params.redirectToHome) {
+        await this._navigateTo('/home', null, true);
+      }
+      //sync
+      if(params.pull) {
+        try {
+          //first sync then pull
+          // await this.syncHelperSvc.push();
+          this.eventPub.$pub(SyncConstant.EVENT_SYNC_DATA_PULL);
+        } catch (e) {
+          //ignore
+        }
+      }
+    });
+    
+    this.eventPub.$sub(UserConstant.EVENT_USER_LOGGEDOUT, async () => {
+      if(AppConstant.DEBUG) {
+        console.log('AppComponent: EVENT_USER_LOGGEDOUT');
+      }
+      this.currentUser = null;
+
+      //redirect to login...
+      await this._navigateTo('/authentication/login', null, true);
     });
   }
 
   private async _logout() {
     const resp = await this.helperSvc.presentConfirmDialog();
     if(resp) {
+      const loader = await this.helperSvc.loader;
+      await loader.dismiss();
 
+      try {
+        await this.authSvc.logout();
+      } catch(e) {
+
+      } finally {
+        await loader.dismiss();
+      }
     }
   }
 
@@ -190,10 +225,10 @@ export class AppComponent {
     //user
     const cUser = res[0];
     if(cUser) {
-      this.eventPub.$pub(UserConstant.EVENT_USER_LOGGEDIN, cUser);
+      this.eventPub.$pub(UserConstant.EVENT_USER_LOGGEDIN, { user: cUser });
       await this._navigateTo('/home');
 
-      this.eventPub.$pub(SyncConstant.EVENT_SYNC_DATA_PULL, cUser);
+      this.eventPub.$pub(SyncConstant.EVENT_SYNC_DATA_PULL);
     } else {
       await this._navigateTo('/authentication/login');
     }

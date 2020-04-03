@@ -1,20 +1,34 @@
 import { Injectable } from "@angular/core";
 
-import { IUser, IUserProfile } from './authentication.model';
+import { IUser, IUserProfile, LoginType, ILoginParams } from './authentication.model';
 import { UserSettingService } from './user-setting.service';
 import { BaseService } from '../shared/base.service';
-import { AppInjector } from '../shared/app-injector';
+import { AuthenticationGoogleService } from './authentication-google.service';
+import { UserConstant } from './user-constant';
+import { SyncConstant } from '../shared/sync/sync-constant';
 
 @Injectable({
     providedIn: 'root'
 })
 export class AuthenticationService extends BaseService {
-    protected userSettingSvc: UserSettingService;
-    constructor() {
+    constructor(private userSettingSvc: UserSettingService
+        , private googleAuthSvc: AuthenticationGoogleService) {
         super();
+    }
 
-        const injector = AppInjector.getInjector();
-        this.userSettingSvc = injector.get(UserSettingService);
+    async initGoogleAuth(gSigninButtonEle: HTMLElement) {
+        await this.googleAuthSvc.attachButtonHandler(gSigninButtonEle
+        , async (gUserProfile) => {
+            const loader = await this.helperSvc.loader;
+            await loader.present();
+    
+            await this._handleLoginResponse({ 
+                loginType: LoginType.GOOGLE, 
+                user: gUserProfile 
+            }, loader);
+        }, async (e) => {
+            console.log(e);
+        });
     }
 
     async getUserProfileLocal(username?): Promise<IUserProfile> {
@@ -52,4 +66,74 @@ export class AuthenticationService extends BaseService {
 
         return profile;
     }
+
+    logout(username?) {
+        return new Promise(async (resolve, reject) => {
+            const loginType = await this.userSettingSvc.getLoggedInMethod();
+            switch(loginType) {
+                case LoginType.GOOGLE:
+                    await this.googleAuthSvc.logout();
+                break;
+            }
+            
+            if(!username) {
+                username = await this.userSettingSvc.getCurrentUser();
+            }
+        
+            if(!username) {
+                return;
+            }
+
+            await Promise.all([
+                this.removeUserProfileLocal(username), 
+                this.userSettingSvc.removeCurrentUser(), 
+                this.userSettingSvc.removeLoggedInMethod(),
+                this.userSettingSvc.removeCurrentUserPassword()
+            ]);
+
+            this.eventPub.$pub(UserConstant.EVENT_USER_LOGGEDOUT);
+            resolve();
+        });
+    }
+
+      
+  private async _handleLoginResponse(args: ILoginParams, loader?: HTMLIonLoadingElement) {
+    const promises = [];
+
+    let profilePromise = this.putUserProfileLocal(args.user);
+    promises.push(profilePromise);
+
+    let loginTypePromise = this.userSettingSvc.putLoggedInMethod(args.loginType);
+    promises.push(loginTypePromise);
+
+    if(args.loginType == LoginType.STANDARD) {
+      let currentUserPromise = this.userSettingSvc.putCurrentUser(args.email);
+      promises.push(currentUserPromise);
+
+      //TODO: need to remvoe storing password
+      let passwordPromise =  this.userSettingSvc.putCurrentUserPassword(args.password);
+      promises.push(passwordPromise);
+    } else {
+      let currentUserPromise = this.userSettingSvc.putCurrentUser(args.user.email);
+      promises.push(currentUserPromise);
+    }
+
+    try {
+      await Promise.all(promises);
+
+      //fire the user loggedin event
+      const profile = this.setUserDefaults(args.user);
+      this.eventPub.$pub(UserConstant.EVENT_USER_LOGGEDIN, { 
+        user: profile, 
+        redirectToHome: true,
+        pull: true
+      });
+    } catch(e) {
+      throw e;
+    } finally {
+      if(loader) {
+        await loader.dismiss();
+      }
+    }
+  }
 }

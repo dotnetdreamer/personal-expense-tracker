@@ -5,7 +5,6 @@ import { LoginPageRoutingModule } from './login-routing.module';
 import { LoginPage } from './login.page';
 import { ComponentsWithFormsModule } from 'src/app/components/components-with-forms.module';
 import { PipesModule } from 'src/app/pipes/pipes.module';
-import { AuthenticationGoogleService } from '../authentication-google.service';
 
 @NgModule({
   imports: [
@@ -14,6 +13,6 @@ import { AuthenticationGoogleService } from '../authentication-google.service';
     LoginPageRoutingModule
   ],
   declarations: [LoginPage],
-  providers: [AuthenticationGoogleService]
+  providers: []
 })
 export class LoginPageModule {}

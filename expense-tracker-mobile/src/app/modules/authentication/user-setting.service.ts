@@ -2,6 +2,7 @@ import { Injectable } from "@angular/core";
 
 import { UserConstant } from './user-constant';
 import { AppSettingService } from '../shared/app-setting.service';
+import { LoginType } from './authentication.model';
 
 
 @Injectable({
@@ -52,10 +53,10 @@ export class UserSettingService extends AppSettingService {
         });
     }
 
-    getLoggedInMethod() {
+    getLoggedInMethod(): Promise<LoginType> {
         return this.get(UserConstant.KEY_LOGGEDIN_METHOD)
             .then(loggedInMethod => {
-                return loggedInMethod;
+                return <any>loggedInMethod;
             });
     } 
 
