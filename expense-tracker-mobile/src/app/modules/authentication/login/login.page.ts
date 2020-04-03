@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, AfterViewInit, ViewEncapsulation } from '@angular/core';
 
 import { LoginType, ILoginParams, IUser } from '../authentication.model';
 import { AuthenticationGoogleService } from '../authentication-google.service';
@@ -6,11 +6,13 @@ import { UserSettingService } from '../user-setting.service';
 import { EventPublisher } from '../../shared/event-publisher';
 import { UserConstant } from '../user-constant';
 import { BasePage } from '../../shared/base.page';
+import { SyncConstant } from '../../shared/sync/sync-constant';
 
 @Component({
-  selector: 'app-login',
+  selector: 'page-user-login',
   templateUrl: './login.page.html',
   styleUrls: ['./login.page.scss'],
+  encapsulation: ViewEncapsulation.None
 })
 export class LoginPage extends BasePage implements OnInit, AfterViewInit {
   @ViewChild('gSigninButton') gSigninButton: ElementRef;
@@ -32,8 +34,8 @@ export class LoginPage extends BasePage implements OnInit, AfterViewInit {
         await this._handleLoginResponse({ 
           loginType: LoginType.GOOGLE, 
           user: gUserProfile 
-        });
-      }, (e) => {
+        }, loader);
+      }, async (e) => {
         console.log(e);
       });
   }
@@ -67,6 +69,16 @@ export class LoginPage extends BasePage implements OnInit, AfterViewInit {
       this.eventPub.$pub(UserConstant.EVENT_USER_LOGGEDIN, profile);
 
       await this.navigateToHome();
+
+      //sync
+      try {
+        //first sync then pull
+        // await this.syncHelperSvc.push();
+        this.eventPub.$pub(SyncConstant.EVENT_SYNC_DATA_PULL);
+      } catch (e) {
+        //ignore
+      }
+
     } catch(e) {
       throw e;
     } finally {
