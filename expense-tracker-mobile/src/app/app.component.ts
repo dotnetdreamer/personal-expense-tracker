@@ -131,6 +131,13 @@ export class AppComponent {
       // }, 1000);
     });
 
+    this.eventPub.$sub(SyncConstant.EVENT_SYNC_DATA_PULL, async (table?) => {
+      if(AppConstant.DEBUG) {
+        console.log('HomePage: EVENT_SYNC_DATA_PULL: table:', table);
+      }
+      await this.syncHelperSvc.pull(table);
+    });
+
     this.eventPub.$sub(SyncConstant.EVENT_SYNC_DATA_PULL_COMPLETE, async () => {
       if(AppConstant.DEBUG) {
         console.log('AppComponent:Event received: EVENT_SYNC_DATA_PULL_COMPLETE');
@@ -185,22 +192,16 @@ export class AppComponent {
     if(cUser) {
       this.eventPub.$pub(UserConstant.EVENT_USER_LOGGEDIN, cUser);
       await this._navigateTo('/home');
+
+      this.eventPub.$pub(SyncConstant.EVENT_SYNC_DATA_PULL, cUser);
     } else {
       await this._navigateTo('/authentication/login');
     }
 
-    try {
-      // await this._navigateTo('/expense/expense-create-or-update');
-      // await this._navigateTo('/expense/expense-listing');
-      // await this._navigateTo('/category');
-      // await this._navigateTo('/home');
-
-      //first sync then pull
-      // await this.syncHelperSvc.push();
-      await this.syncHelperSvc.pull();
-    } catch (e) {
-      //ignore
-    }
+    // await this._navigateTo('/expense/expense-create-or-update');
+    // await this._navigateTo('/expense/expense-listing');
+    // await this._navigateTo('/category');
+    // await this._navigateTo('/home');
   }
 
   private async _navigateTo(path, args?, replaceUrl = false) {
