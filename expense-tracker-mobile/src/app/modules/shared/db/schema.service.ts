@@ -117,7 +117,7 @@ export class SchemaService {
                 columns: [{ 
                     name: 'email', 
                     isPrimaryKey: true, 
-                    type: 'INTEGER'
+                    type: 'TEXT'
                 }, {
                     name: 'name',
                     type: 'TEXT'
