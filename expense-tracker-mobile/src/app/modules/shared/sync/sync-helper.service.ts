@@ -18,14 +18,32 @@ export class SyncHelperService {
         , private attachmentSvc: AttachmentService) {
     }
 
-    pull() {
+    pull(table?: SyncEntity) {
         return new Promise(async (resolve, reject) => {
             const promises: Array<Promise<any>> = [];
 
-            //category
-            promises.push(this.categorySvc.pull());
-            //expense
-            promises.push(this.expenseSvc.pull());
+            if(table) {
+                switch(table) {
+                    case SyncEntity.Category:
+                        promises.push(this.categorySvc.pull());
+                    break;
+                    case SyncEntity.Attachment:
+                        // promises.push(this.attachmentSvc.pull());
+                    break;
+                    case SyncEntity.Expense:
+                        promises.push(this.expenseSvc.pull());
+                    break;
+                    default:
+                    break;
+                }
+            } else {   //sync all
+                //category
+                promises.push(this.categorySvc.pull());
+                //attachment
+                // promises.push(this.attachmentSvc.pull());
+                //expense
+                promises.push(this.expenseSvc.pull());
+            }
             
             try {
                 await Promise.all(promises);
