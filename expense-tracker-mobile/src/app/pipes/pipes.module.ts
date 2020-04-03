@@ -3,12 +3,14 @@ import { NgModule } from '@angular/core';
 import { LocalizedResourcePipe } from './localizedRresource.pipe';
 import { FormateDatePipe } from './formateDate.pipe';
 import { HighlightSearchPipe } from './highlightsearch.pipe';
+import { SafePipe } from './safe.pipe';
 
 @NgModule({
     declarations: [
         LocalizedResourcePipe,
         FormateDatePipe,
-        HighlightSearchPipe
+        HighlightSearchPipe,
+        SafePipe
     ],
     imports: [
 
@@ -16,7 +18,8 @@ import { HighlightSearchPipe } from './highlightsearch.pipe';
     exports: [
         LocalizedResourcePipe,
         FormateDatePipe,
-        HighlightSearchPipe
+        HighlightSearchPipe,
+        SafePipe
     ]
 })
 export class PipesModule { }
