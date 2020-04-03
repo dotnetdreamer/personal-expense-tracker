@@ -20,7 +20,6 @@ export class DbWebService implements DbService {
         const schema = { stores: [] };
         schemaService.schema.stores.forEach(s => {
             const pkCol = s.columns.filter(c => c.isPrimaryKey)[0];
-            debugger;
             schema.stores.push({
                 name: s.name,
                 keyPath: pkCol.name,

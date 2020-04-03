@@ -96,7 +96,7 @@ export class DashboardPage extends BasePage implements AfterViewInit, OnDestroy 
 
   async doRefresh(ev) {
     //reset
-    this.selectedFromDate = moment().add(-7, 'd').format(AppConstant.DEFAULT_DATE_FORMAT);
+    this.selectedFromDate = moment().add(-6, 'd').format(AppConstant.DEFAULT_DATE_FORMAT);
     this.selectedToDate = moment().format(AppConstant.DEFAULT_DATE_FORMAT);
 
     this.todayExpenses = [];
