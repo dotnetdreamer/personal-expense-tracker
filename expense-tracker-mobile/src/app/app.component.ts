@@ -17,7 +17,7 @@ import { CurrencySettingService } from './modules/currency/currency-setting.serv
 import { CurrencyConstant } from './modules/currency/currency-constant';
 import { CheckForUpdateService } from './modules/shared/update-service';
 import { UserConstant } from './modules/authentication/user-constant';
-import { IUser } from './modules/authentication/authentication.model';
+import { IUser, IUserProfile } from './modules/authentication/authentication.model';
 import { AuthenticationService } from './modules/authentication/authentication.service';
 
 @Component({
@@ -29,7 +29,7 @@ import { AuthenticationService } from './modules/authentication/authentication.s
 export class AppComponent {
   workingLanguage;
   appVersion;
-  currentUser: IUser;
+  currentUser: IUserProfile;
 
   constructor( private router: Router, @Inject(DOCUMENT) private document: Document
   , private renderer: Renderer2, private platform: Platform
@@ -56,6 +56,9 @@ export class AppComponent {
         case '/home':
           //clear all history
           this.router.navigate([url], { replaceUrl: true });
+        break;
+        case '/logout':
+          await this._logout();
         break;
         default:
           this.router.navigate([url]);
@@ -141,12 +144,19 @@ export class AppComponent {
       } catch(e) { }
     });
 
-    this.eventPub.$sub(UserConstant.EVENT_USER_LOGGEDIN, async (user: IUser) => {
+    this.eventPub.$sub(UserConstant.EVENT_USER_LOGGEDIN, async (user: IUserProfile) => {
       if(AppConstant.DEBUG) {
         console.log('AppComponent: EVENT_USER_LOGGEDIN: user', user);
       }
       this.currentUser = user;
     });
+  }
+
+  private async _logout() {
+    const resp = await this.helperSvc.presentConfirmDialog();
+    if(resp) {
+
+    }
   }
 
   private async _setDefaults() {

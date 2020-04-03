@@ -1,18 +1,23 @@
 import { Injectable } from "@angular/core";
 
-import { IUser } from './authentication.model';
+import { IUser, IUserProfile } from './authentication.model';
 import { UserSettingService } from './user-setting.service';
 import { BaseService } from '../shared/base.service';
+import { AppInjector } from '../shared/app-injector';
 
 @Injectable({
     providedIn: 'root'
 })
 export class AuthenticationService extends BaseService {
-    constructor(private userSettingSvc: UserSettingService) {
+    protected userSettingSvc: UserSettingService;
+    constructor() {
         super();
+
+        const injector = AppInjector.getInjector();
+        this.userSettingSvc = injector.get(UserSettingService);
     }
 
-    async getUserProfileLocal(username?): Promise<IUser> {
+    async getUserProfileLocal(username?): Promise<IUserProfile> {
         return new Promise<IUser>(async (resolve, reject) => {
             if(!username) {
               username = await this.userSettingSvc.getCurrentUser();
@@ -23,7 +28,8 @@ export class AuthenticationService extends BaseService {
             }
             username = username.toLowerCase();
             let profile = await this.dbService.get<IUser>(this.schemaService.tables.user, username);
-            // profile.MediaPath = UserConstant.BASE_URL + profile.MediaPath + profile.MediaName;            
+            profile = this.setUserDefaults(profile);
+
             resolve(profile);
         });
     }
@@ -36,6 +42,14 @@ export class AuthenticationService extends BaseService {
     putUserProfileLocal(user: IUser) {
         user.email = user.email.toLowerCase();
         return this.dbService.putLocal(this.schemaService.tables.user, user);
-    }    
+    }   
+    
+    setUserDefaults(user: IUser): IUserProfile {
+        const profile: IUserProfile = { ...user };
+        if(profile.photo) {
+            profile.photoStyle = `url('${profile.photo}')`;
+        }
 
+        return profile;
+    }
 }

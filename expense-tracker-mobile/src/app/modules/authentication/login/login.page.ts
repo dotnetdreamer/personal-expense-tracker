@@ -16,8 +16,7 @@ export class LoginPage extends BasePage implements OnInit, AfterViewInit {
   @ViewChild('gSigninButton') gSigninButton: ElementRef;
 
   constructor(private gAuthService: AuthenticationGoogleService
-    , private userSettingSvc: UserSettingService
-    , private eventPub: EventPublisher) { 
+    , private userSettingSvc: UserSettingService) { 
       super();
     }
 
@@ -62,9 +61,10 @@ export class LoginPage extends BasePage implements OnInit, AfterViewInit {
 
     try {
       await Promise.all(promises);
-      
+
       //fire the user loggedin event
-      this.eventPub.$pub(UserConstant.EVENT_USER_LOGGEDIN, args.user);
+      const profile = this.gAuthService.setUserDefaults(args.user);
+      this.eventPub.$pub(UserConstant.EVENT_USER_LOGGEDIN, profile);
 
       await this.navigateToHome();
     } catch(e) {

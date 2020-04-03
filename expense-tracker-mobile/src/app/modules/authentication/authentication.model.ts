@@ -6,6 +6,10 @@ export interface IUser {
     mobile?: string
 }
 
+export interface IUserProfile extends IUser {
+    photoStyle?: string
+}
+
 export enum LoginType {
     STANDARD = 'standard',
     GOOGLE = 'google',

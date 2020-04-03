@@ -1,4 +1,40 @@
 app-root {
+    ion-content {
+        .button-setting {
+            position: absolute;
+            top: 0;
+            right: 0; 
+        }
+        .user-info {
+            background-image: url('../assets/images/background.png');
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-position: 85px 50%;
+            padding: 20px;
+
+            .avatar {
+                > div {
+                    width: 80px;
+                    height: 80px;
+                    display: inline-block;
+                    background-size: cover;
+                    background-position: center;
+                    background-repeat: no-repeat;
+                    border-radius: 50%;
+                    overflow: hidden;
+                }
+
+                > ion-icon {
+                    font-size: 80px;
+                    height: 80px;
+                }
+            }
+
+            .user-name {
+                margin: 5px 0;
+            }
+        }
+    }
     ion-footer {
         ion-title {
             color: #ddd;
