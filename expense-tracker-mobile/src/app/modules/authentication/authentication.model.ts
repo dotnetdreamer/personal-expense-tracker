@@ -4,6 +4,7 @@ export interface IUser {
     email: string
     photo: string
     mobile?: string
+    externalAuthResponse?: IGoogleAuthResponse | any
 }
 
 export interface IUserProfile extends IUser {
@@ -21,4 +22,15 @@ export interface ILoginParams {
     password? 
     loginType: LoginType
     user: IUser
+}
+
+export interface IGoogleAuthResponse {
+    email: string
+    familyName: string
+    givenName: string
+    id: string
+    imageUrl: string
+    name: string
+    authentication: { accessToken: string, idToken: string }
+    serverAuthCode: string
 }

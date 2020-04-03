@@ -28,7 +28,11 @@ export class LoginPage extends BasePage implements OnInit, AfterViewInit, OnDest
   }
 
   async ngAfterViewInit() {
-    await this.authSvc.initGoogleAuth(this.gSigninButton.nativeElement);
+    // await this.authSvc.initGoogleAuth(this.gSigninButton.nativeElement);
+  }
+
+  async onLoginClicked(type) {
+    await this.authSvc.login(type);
   }
 
   ngOnDestroy() {

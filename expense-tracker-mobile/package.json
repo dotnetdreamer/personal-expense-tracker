@@ -23,6 +23,7 @@
     "@capacitor/android": "^1.5.1",
     "@capacitor/cli": "^1.5.1",
     "@capacitor/core": "^1.5.1",
+    "@codetrix-studio/capacitor-google-auth": "^1.5.1",
     "@ionic-native/camera": "^5.22.0",
     "@ionic-native/core": "^5.0.0",
     "@ionic-native/file": "^5.22.0",
