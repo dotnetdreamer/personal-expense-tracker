@@ -1,5 +1,5 @@
 import { AuthenticationService } from './authentication.service';
-import { Injectable } from '@angular/core';
+import { Injectable, NgZone } from '@angular/core';
 import { IUser } from './authentication.model';
 
 
@@ -10,7 +10,7 @@ declare const gapi: any;
 export class AuthenticationGoogleService extends AuthenticationService {
     private _auth2;
 
-    constructor() {
+    constructor(private ngZone: NgZone) {
         super();
     }
 
@@ -49,7 +49,9 @@ export class AuthenticationGoogleService extends AuthenticationService {
 
             this._auth2.attachClickHandler(googleBtnElement, {}
             , (gUser) => {
-                successCallback(this._getValues(gUser));
+                this.ngZone.run(() => {
+                    successCallback(this._getValues(gUser));
+                });
             }, errorCallback);
         });
     }
