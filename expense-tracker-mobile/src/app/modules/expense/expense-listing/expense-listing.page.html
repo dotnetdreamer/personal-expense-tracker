@@ -35,7 +35,11 @@
           <div class="category-description-amount">
             <div class="category-description">
               <div class="description" [innerHTML]="(item.description | slice:0:40) | highlightsearch: searchTerm"></div>
-              <div class="category" [innerHTML]=" item.category?.name | highlightsearch: searchTerm"></div>
+              <div class="category-notes-attachment">
+                <div class="category" [innerHTML]=" item.category?.name | highlightsearch: searchTerm"></div>
+                <ion-icon slot="icon-only" name="reader-outline" *ngIf="item.notes"></ion-icon>        
+                <ion-icon slot="icon-only" name="receipt-outline" *ngIf="item.attachment"></ion-icon>        
+              </div>
             </div>
             <div class="amount-date">
               <div class="amount">{{item.amount}}&nbsp;{{workingCurrency}}</div>

@@ -66,7 +66,7 @@
       </div>
       <no-data *ngIf="todayExpenses && !todayExpenses.length"></no-data>
       <ion-list *ngIf="todayExpenses && todayExpenses.length">
-        <ion-item lines="none" *ngFor="let item of todayExpenses">
+        <ng-container *ngFor="let item of todayExpenses">
           <div class="expense-item">
             <div class="icon-container">
               <ion-icon [attr.name]="item.category.icon" 
@@ -83,7 +83,7 @@
               </div>
             </div>
           </div>
-        </ion-item>
+        </ng-container>
       </ion-list>
       <ion-button shape="round" class="button-custom button-viewall" 
         (click)="onViewAllExpensesClicked()">

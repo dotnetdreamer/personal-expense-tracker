@@ -28,6 +28,8 @@
         justify-content: space-between;
 
         .category-description {
+            width: 100%;
+
             .description {
                 font-size: 1em;
                 margin-bottom: 5px;
@@ -35,14 +37,25 @@
                 word-break: break-word;
             }
 
-            .category {
-                font-size: 0.8em;
+            .category-notes-attachment {
+                display: flex;
+                align-items: center;
+
+                .category {
+                    font-size: 0.8em;
+                }
+
+                ion-icon {
+                    font-size: 14px;
+                    margin-left: 5px;
+                }
             }
         }
 
         .amount-date {
             text-align: right;
             margin-left: 5px;
+            min-width: 90px;
             
             .date {
                 font-size: 0.8em;
