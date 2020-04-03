@@ -38,30 +38,31 @@ page-home-dashboard {
     }
     ion-content {
         .card-total {
-            ion-card-content {
-                padding-top: 5px;
-                padding-bottom: 5px;
+            padding-left: unset;
+            padding-right: unset;
+            padding-inline-start: var(--ion-padding, 16px);
+            padding-inline-end: var(--ion-padding, 16px);
+            min-height: 80px;
 
-                .total-with-chart {
+            .total-with-chart {
+                display: flex;
+                justify-content: space-between;
+
+                .total-container {
                     display: flex;
-                    justify-content: space-between;
+                    justify-content: center;
+                    flex-direction: column;
+                    margin-right: 20px;
 
-                    .total-container {
-                        display: flex;
-                        justify-content: center;
-                        flex-direction: column;
-                        margin-right: 20px;
-
-                        .total-label {
-                            font-size: 2em;
-                            font-weight: bold;
-                        }
+                    .total-label {
+                        font-size: 2em;
+                        font-weight: bold;
                     }
+                }
 
-                    .total-chart-container {
-                        min-height: 45px;
-                        min-width: 200px;
-                    }
+                .total-chart-container {
+                    min-height: 45px;
+                    min-width: 200px;
                 }
             }
         }

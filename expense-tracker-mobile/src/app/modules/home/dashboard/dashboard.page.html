@@ -31,32 +31,27 @@
   <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
-  <ion-card class="card-total">
-    <!-- <ion-card-header>
-      <ion-card-title></ion-card-title>
-    </ion-card-header> -->
-    <ion-card-content>
-      <div class="total-with-chart">
-        <div class="total-container">
-          <div class="total-label">{{'expense.total' | localizedresource | async }}</div>
-          <ion-label *ngIf="totalAmount">{{ (totalAmount || 0) | currency: (workingCurrency + '&nbsp;')}}</ion-label>
-        </div>
-        <div class="total-chart-container" [class.skeleton-loading]="!totalChartOptions">
-          <apx-chart *ngIf="totalChartOptions" 
-            [series]="totalChartOptions.series"
-            [chart]="totalChartOptions.chart"
-            [xaxis]="totalChartOptions.xaxis"
-            [yaxis]="totalChartOptions.yaxis"
-            [dataLabels]="totalChartOptions.dataLabels"
-            [grid]="totalChartOptions.grid"
-            [stroke]="totalChartOptions.stroke"
-            [title]="totalChartOptions.title"
-            [legend]="totalChartOptions.legend"
-        ></apx-chart>
-        </div>
+  <div class="card-total">
+    <div class="total-with-chart">
+      <div class="total-container">
+        <div class="total-label">{{'expense.total' | localizedresource | async }}</div>
+        <ion-label *ngIf="totalAmount">{{ (totalAmount || 0) | currency: (workingCurrency + '&nbsp;')}}</ion-label>
       </div>
-    </ion-card-content>
-  </ion-card>
+      <div class="total-chart-container" [class.skeleton-loading]="!totalChartOptions">
+        <apx-chart *ngIf="totalChartOptions" 
+          [series]="totalChartOptions.series"
+          [chart]="totalChartOptions.chart"
+          [xaxis]="totalChartOptions.xaxis"
+          [yaxis]="totalChartOptions.yaxis"
+          [dataLabels]="totalChartOptions.dataLabels"
+          [grid]="totalChartOptions.grid"
+          [stroke]="totalChartOptions.stroke"
+          [title]="totalChartOptions.title"
+          [legend]="totalChartOptions.legend"
+      ></apx-chart>
+      </div>
+    </div>
+  </div>
   <ion-card class="card-today">
     <ion-card-content [class.skeleton-loading]="!todayExpenses">
       <div class="today-header"> 
