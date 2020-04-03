@@ -49,5 +49,11 @@
     },
     "search": {
         "title": "Search"    
+    },
+    "user": {
+        "logout": "Logout",
+        "login": "Login",
+        "register": "Register",
+        "profile": "Profile"
     }
 }
