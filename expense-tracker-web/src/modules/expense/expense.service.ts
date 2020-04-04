@@ -41,22 +41,17 @@ export class ExpenseService {
         const toDate =  args.toDate; 
         qb = qb.andWhere('exp.createdOn <= :createdOnToDate', { createdOnToDate: toDate });
       }
-
-      console.log(qb.getQuery())
-      
-
+      // console.log(qb.getQuery())
     }
       
     // .orWhere('user.email = :email', { email });
-    if(!args || (args && !args.showHidden)) {
-      qb = qb.andWhere('exp.isDeleted <= :isDeleted', { isDeleted: false });
-    }
+    qb = qb.andWhere('exp.isDeleted <= :isDeleted', { isDeleted: args && args.showHidden ? true : false });
     qb = qb.orderBy("exp.id", 'DESC')
 
     return qb.getMany();
   }
 
-  async getReport(fromDate: string, toDate: string, totalItems = 10)
+  async getReport(fromDate: string, toDate: string, totalItems = 10, showHidden = false)
     : Promise<{ categories: Array<{ label, total, totalAmount }>, dates: Array<{ label, total, totalAmount }> }> {
     let qb = await getRepository(Expense)
       .createQueryBuilder("exp");
@@ -64,6 +59,7 @@ export class ExpenseService {
     qb = qb.innerJoinAndSelect(Category, "cat", "cat.id == categoryId");
     qb = qb.andWhere('date(exp.createdOn) >= :createdOnFrom', { createdOnFrom: fromDate });
     qb = qb.andWhere('date(exp.createdOn) <= :createdOnToDate', { createdOnToDate: toDate });
+    qb = qb.andWhere('exp.isDeleted <= :isDeleted', { isDeleted: showHidden });
 
     qb = qb.select("COUNT(exp.id)", "total")
     .addSelect("SUM(exp.amount)", "totalAmount");
