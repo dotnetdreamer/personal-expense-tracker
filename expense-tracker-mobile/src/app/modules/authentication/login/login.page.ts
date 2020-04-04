@@ -15,23 +15,18 @@ import { AppConstant } from '../../shared/app-constant';
   styleUrls: ['./login.page.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class LoginPage extends BasePage implements OnInit, AfterViewInit, OnDestroy {
+export class LoginPage extends BasePage implements OnInit, OnDestroy {
   @ViewChild('gSigninButton') gSigninButton: ElementRef;
 
   //used in BackButtonDisableService
   canDeactivate = false;
 
-  private _userLoggedInSub: Subscription;
   constructor(private authSvc: AuthenticationService
     , private userSettingSvc: UserSettingService) { 
       super();
     }
 
   ngOnInit() {
-  }
-
-  async ngAfterViewInit() {
-    // await this.authSvc.initGoogleAuth(this.gSigninButton.nativeElement);
   }
 
   async onLoginClicked(type) {
@@ -48,9 +43,7 @@ export class LoginPage extends BasePage implements OnInit, AfterViewInit, OnDest
   }
 
   ngOnDestroy() {
-    if(this._userLoggedInSub) {
-      this._userLoggedInSub.unsubscribe();
-    }
+
   }
 
 }

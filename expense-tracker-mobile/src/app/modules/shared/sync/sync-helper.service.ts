@@ -51,6 +51,9 @@ export class SyncHelperService {
             } catch(e) {
                 reject(e);
             } finally {
+                if(AppConstant.DEBUG) {
+                    console.log('SyncHelperService: publishing EVENT_SYNC_DATA_PULL_COMPLETE');
+                }
                 this.eventPub.$pub(SyncConstant.EVENT_SYNC_DATA_PULL_COMPLETE);
             }
         });

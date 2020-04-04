@@ -162,6 +162,7 @@ export class AppComponent {
       if(params.redirectToHome) {
         await this._navigateTo('/home', null, true);
       }
+
       //sync
       if(params.pull) {
         try {
@@ -228,6 +229,9 @@ export class AppComponent {
       this.eventPub.$pub(UserConstant.EVENT_USER_LOGGEDIN, { user: cUser });
       await this._navigateTo('/home');
 
+      if(AppConstant.DEBUG) {
+        console.log('AppComponent: _setDefaults: publishing EVENT_SYNC_DATA_PULL');
+      }
       this.eventPub.$pub(SyncConstant.EVENT_SYNC_DATA_PULL);
     } else {
       await this._navigateTo('/authentication/login');
