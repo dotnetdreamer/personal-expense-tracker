@@ -26,6 +26,11 @@ export class AuthenticationService extends BaseService {
             user = await this.googleAuthSvc.login();
           break;
         }
+
+        if(!user) {
+          return;
+        }
+
         loader = await this.helperSvc.loader;
         await loader.present();
 
@@ -37,21 +42,6 @@ export class AuthenticationService extends BaseService {
         alert(e.toString());
       }
     }
-
-    // async initGoogleAuth(gSigninButtonEle: HTMLElement) {
-    //     await this.googleAuthSvc.attachButtonHandler(gSigninButtonEle
-    //     , async (gUserProfile) => {
-    //         const loader = await this.helperSvc.loader;
-    //         await loader.present();
-    
-    //         await this._handleLoginResponse({ 
-    //             loginType: LoginType.GOOGLE, 
-    //             user: gUserProfile 
-    //         }, loader);
-    //     }, async (e) => {
-    //         console.log(e);
-    //     });
-    // }
 
     async getUserProfileLocal(username?): Promise<IUserProfile> {
         return new Promise<IUser>(async (resolve, reject) => {

@@ -1,0 +1,49 @@
+page-auth-login {
+    ion-content {
+        --background: transparent;
+
+        &:after {
+            clip-path: ellipse(100% 60% at 15% 25%);
+            background: #000;
+            content: "";
+            height: 100%;
+            width: 100%;
+            background: linear-gradient(147deg, var(--ion-color-primary-shade), var(--ion-color-primary));
+            position: absolute;
+            top: -44px;
+            z-index: -1;
+        }
+
+        .container {
+            height: 100%;
+            text-align: center;
+            padding-top: 8vh;
+
+            > ion-icon { 
+                font-size: 100px;
+            }
+
+            .social-media-container {
+                position: absolute;
+                width: 100%;
+                text-align: center;
+                bottom: 10px;
+
+                .continue-with {
+                    margin-bottom: 5px;
+                }
+
+                .social-media-buttons {
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+
+                    ion-button {
+                        width: 40px;
+                        height: 40px;
+                    }
+                }
+            }
+        }
+    }
+}

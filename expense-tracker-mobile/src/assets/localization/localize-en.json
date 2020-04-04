@@ -52,8 +52,16 @@
     },
     "user": {
         "logout": "Logout",
-        "login": "Login",
-        "register": "Register",
-        "profile": "Profile"
+        "profile": "Profile",
+        "email": "Email",
+        "password": "Password",
+
+        "login": {
+            "title": "Login",
+            "continue_with": "Or continue with"
+        },
+        "register": {
+            "title": "Register"
+        }
     }
 }

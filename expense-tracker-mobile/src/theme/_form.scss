@@ -1,0 +1,30 @@
+.custom-form  {
+    ion-list {
+        --ion-item-background: transparent;
+
+        ion-item {
+            --padding-start: 10px;
+
+            ion-label {
+                &.label-floating {
+                    &.sc-ion-label-ios-h {
+                        // transform: translate3d(5px,  32px,  0);
+                    }
+                }
+            }
+
+            ion-input {
+                --background: rgba(255,255,255, 0.5);
+                --padding-start: 5px !important;
+                --padding-end: 5px !important;
+                --padding-top: 10px !important;;
+                --padding-bottom: 10px !important;;
+                border-radius: 5px;
+            }
+        }
+    }
+
+    .buttons-container {
+        margin-top: 20px;
+    }
+}

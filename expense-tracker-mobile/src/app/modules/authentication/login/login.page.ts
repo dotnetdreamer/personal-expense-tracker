@@ -10,7 +10,7 @@ import { Subscription } from 'rxjs';
 import { AppConstant } from '../../shared/app-constant';
 
 @Component({
-  selector: 'page-user-login',
+  selector: 'page-auth-login',
   templateUrl: './login.page.html',
   styleUrls: ['./login.page.scss'],
   encapsulation: ViewEncapsulation.None
