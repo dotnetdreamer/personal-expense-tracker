@@ -18,6 +18,9 @@ import { AppConstant } from '../../shared/app-constant';
 export class LoginPage extends BasePage implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('gSigninButton') gSigninButton: ElementRef;
 
+  //used in BackButtonDisableService
+  canDeactivate = false;
+
   private _userLoggedInSub: Subscription;
   constructor(private authSvc: AuthenticationService
     , private userSettingSvc: UserSettingService) { 
@@ -32,7 +35,16 @@ export class LoginPage extends BasePage implements OnInit, AfterViewInit, OnDest
   }
 
   async onLoginClicked(type) {
-    await this.authSvc.login(type);
+    const profile = await this.authSvc.login(type);
+    if(profile) {
+      this.canDeactivate = true;
+
+      this.eventPub.$pub(UserConstant.EVENT_USER_LOGGEDIN, { 
+        user: profile, 
+        redirectToHome: true,
+        pull: true
+      });
+    }
   }
 
   ngOnDestroy() {

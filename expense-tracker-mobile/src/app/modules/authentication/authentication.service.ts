@@ -34,7 +34,7 @@ export class AuthenticationService extends BaseService {
         loader = await this.helperSvc.loader;
         await loader.present();
 
-        await this._handleLoginResponse({ loginType: loginType, user: user }, loader);
+        return this._handleLoginResponse({ loginType: loginType, user: user }, loader);
       } catch (e) {
         if(loader) {
           await loader.dismiss();
@@ -135,11 +135,7 @@ export class AuthenticationService extends BaseService {
 
       //fire the user loggedin event
       const profile = this.setUserDefaults(args.user);
-      this.eventPub.$pub(UserConstant.EVENT_USER_LOGGEDIN, { 
-        user: profile, 
-        redirectToHome: true,
-        pull: true
-      });
+      return profile;
     } catch(e) {
       throw e;
     } finally {
