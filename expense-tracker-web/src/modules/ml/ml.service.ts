@@ -39,7 +39,7 @@ export class MlService {
     async trainExpenseCategoryMl() {
         // create configuration for training
         const config = {
-            iterations: 1500,
+            iterations: 20000,
             log: false,
             logPeriod: 50,
             layers: [10]
