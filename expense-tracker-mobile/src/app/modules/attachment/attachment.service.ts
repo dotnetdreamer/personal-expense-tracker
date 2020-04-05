@@ -37,8 +37,6 @@ export class AttachmentService extends BaseService {
                     //binary
                     let blob = new Blob([ul.attachment], { type: ul.contentType });
                     ul.attachment = blob;
-                } else {
-                    delete ul.attachment;
                 }
                 return ul;
             });
@@ -47,7 +45,7 @@ export class AttachmentService extends BaseService {
             for (let i = 0; i < unSycedLocal.length; i++) { 
                 const item = unSycedLocal[i]; 
                 for (const prop in item) { 
-                    if(prop == 'attachment') {
+                    if(prop == 'attachment' && typeof item[prop] !== 'string') {
                         formData.append(`files[]`, item.attachment, `${item.guid}.${item.extension}`); 
                     } else {
                         formData.append(`attachments[${i}][${prop}]`, item[prop]); 
