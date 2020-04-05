@@ -42,6 +42,9 @@ export class AttachmentController {
       let items: Array<Map<number, any>> = [];
 
       const attachments = <IAttachmentParams[]>request.body.attachments;
+      if(!attachments || !attachments?.length) {
+        return items;
+      }
       //verify if file uploaded successfully
       // const successUploadedAttachs = attachments.filter(i => {
       //   const file = files.filter(f => {
@@ -59,6 +62,7 @@ export class AttachmentController {
         const itemMap: Map<number, IAttachmentParams> = new Map();
         let returnedItem: any;
   
+        model.id = +model.id;
         if (model.markedForAdd) {
           //generate new one..ignore id from client
           let toAdd = Object.assign({}, model);

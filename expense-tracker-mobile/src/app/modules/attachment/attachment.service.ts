@@ -32,9 +32,14 @@ export class AttachmentService extends BaseService {
             }
 
             unSycedLocal = unSycedLocal.map((ul) => {
-                let blob = new Blob([ul.attachment], { type: ul.contentType });
-                ul.attachment = blob;
-
+                //not a path e.g in update or delete
+                if(typeof ul.attachment != 'string') {
+                    //binary
+                    let blob = new Blob([ul.attachment], { type: ul.contentType });
+                    ul.attachment = blob;
+                } else {
+                    delete ul.attachment;
+                }
                 return ul;
             });
 
