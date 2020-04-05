@@ -46,7 +46,8 @@ export class ExpenseService {
       
     // .orWhere('user.email = :email', { email });
     qb = qb.andWhere('exp.isDeleted <= :isDeleted', { isDeleted: args && args.showHidden ? true : false });
-    qb = qb.orderBy("exp.id", 'DESC')
+    qb = qb.orderBy("exp.createdOn", 'DESC')
+      .addOrderBy('exp.id', 'DESC');
 
     return qb.getMany();
   }
