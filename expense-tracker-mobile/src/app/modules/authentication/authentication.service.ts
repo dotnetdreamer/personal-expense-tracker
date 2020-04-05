@@ -39,7 +39,14 @@ export class AuthenticationService extends BaseService {
         if(loader) {
           await loader.dismiss();
         }
-        alert(e.toString());
+        let msg = e.toString();
+        if(e.error) {
+          msg = e.error.toString();
+        }
+        if(e.error.error_description) {
+          msg += "\n" + e.error.error_description;
+        }
+        await this.helperSvc.presentToast(msg, false);
       }
     }
 
