@@ -49,14 +49,19 @@
     <ion-list>
       <ion-item lines="none">
         <ion-button fill="clear" (click)="onNotesClicked()">
-          <ion-icon slot="icon-only" name="reader-outline"></ion-icon>        
+          <ion-icon slot="icon-only" name="reader-outline"></ion-icon>  
+          <ion-icon name="pencil" *ngIf="formGroup.controls.notes.value"></ion-icon>      
         </ion-button>
       </ion-item>
       <ion-item lines="none">
-        <ion-button fill="clear">
-            <input type="file" accept="*" (change)="onAttachmentChanged($event)" />
+        <ion-button fill="clear" *ngIf="!attachment || attachment?.markedForDelete">
+          <input type="file" accept="*" (change)="onAttachmentChanged($event)"/>
           <ion-icon slot="icon-only" name="receipt-outline"></ion-icon>
-        </ion-button>
+        </ion-button> 
+        <ion-button fill="clear" *ngIf="attachment && !attachment.markedForDelete" (click)="onAttachmentRemoveClicked()">
+          <ion-icon slot="icon-only" name="receipt-outline"></ion-icon>
+          <ion-icon name="trash"></ion-icon>
+        </ion-button> 
       </ion-item>
     </ion-list>
   </form>

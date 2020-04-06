@@ -41,6 +41,24 @@ page-expense-create-or-update {
                                 font-size: 24px;
                             }
 
+                            &[name="trash"], &[name="pencil"] {
+                                position: absolute;
+                                top: 5px;
+                                left: 0;
+                                font-size: 16px;
+                                z-index: 99;
+                            }
+
+                            &[name="trash"] {
+                                color: red;
+                            }
+
+                            &[name="pencil"] {
+                                font-size: 16px;
+                                top: 6px;
+                                left: 0;
+                            }
+
                             // &[name="receipt-outline"] {
                             //     font-size: 24px;
                             //     position: absolute;

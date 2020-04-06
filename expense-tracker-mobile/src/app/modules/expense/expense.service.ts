@@ -55,7 +55,7 @@ export class ExpenseService extends BaseService {
                 return;
             }
 
-            let dependancySynced = true;
+            let dependancySynced = false;
             //make sure category and attachments are synced...if dependant are found
             unSycedLocal.forEach(async (ul) => {
                 //make sure its synched first...
@@ -63,20 +63,23 @@ export class ExpenseService extends BaseService {
                     if(ul.category 
                         && (ul.category.markedForAdd || ul.category.markedForUpdate || ul.category.markedForDelete)) {
                         await this.categorySvc.push();
+                        dependancySynced = true;
                     }
                 } catch (e) {
                     //ignore...
-                    dependancySynced = false;
                 }
 
                 try {
                     if(ul.attachment 
                         && (ul.attachment.markedForAdd || ul.attachment.markedForUpdate || ul.attachment.markedForDelete)) {
-                        await this.attachmentSvc.push();
+                        await this.attachmentSvc.push({
+                            data: [ul],
+                            entity: this.schemaService.tables.expense
+                        });
+                        dependancySynced = true;
                     } 
                 } catch(e) {
                     //ignore...
-                    dependancySynced = false;
                 }
             });
 
@@ -129,7 +132,6 @@ export class ExpenseService extends BaseService {
             
             try {
                 const promises = [];
-                // const removePromises = [];
                 //mark it
                 for (let item of unSycedLocal) {
                     if (item.markedForAdd || item.markedForUpdate) {
@@ -403,10 +405,12 @@ export class ExpenseService extends BaseService {
             }
         }
 
-        //push attachment only in case of Add, ignore in edit/delete
-        if(item.attachment && item.markedForAdd) {
-            const id = await this.attachmentSvc.putLocal(item.attachment);
-            item.attachment.id = +id;
+        //push attachment only in case of Add/Edit, ignore in delete
+        if(item.attachment) {
+            if(item.markedForAdd || item.markedForUpdate) {
+                const res = await this.attachmentSvc.putLocal(item.attachment);
+                item.attachment.id = +res.insertId;
+            }
         }
         
         let createdOn;

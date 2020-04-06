@@ -6,6 +6,7 @@ import * as moment from 'moment';
 import { BaseService } from '../shared/base.service';
 import { IAttachment } from './attachment.model';
 import { AppConstant } from '../shared/app-constant';
+import { SyncEntity } from '../shared/sync/sync.model';
 
 declare const ydn: any;
 
@@ -19,7 +20,7 @@ export class AttachmentService extends BaseService {
         super();
     }
 
-    push() {
+    push(dependantDataOptions?: { data: any[], entity: string}) {
         return new Promise(async (resolve, reject) => {
             let unSycedLocal = await this.getUnSyncedLocal();
             if(AppConstant.DEBUG) {
@@ -93,7 +94,30 @@ export class AttachmentService extends BaseService {
                         await this.remove(item.id);
 
                         const pItem: IAttachment = cp[item.id];
-                        promises.push(this.putLocal(pItem, true, true));
+                        const pro = this.putLocal(pItem, true, true)
+                            .then(async (args) => {
+                                //now update the dependent records as well
+                                if(dependantDataOptions && dependantDataOptions.data.length) {
+                                    const id = args.insertId;
+                                    const updatedAttachment = await this.getByIdLocal(id);
+
+                                    dependantDataOptions.data.forEach(async (dd) => {
+                                        if(dd.attachment.id == item.id) {
+                                            dd.attachment = {
+                                                ...updatedAttachment
+                                            };
+                                            //now update it also locally
+                                            await this.dbService.putLocal(
+                                                this.schemaService.tables[dependantDataOptions.entity], dd);
+                                        }
+                                    });
+                                }
+
+                                return args;
+                            });
+                        promises.push(pro);
+                       
+
                     } else if (item.markedForDelete) {
                         const promise = this.remove(item.id);
                         promises.push(promise);
@@ -113,7 +137,9 @@ export class AttachmentService extends BaseService {
         });
     }
 
-    async putLocal(item: IAttachment, ignoreFiringEvent?: boolean, ignoreDefaults?: boolean) {
+    async putLocal(item: IAttachment
+        , ignoreFiringEvent?: boolean
+        , ignoreDefaults?: boolean) {
         //defaults
          if(!ignoreDefaults) {
             if(typeof item.markedForAdd === 'undefined' 
@@ -141,11 +167,13 @@ export class AttachmentService extends BaseService {
         }
 
         return this.dbService.putLocal(this.schemaService.tables.attachment, item)
-        .then((affectedRows) => {
+        .then((insertId) => {
             if(!ignoreFiringEvent) {
                 this.eventPub.$pub(AppConstant.EVENT_ATTACHMENT_CREATED_OR_UPDATED, item);
             }
-            return affectedRows;
+            return {
+                insertId: insertId
+            };
         });
     }
 
@@ -178,6 +206,10 @@ export class AttachmentService extends BaseService {
                 resolve(unSynced);
             });
         });
+    }
+
+    getByIdLocal(id) {
+        return this.dbService.get<IAttachment>(this.schemaService.tables.attachment, id);
     }
 
     remove(id) {

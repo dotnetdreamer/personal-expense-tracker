@@ -95,8 +95,8 @@ export class ExpenseController {
 
   private async _updateOrDelete(toUpdateOrDelete: Expense, model, shouldDelete?: boolean) {
     //no need to update
-    delete model.createdOn;
-    delete model.attachment;
+    // delete model.createdOn;
+    // delete model.attachment;
     model.isDeleted = shouldDelete;
 
     let updated = Object.assign(toUpdateOrDelete, model);

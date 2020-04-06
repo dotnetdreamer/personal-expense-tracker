@@ -93,6 +93,8 @@ export class AttachmentController {
           
           delete returnedItem.markedForDelete;
         }
+
+        returnedItem = await this._prepare(returnedItem);
   
         itemMap.set(model.id, returnedItem);
         items.push(itemMap);
@@ -110,5 +112,16 @@ export class AttachmentController {
       await this.attachmentSvc.save(updated);
   
       return updated;
+    }
+
+    private async _prepare(att: Attachment) {
+      let mAtt = Object.assign({}, att);
+      
+      //remove 
+      delete mAtt['markedForAdd'];
+      delete mAtt['markedForUpdate'];
+      delete mAtt['markedForDelete'];
+  
+      return mAtt;
     }
 }

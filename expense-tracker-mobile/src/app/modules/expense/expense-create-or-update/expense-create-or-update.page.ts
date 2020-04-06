@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewEncapsulation, OnDestroy, ViewChild } from '@angular/core';
 import { Location } from '@angular/common';
+import { ActivatedRoute } from '@angular/router';
 
 import { AlertController, ModalController, IonInput } from '@ionic/angular';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
@@ -31,10 +32,12 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit {
   selectedCategory: ICategory;
   suggestedCategory: ICategory;
   todayDate;
+  attachment: IAttachment;
 
-  private _attachment: IAttachment;
+  private _expense: IExpense;
 
-  constructor(private formBuilder: FormBuilder, private location: Location
+  constructor(private activatedRoute: ActivatedRoute
+    , private formBuilder: FormBuilder, private location: Location
     , private alertCtrl: AlertController, private modalCtrl: ModalController
     , private expenseSvc: ExpenseService, private mlSvc: MlService
     , private categorySvc: CategoryService
@@ -48,7 +51,7 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit {
       categoryId: ['', Validators.required],
       description: ['', Validators.required],
       notes: [''],
-      attachment: [''],
+      // attachment: [''],
       amount:['', Validators.required], 
       date: [this.todayDate, Validators.required]
     });
@@ -57,6 +60,37 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit {
   get f() { return this.formGroup.controls; }
 
   async ngOnInit() {
+    this.activatedRoute.params.subscribe(async (params) => {
+      let { id } = params;
+      if(!id) {
+        return;
+      }
+
+      id = +id;
+      if(id <= 0) {
+        return;
+      }
+
+      this._expense = await this.expenseSvc.getByIdLocal(id);
+      if(AppConstant.DEBUG) {
+        console.log('ExpenseCreateOrUpdatePage: ngOnInit: expense', this._expense);
+      }
+
+      this.f.categoryId.setValue(this._expense.category.id);
+      this.selectedCategory = this._expense.category;
+      
+      this.f.description.setValue(this._expense.description);
+      this.f.amount.setValue(this._expense.amount);
+      this.f.notes.setValue(this._expense.notes);
+
+      this.f.date.setValue(this._expense.createdOn);
+      this.todayDate = this._expense.createdOn;
+
+      if(this._expense.attachment) {
+        this.attachment = this._expense.attachment;
+      }
+    });
+
     await this._getCategoryList();
 
     //auto focus on first field
@@ -74,14 +108,14 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit {
       category: this.selectedCategory || this.suggestedCategory,
       description: args.description,
       notes: args.notes,
-      attachment: this._attachment,
+      attachment: this.attachment,
       createdOn: args.date
     };
     //TODO: add update logic here
-    // if(category) {
-    //   cat.id = category.id;
-    //   cat.markedForUpdate = true;
-    // }
+    if(this._expense) {
+      exp.id = this._expense.id;
+      exp.markedForUpdate = true;
+    }
     if(AppConstant.DEBUG) {
       console.log('ExpenseCreateOrUpdatePage: onSaveClick: exp', exp)
     }
@@ -109,28 +143,40 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit {
   async onAttachmentChanged($event) {
     const file: File = $event.srcElement.files[0];
     if(file != undefined) {
-      this._attachment = {
+      this.attachment = {
         filename: file.name,
         contentType: file.type,
         extension: file.name.split('.').pop(),
         attachment: file,
-        guid: this.helperSvc.generateGuid()
+        guid: this.helperSvc.generateGuid(),
+        markedForAdd: !this._expense || this._expense?.attachment == null,
+        markedForUpdate: this._expense && this._expense.attachment != null
       };
       let reader = new FileReader();
       reader.onload = (e) => {
         const arrayBuffer = reader.result;
-        this._attachment.attachment = arrayBuffer;
-        // let blob = new Blob([e.target.result], { type: file.type });
-        // this.f.attachment.setValue(e.target.result);
+        this.attachment.attachment = arrayBuffer;
       };
       reader.readAsArrayBuffer(file);
-      // reader.readAsBinaryString(file);
     } else {
-      this._attachment = null;
+      this.attachment = null;
     }
     if(AppConstant.DEBUG) {
-      console.log('onAttachmentChanged: attachment', this._attachment);
+      console.log('onAttachmentChanged: attachment', this.attachment);
     }
+  }
+
+  async onAttachmentRemoveClicked() {
+    const res = await this.helperSvc.presentConfirmDialog();
+    if(!res) {
+      return;
+    }
+    //if edit, and there was attachment but now not, then mark it delete
+    if(this._expense && this._expense.attachment) {
+      this.attachment.markedForDelete = true;
+    } else {
+      this.attachment = null;
+    }    
   }
 
   // async onAttachmentClicked() {
@@ -170,6 +216,7 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit {
         {
           name: 'notes',
           type: 'textarea',
+          value: this.f.notes.value || '',
           placeholder: resources[0]
         }
       ],

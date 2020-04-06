@@ -89,8 +89,8 @@ export class ExpenseListingPage extends BasePage implements OnInit, OnDestroy {
     await this._getExpenses();
   }
 
-  async onAddClick() {
-    await this.navigate({ path: '/expense/expense-create-or-update'})
+  async onAddClicked() {
+    await this.navigate({ path: '/expense/expense-create-or-update' });
   }
 
   async onExpenseItemClicked(ev: CustomEvent, expense: IExpense
@@ -105,7 +105,13 @@ export class ExpenseListingPage extends BasePage implements OnInit, OnDestroy {
       // if(expense.markedForAdd || expense.markedForUpdate || expense.markedForDelete) {
       //   return;
       // }
-      await this._presentUpdateModal(expense);
+      // await this._presentUpdateModal(expense);
+      await this.navigate({ 
+        path: '/expense/expense-create-or-update', 
+        params: { 
+          id: expense.id 
+        } 
+      });
     } else if(action === 'delete') {
       const res = await this.helperSvc.presentConfirmDialog();
       if(res) {
