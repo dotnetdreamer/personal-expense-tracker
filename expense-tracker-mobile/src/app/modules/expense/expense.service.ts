@@ -55,7 +55,10 @@ export class ExpenseService extends BaseService {
                 return;
             }
 
-            let dependancySynced = false;
+            let dependancySynced = {
+                category: false,
+                attachment: false
+            };
             //make sure category and attachments are synced...if dependant are found
             unSycedLocal.forEach(async (ul) => {
                 //make sure its synched first...
@@ -63,7 +66,9 @@ export class ExpenseService extends BaseService {
                     if(ul.category 
                         && (ul.category.markedForAdd || ul.category.markedForUpdate || ul.category.markedForDelete)) {
                         await this.categorySvc.push();
-                        dependancySynced = true;
+                        dependancySynced.category = true;
+                    } else {
+                        dependancySynced.category = true;
                     }
                 } catch (e) {
                     //ignore...
@@ -74,16 +79,21 @@ export class ExpenseService extends BaseService {
                         && (ul.attachment.markedForAdd || ul.attachment.markedForUpdate || ul.attachment.markedForDelete)) {
                         await this.attachmentSvc.push({
                             data: [ul],
-                            entity: this.schemaService.tables.expense
+                            successCallback: async (updatedItems: IExpense[]) => {   
+                                //now update it also locally
+                                await this.putAllLocal(updatedItems, true, true);
+                                dependancySynced.attachment = true;
+                            }
                         });
-                        dependancySynced = true;
-                    } 
+                    } else {
+                        dependancySynced.attachment = true;
+                    }
                 } catch(e) {
                     //ignore...
                 }
             });
 
-            if(!dependancySynced) {
+            if(!dependancySynced.attachment || !dependancySynced.category) {
                 resolve();
                 return; 
             }
@@ -406,12 +416,12 @@ export class ExpenseService extends BaseService {
         }
 
         //push attachment only in case of Add/Edit, ignore in delete
-        if(item.attachment) {
-            if(item.markedForAdd || item.markedForUpdate) {
-                const res = await this.attachmentSvc.putLocal(item.attachment);
-                item.attachment.id = +res.insertId;
-            }
-        }
+        // if(item.attachment) {
+        //     if(item.attachment.markedForAdd || item.attachment.markedForUpdate) {
+        //         const res = await this.attachmentSvc.putLocal(item.attachment);
+        //         item.attachment.id = +res.insertId;
+        //     }
+        // }
         
         let createdOn;
         //if there is no time, add it...

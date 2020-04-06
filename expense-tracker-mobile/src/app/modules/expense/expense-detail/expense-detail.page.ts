@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation, ViewChild, ElementRef, OnDestroy } from '@angular/core';
 
 import { Plugins } from '@capacitor/core';
 const { Browser } = Plugins;
@@ -9,6 +9,7 @@ import { AppConstant } from '../../shared/app-constant';
 import { ExpenseService } from '../expense.service';
 import { IExpense } from '../expense.model';
 import { IAttachment } from '../../attachment/attachment.model';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'page-expense-detail',
@@ -16,18 +17,19 @@ import { IAttachment } from '../../attachment/attachment.model';
   styleUrls: ['./expense-detail.page.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class ExpenseDetailPage extends BasePage implements OnInit {
+export class ExpenseDetailPage extends BasePage implements OnInit, OnDestroy {
   @ViewChild('attachment') attachmentElementRef: ElementRef;
   
   expense: IExpense;
 
+  private _routeParamsSub: Subscription;
   constructor(private activatedRoute: ActivatedRoute
     , private expenseSvc: ExpenseService) {
     super();
   }
 
   ngOnInit() {
-    this.activatedRoute.params.subscribe(async params => {
+    this._routeParamsSub = this.activatedRoute.params.subscribe(async params => {
       if(AppConstant.DEBUG) {
         console.log('ExpenseDetailPage: ngOnInit: params', params);
       }
@@ -40,6 +42,12 @@ export class ExpenseDetailPage extends BasePage implements OnInit {
   async onAttachmentClicked(expense: IExpense) {
     if(expense.attachment) {
       await Browser.open({ url: `${AppConstant.BASE_URL}${expense.attachment.attachment}` });
+    }
+  }
+
+  ngOnDestroy() {
+    if(this._routeParamsSub) {
+      this._routeParamsSub.unsubscribe();
     }
   }
 

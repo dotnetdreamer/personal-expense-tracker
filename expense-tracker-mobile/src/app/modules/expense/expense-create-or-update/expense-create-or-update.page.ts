@@ -17,6 +17,8 @@ import { SyncConstant } from '../../shared/sync/sync-constant';
 import { SyncEntity } from '../../shared/sync/sync.model';
 import { IAttachment } from '../../attachment/attachment.model';
 import { MlService } from '../../shared/ml/ml.service';
+import { AttachmentService } from '../../attachment/attachment.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'page-expense-create-or-update',
@@ -24,7 +26,7 @@ import { MlService } from '../../shared/ml/ml.service';
   styleUrls: ['./expense-create-or-update.page.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit {
+export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit, OnDestroy {
   @ViewChild('description') descriptionInput: IonInput;
 
   formGroup: FormGroup;
@@ -35,12 +37,13 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit {
   attachment: IAttachment;
 
   private _expense: IExpense;
+  private _routeParamsSub: Subscription;
 
   constructor(private activatedRoute: ActivatedRoute
     , private formBuilder: FormBuilder, private location: Location
     , private alertCtrl: AlertController, private modalCtrl: ModalController
     , private expenseSvc: ExpenseService, private mlSvc: MlService
-    , private categorySvc: CategoryService
+    , private categorySvc: CategoryService, private attachmentSvc: AttachmentService
     ) {
     super();
 
@@ -60,7 +63,7 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit {
   get f() { return this.formGroup.controls; }
 
   async ngOnInit() {
-    this.activatedRoute.params.subscribe(async (params) => {
+    this._routeParamsSub = this.activatedRoute.params.subscribe(async (params) => {
       let { id } = params;
       if(!id) {
         return;
@@ -108,7 +111,6 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit {
       category: this.selectedCategory || this.suggestedCategory,
       description: args.description,
       notes: args.notes,
-      attachment: this.attachment,
       createdOn: args.date
     };
     //TODO: add update logic here
@@ -118,6 +120,12 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit {
     }
     if(AppConstant.DEBUG) {
       console.log('ExpenseCreateOrUpdatePage: onSaveClick: exp', exp)
+    }
+
+    if(this.attachment) {
+      const added = await this.attachmentSvc.putLocal(this.attachment);
+      this.attachment.id = +added.insertId;
+      exp.attachment = this.attachment;
     }
 
     await this.expenseSvc.putLocal(exp);
@@ -291,6 +299,12 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit {
           //ignore...
         }
       }
+    }
+  }
+
+  ngOnDestroy() {
+    if(this._routeParamsSub) {
+      this._routeParamsSub.unsubscribe();
     }
   }
 

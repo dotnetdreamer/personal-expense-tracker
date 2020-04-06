@@ -7,6 +7,7 @@ import { BaseService } from '../shared/base.service';
 import { IAttachment } from './attachment.model';
 import { AppConstant } from '../shared/app-constant';
 import { SyncEntity } from '../shared/sync/sync.model';
+import { SyncConstant } from '../shared/sync/sync-constant';
 
 declare const ydn: any;
 
@@ -20,7 +21,7 @@ export class AttachmentService extends BaseService {
         super();
     }
 
-    push(dependantDataOptions?: { data: any[], entity: string}) {
+    push(dependantDataOptions?: { data: any[], successCallback: (updatedData: any[]) => void }) {
         return new Promise(async (resolve, reject) => {
             let unSycedLocal = await this.getUnSyncedLocal();
             if(AppConstant.DEBUG) {
@@ -99,20 +100,18 @@ export class AttachmentService extends BaseService {
                                 //now update the dependent records as well
                                 if(dependantDataOptions && dependantDataOptions.data.length) {
                                     const id = args.insertId;
-                                    const updatedAttachment = await this.getByIdLocal(id);
+                                    const updatedData = [];
 
-                                    dependantDataOptions.data.forEach(async (dd) => {
+                                    for(let a = 0; a < dependantDataOptions.data.length; a++) {
+                                        const dd = dependantDataOptions.data[a];
                                         if(dd.attachment.id == item.id) {
-                                            dd.attachment = {
-                                                ...updatedAttachment
-                                            };
-                                            //now update it also locally
-                                            await this.dbService.putLocal(
-                                                this.schemaService.tables[dependantDataOptions.entity], dd);
+                                            const updatedAttachment = await this.getByIdLocal(id);
+                                            dd.attachment = updatedAttachment;
                                         }
-                                    });
+                                        updatedData.push(dd);
+                                    }
+                                    dependantDataOptions.successCallback(updatedData);
                                 }
-
                                 return args;
                             });
                         promises.push(pro);
@@ -129,7 +128,8 @@ export class AttachmentService extends BaseService {
                 if(AppConstant.DEBUG) {
                     console.log('AttachmentService: sync: complete');
                 }
-                // this.eventPub.$pub(AppConstant.EVENT_ATTACHMENT_CREATED_OR_UPDATED);
+                //attachments have always dependents from other entities..let's push them
+                this.eventPub.$pub(SyncConstant.EVENT_SYNC_DATA_PUSH);
                 resolve();
             } catch (e) {
                 reject(e);
