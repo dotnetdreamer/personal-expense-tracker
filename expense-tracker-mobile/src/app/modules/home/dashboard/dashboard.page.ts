@@ -269,7 +269,7 @@ export class DashboardPage extends BasePage implements AfterViewInit, OnDestroy 
   }
 
   private _subscribeToEvents() {
-    this._syncDataPullCompleteSub = this.eventPub.$sub(SyncConstant.EVENT_SYNC_DATA_PULL_COMPLETE, async () => {
+    this._syncDataPullCompleteSub = this.pubsubSvc.subscribe(SyncConstant.EVENT_SYNC_DATA_PULL_COMPLETE, async () => {
       if(AppConstant.DEBUG) {
         console.log('DashboardPage:Event received: EVENT_SYNC_DATA_PULL_COMPLETE');
       }
@@ -277,7 +277,7 @@ export class DashboardPage extends BasePage implements AfterViewInit, OnDestroy 
       await this._renderCharts(this.selectedFromDate, this.selectedToDate);
     });
 
-    this._eventCreatedOrUpdatedSub = this.eventPub.$sub(AppConstant.EVENT_EXPENSE_CREATED_OR_UPDATED, async () => {
+    this._eventCreatedOrUpdatedSub = this.pubsubSvc.subscribe(AppConstant.EVENT_EXPENSE_CREATED_OR_UPDATED, async () => {
       if(AppConstant.DEBUG) {
         console.log('DashboardPage:Event received: EVENT_EXPENSE_CREATED_OR_UPDATED');
       }
@@ -286,7 +286,7 @@ export class DashboardPage extends BasePage implements AfterViewInit, OnDestroy 
     });
 
     //we add item...after successfuly sync, reload to hide that spinner icon from each expense item
-    this._syncDataPushCompleteSub = this.eventPub.$sub(SyncConstant.EVENT_SYNC_DATA_PUSH_COMPLETE, async () => {
+    this._syncDataPushCompleteSub = this.pubsubSvc.subscribe(SyncConstant.EVENT_SYNC_DATA_PUSH_COMPLETE, async () => {
       if(AppConstant.DEBUG) {
         console.log('DashboardPage:Event received: EVENT_SYNC_DATA_PUSH_COMPLETE');
       }

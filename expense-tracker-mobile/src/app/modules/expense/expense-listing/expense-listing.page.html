@@ -55,7 +55,7 @@
           </div>
         </div>
       </ion-item>
-      <ng-container *ngIf="!item.markedForAdd && !item.markedForUpdate && !item.markedForDelete">
+      <!-- <ng-container *ngIf="!item.markedForAdd && !item.markedForUpdate && !item.markedForDelete"> -->
         <ion-item-options side="end">
           <ion-item-option (click)="onExpenseItemClicked($event, item, 'edit', slidingItem)">
             <ion-icon name="pencil"></ion-icon>
@@ -64,7 +64,7 @@
             <ion-icon name="trash"></ion-icon>
           </ion-item-option>
         </ion-item-options>
-      </ng-container>
+      <!-- </ng-container> -->
     </ion-item-sliding>
   </ion-virtual-scroll>
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">

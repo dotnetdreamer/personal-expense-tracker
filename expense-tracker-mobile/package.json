@@ -30,6 +30,7 @@
     "@ionic-native/media": "^5.22.0",
     "@ionic-native/media-capture": "^5.22.0",
     "@ionic/angular": "^5.0.7",
+    "@pscoped/ngx-pub-sub": "^3.0.0",
     "apexcharts": "^3.17.0",
     "brain.js": "^2.0.0-alpha.12",
     "capacitor-sqlite": "^1.5.2-1",

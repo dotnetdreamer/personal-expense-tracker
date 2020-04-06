@@ -110,7 +110,7 @@ export class AuthenticationService extends BaseService {
                 this.userSettingSvc.removeCurrentUserPassword()
             ]);
 
-            this.eventPub.$pub(UserConstant.EVENT_USER_LOGGEDOUT);
+            this.pubsubSvc.publishEvent(UserConstant.EVENT_USER_LOGGEDOUT);
             resolve();
         });
     }

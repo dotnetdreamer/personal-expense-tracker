@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core';
 
 import { SchemaService } from './schema.service';
 import { AppConstant } from "../app-constant";
-import { EventPublisher } from '../event-publisher';
 import { DbService } from './db-base.service';
+import { NgxPubSubService } from '@pscoped/ngx-pub-sub';
 
 //configured in angular.json
 declare var ydn: any;
@@ -16,7 +16,7 @@ export class DbWebService implements DbService {
     private db: any;
     private _isDbInitialized = false;
 
-    constructor(private schemaService: SchemaService, private eventPublisher: EventPublisher) {
+    constructor(private schemaService: SchemaService, private pubsubSvc: NgxPubSubService) {
         const schema = { stores: [] };
         schemaService.schema.stores.forEach(s => {
             const pkCol = s.columns.filter(c => c.isPrimaryKey)[0];
@@ -55,7 +55,7 @@ export class DbWebService implements DbService {
                 }
 
                 // heavy database operations should start from this...
-                _self.eventPublisher.$pub(AppConstant.EVENT_DB_INITIALIZED);
+                _self.pubsubSvc.publishEvent(AppConstant.EVENT_DB_INITIALIZED);
             }
         }, delay);
     }

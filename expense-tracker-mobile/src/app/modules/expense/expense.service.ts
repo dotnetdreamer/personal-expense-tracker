@@ -168,7 +168,7 @@ export class ExpenseService extends BaseService {
                 if(AppConstant.DEBUG) {
                     console.log('ExpenseService: sync: complete');
                 }
-                // this.eventPub.$pub(AppConstant.EVENT_EXPENSE_CREATED_OR_UPDATED);
+                // this.pubsubSvc.publishEvent(AppConstant.EVENT_EXPENSE_CREATED_OR_UPDATED);
                 resolve();
             } catch (e) {
                 reject(e);
@@ -440,7 +440,7 @@ export class ExpenseService extends BaseService {
         return this.dbService.putLocal(this.schemaService.tables.expense, item)
         .then((affectedRows) => {
             if(!ignoreFiringEvent) {
-                this.eventPub.$pub(AppConstant.EVENT_EXPENSE_CREATED_OR_UPDATED, item);
+                this.pubsubSvc.publishEvent(AppConstant.EVENT_EXPENSE_CREATED_OR_UPDATED, item);
             }
             return affectedRows;
         });

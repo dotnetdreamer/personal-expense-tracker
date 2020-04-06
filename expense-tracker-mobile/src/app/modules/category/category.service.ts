@@ -103,7 +103,7 @@ export class CategoryService extends BaseService {
                 if(AppConstant.DEBUG) {
                     console.log('CategoryService: sync: complete');
                 }
-                // this.eventPub.$pub(AppConstant.EVENT_CATEGORY_CREATED_OR_UPDATED);
+                // this.pubsubSvc.publishEvent(AppConstant.EVENT_CATEGORY_CREATED_OR_UPDATED);
                 resolve();
             } catch (e) {
                 reject(e);
@@ -184,7 +184,7 @@ export class CategoryService extends BaseService {
 
         return this.dbService.putLocal(this.schemaService.tables.category, item).then((affectedRows) => {
             if(!ignoreFiringEvent) {
-                this.eventPub.$pub(AppConstant.EVENT_CATEGORY_CREATED_OR_UPDATED, item);
+                this.pubsubSvc.publishEvent(AppConstant.EVENT_CATEGORY_CREATED_OR_UPDATED, item);
             }
             return affectedRows;
         });

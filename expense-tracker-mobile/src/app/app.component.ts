@@ -7,7 +7,6 @@ import { Platform } from '@ionic/angular';
 import { AppSettingService } from './modules/shared/app-setting.service';
 import { Router } from '@angular/router';
 import { CategoryService } from './modules/category/category.service';
-import { EventPublisher } from './modules/shared/event-publisher';
 import { SyncHelperService } from './modules/shared/sync/sync-helper.service';
 import { SyncConstant } from './modules/shared/sync/sync-constant';
 import { AppConstant } from './modules/shared/app-constant';
@@ -20,6 +19,7 @@ import { UserConstant } from './modules/authentication/user-constant';
 import { IUser, IUserProfile, LoginType } from './modules/authentication/authentication.model';
 import { AuthenticationService } from './modules/authentication/authentication.service';
 import { UserSettingService } from './modules/authentication/user-setting.service';
+import { NgxPubSubService } from '@pscoped/ngx-pub-sub';
 
 @Component({
   selector: 'app-root',
@@ -34,7 +34,7 @@ export class AppComponent {
 
   constructor( private router: Router, @Inject(DOCUMENT) private document: Document
   , private renderer: Renderer2, private platform: Platform
-    , private eventPub: EventPublisher, private checkforUpdateSvc: CheckForUpdateService
+    , private pubsubSvc: NgxPubSubService, private checkforUpdateSvc: CheckForUpdateService
     , protected currencySettingSvc: CurrencySettingService
     , private appSettingSvc: AppSettingService, private syncHelperSvc: SyncHelperService
     , private categorySvc: CategoryService, private helperSvc: HelperService
@@ -69,7 +69,7 @@ export class AppComponent {
   }
 
   private async _subscribeToEvents() {
-    this.eventPub.$sub(AppConstant.EVENT_DB_INITIALIZED, async () => {
+    this.pubsubSvc.subscribe(AppConstant.EVENT_DB_INITIALIZED, async () => {
       if(AppConstant.DEBUG) {
           console.log('Event received: EVENT_DB_INITIALIZED');
       }
@@ -77,7 +77,7 @@ export class AppComponent {
       await this._setDefaults();
     });
 
-    this.eventPub.$sub(AppConstant.EVENT_LANGUAGE_CHANGED, async (params) => {
+    this.pubsubSvc.subscribe(AppConstant.EVENT_LANGUAGE_CHANGED, async (params) => {
       if(AppConstant.DEBUG) {
         console.log('EVENT_LANGUAGE_CHANGED', params);
       }
@@ -100,7 +100,7 @@ export class AppComponent {
       }
     });
 
-    this.eventPub.$sub(CurrencyConstant.EVENT_CURRENCY_CHANGED, async (params) => {
+    this.pubsubSvc.subscribe(CurrencyConstant.EVENT_CURRENCY_CHANGED, async (params) => {
       if(AppConstant.DEBUG) {
         console.log('EVENT_CURRENCY_CHANGED', params);
       }
@@ -116,14 +116,14 @@ export class AppComponent {
       }
     });
 
-    this.eventPub.$sub(SyncConstant.EVENT_SYNC_DATA_PUSH, async (table?) => {
+    this.pubsubSvc.subscribe(SyncConstant.EVENT_SYNC_DATA_PUSH, async (table?) => {
       if(AppConstant.DEBUG) {
         console.log('HomePage: EVENT_SYNC_DATA_PUSH: table:', table);
       }
       await this.syncHelperSvc.push(table);
     });
 
-    this.eventPub.$sub(SyncConstant.EVENT_SYNC_DATA_PUSH_COMPLETE, async (totalTables) => {
+    this.pubsubSvc.subscribe(SyncConstant.EVENT_SYNC_DATA_PUSH_COMPLETE, async (totalTables) => {
       if(AppConstant.DEBUG) {
         console.log('AppComponent: EVENT_SYNC_DATA_PUSH_COMPLETE: totalTables', totalTables);
       }
@@ -132,14 +132,14 @@ export class AppComponent {
       // }, 1000);
     });
 
-    this.eventPub.$sub(SyncConstant.EVENT_SYNC_DATA_PULL, async (table?) => {
+    this.pubsubSvc.subscribe(SyncConstant.EVENT_SYNC_DATA_PULL, async (table?) => {
       if(AppConstant.DEBUG) {
         console.log('HomePage: EVENT_SYNC_DATA_PULL: table:', table);
       }
       await this.syncHelperSvc.pull(table);
     });
 
-    this.eventPub.$sub(SyncConstant.EVENT_SYNC_DATA_PULL_COMPLETE, async () => {
+    this.pubsubSvc.subscribe(SyncConstant.EVENT_SYNC_DATA_PULL_COMPLETE, async () => {
       if(AppConstant.DEBUG) {
         console.log('AppComponent:Event received: EVENT_SYNC_DATA_PULL_COMPLETE');
       }
@@ -152,7 +152,7 @@ export class AppComponent {
       } catch(e) { }
     });
 
-    this.eventPub.$sub(UserConstant.EVENT_USER_LOGGEDIN
+    this.pubsubSvc.subscribe(UserConstant.EVENT_USER_LOGGEDIN
       , async (params: { user: IUserProfile, redirectToHome: boolean, pull: boolean }) => {
       if(AppConstant.DEBUG) {
         console.log('AppComponent: EVENT_USER_LOGGEDIN: params', params);
@@ -168,14 +168,14 @@ export class AppComponent {
         try {
           //first sync then pull
           // await this.syncHelperSvc.push();
-          this.eventPub.$pub(SyncConstant.EVENT_SYNC_DATA_PULL);
+          this.pubsubSvc.publishEvent(SyncConstant.EVENT_SYNC_DATA_PULL);
         } catch (e) {
           //ignore
         }
       }
     });
     
-    this.eventPub.$sub(UserConstant.EVENT_USER_LOGGEDOUT, async () => {
+    this.pubsubSvc.subscribe(UserConstant.EVENT_USER_LOGGEDOUT, async () => {
       if(AppConstant.DEBUG) {
         console.log('AppComponent: EVENT_USER_LOGGEDOUT');
       }
@@ -213,7 +213,7 @@ export class AppComponent {
       wkl = 'en';
       await this.appSettingSvc.putWorkingLanguage(wkl);
     }
-    this.eventPub.$pub(AppConstant.EVENT_LANGUAGE_CHANGED, { wkLangauge: wkl, reload: false });
+    this.pubsubSvc.publishEvent(AppConstant.EVENT_LANGUAGE_CHANGED, { wkLangauge: wkl, reload: false });
     this.workingLanguage = wkl;
 
     let wkc = await res[2];
@@ -221,18 +221,18 @@ export class AppComponent {
       wkc = 'AED';
       await this.currencySettingSvc.putWorkingCurrency(wkc);
     }
-    this.eventPub.$pub(CurrencyConstant.EVENT_CURRENCY_CHANGED, { wkCurrency: wkc, reload: false });
+    this.pubsubSvc.publishEvent(CurrencyConstant.EVENT_CURRENCY_CHANGED, { wkCurrency: wkc, reload: false });
 
     //user
     const cUser = res[0];
     if(cUser) {
-      this.eventPub.$pub(UserConstant.EVENT_USER_LOGGEDIN, { user: cUser });
+      this.pubsubSvc.publishEvent(UserConstant.EVENT_USER_LOGGEDIN, { user: cUser });
       await this._navigateTo('/home');
 
       if(AppConstant.DEBUG) {
         console.log('AppComponent: _setDefaults: publishing EVENT_SYNC_DATA_PULL');
       }
-      this.eventPub.$pub(SyncConstant.EVENT_SYNC_DATA_PULL);
+      this.pubsubSvc.publishEvent(SyncConstant.EVENT_SYNC_DATA_PULL);
     } else {
       await this._navigateTo('/authentication/login');
     }

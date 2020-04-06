@@ -7,8 +7,8 @@ const { CapacitorSQLite } = Plugins;
 
 import { SchemaService, ITableOptions } from './schema.service';
 import { AppConstant } from "../app-constant";
-import { EventPublisher } from '../event-publisher';
 import { DbService } from './db-base.service';
+import { NgxPubSubService } from '@pscoped/ngx-pub-sub';
 
 @Injectable({
     providedIn: 'root'
@@ -19,7 +19,7 @@ export class DbSqlService implements DbService {
     private _isDbInitialized = false;
 
     constructor(private platform: Platform
-        , private eventPub: EventPublisher, private schemaSvc: SchemaService) {
+        , private pubsubSvc: NgxPubSubService, private schemaSvc: SchemaService) {
             this.platform.ready().then(async () => {
                 // await this._deleteDatabase();
                 this._db = CapacitorSQLite;
@@ -65,7 +65,7 @@ export class DbSqlService implements DbService {
                 await _self._prepareTables();
         
                 // heavy database operations should start from this...
-                _self.eventPub.$pub(AppConstant.EVENT_DB_INITIALIZED);
+                _self.pubsubSvc.publishEvent(AppConstant.EVENT_DB_INITIALIZED);
             }
         }, delay);
     }

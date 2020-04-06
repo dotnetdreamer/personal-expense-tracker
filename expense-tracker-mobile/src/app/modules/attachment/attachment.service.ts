@@ -96,29 +96,18 @@ export class AttachmentService extends BaseService {
 
                         const pItem: IAttachment = cp[item.id];
                         const pro = this.putLocal(pItem, true, true)
-                            .then(async (args) => {
+                            .then(async (args: any) => {
                                 //now update the dependent records as well
-                                if(dependantDataOptions && dependantDataOptions.data.length) {
-                                    const id = args.insertId;
-                                    const updatedData = [];
-
-                                    for(let a = 0; a < dependantDataOptions.data.length; a++) {
-                                        const dd = dependantDataOptions.data[a];
-                                        if(dd.attachment.id == item.id) {
-                                            const updatedAttachment = await this.getByIdLocal(id);
-                                            dd.attachment = updatedAttachment;
-                                        }
-                                        updatedData.push(dd);
-                                    }
-                                    dependantDataOptions.successCallback(updatedData);
-                                }
+                                await this._dependentDataCallback(item, dependantDataOptions, args);
                                 return args;
                             });
                         promises.push(pro);
-                       
-
                     } else if (item.markedForDelete) {
-                        const promise = this.remove(item.id);
+                        const promise = this.remove(item.id)
+                        .then(async (deletedItemId) => {
+                            //now update the dependent records as well
+                            await this._dependentDataCallback(item, dependantDataOptions);
+                        });
                         promises.push(promise);
                     }
                 }
@@ -129,7 +118,7 @@ export class AttachmentService extends BaseService {
                     console.log('AttachmentService: sync: complete');
                 }
                 //attachments have always dependents from other entities..let's push them
-                this.eventPub.$pub(SyncConstant.EVENT_SYNC_DATA_PUSH);
+                this.pubsubSvc.publishEvent(SyncConstant.EVENT_SYNC_DATA_PUSH);
                 resolve();
             } catch (e) {
                 reject(e);
@@ -169,7 +158,7 @@ export class AttachmentService extends BaseService {
         return this.dbService.putLocal(this.schemaService.tables.attachment, item)
         .then((insertId) => {
             if(!ignoreFiringEvent) {
-                this.eventPub.$pub(AppConstant.EVENT_ATTACHMENT_CREATED_OR_UPDATED, item);
+                this.pubsubSvc.publishEvent(AppConstant.EVENT_ATTACHMENT_CREATED_OR_UPDATED, item);
             }
             return {
                 insertId: insertId
@@ -218,5 +207,28 @@ export class AttachmentService extends BaseService {
 
     removeAll() {
         return this.dbService.removeAll(this.schemaService.tables.attachment);
+    }
+
+    private async _dependentDataCallback(item: IAttachment
+        , dependantDataOptions?: { data: any[], successCallback: (updatedData: any[]) => void }
+        , args?: { rowsAffected: any, insertId: any }) {
+        if(dependantDataOptions && dependantDataOptions.data.length) {
+            const updatedData = [];
+
+            for(let a = 0; a < dependantDataOptions.data.length; a++) {
+                const dd = dependantDataOptions.data[a];
+                if(dd.attachment.id == item.id) {
+                    if(dd.attachment.markedForAdd || dd.attachment.markedForUpdate) {
+                        const id = args.insertId;
+                        const updatedAttachment = await this.getByIdLocal(id);
+                        dd.attachment = updatedAttachment;
+                    } else if(dd.attachment.markedForDelete) {
+                        dd.attachment = null;
+                    }
+                }
+                updatedData.push(dd);
+            }
+            dependantDataOptions.successCallback(updatedData);
+        }
     }
 }

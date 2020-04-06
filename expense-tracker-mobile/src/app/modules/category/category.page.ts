@@ -85,7 +85,7 @@ export class CategoryPage extends BasePage implements OnInit {
 
         await this.categorySvc.putLocal(category);  
 
-        this.eventPub.$pub(SyncConstant.EVENT_SYNC_DATA_PUSH, SyncEntity.Category);
+        this.pubsubSvc.publishEvent(SyncConstant.EVENT_SYNC_DATA_PUSH, SyncEntity.Category);
         await this._getCategories();
       }
     }
@@ -166,7 +166,7 @@ export class CategoryPage extends BasePage implements OnInit {
             }
             await this.categorySvc.putLocal(cat);   
 
-            this.eventPub.$pub(SyncConstant.EVENT_SYNC_DATA_PUSH, SyncEntity.Category);
+            this.pubsubSvc.publishEvent(SyncConstant.EVENT_SYNC_DATA_PUSH, SyncEntity.Category);
             await this._getCategories();
           }
         }

@@ -10,6 +10,7 @@ import { AppInjector } from './modules/shared/app-injector';
 import { PipesModule } from './pipes/pipes.module';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
+import { NgxPubSubModule } from '@pscoped/ngx-pub-sub';
 
 @NgModule({
   declarations: [AppComponent],
@@ -20,6 +21,7 @@ import { environment } from '../environments/environment';
     PipesModule,
     IonicModule.forRoot(),
     AppRoutingModule,
+    NgxPubSubModule,
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production })
   ],
   providers: [

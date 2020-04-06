@@ -137,10 +137,12 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit, OnDes
     }
 
     await this.expenseSvc.putLocal(exp);
-    this.eventPub.$pub(SyncConstant.EVENT_SYNC_DATA_PUSH, SyncEntity.Expense);
-
     await this.helperSvc.presentToastGenericSuccess();
 
+    //fire after the page navigates away...
+    setTimeout(() => {
+      this.pubsubSvc.publishEvent(SyncConstant.EVENT_SYNC_DATA_PUSH, SyncEntity.Expense);
+    }, 300);
     // if (window.history.length > 1) {
       await this.location.back();
     // } 

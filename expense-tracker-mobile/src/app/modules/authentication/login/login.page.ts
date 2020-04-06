@@ -34,7 +34,7 @@ export class LoginPage extends BasePage implements OnInit, OnDestroy {
     if(profile) {
       this.canDeactivate = true;
 
-      this.eventPub.$pub(UserConstant.EVENT_USER_LOGGEDIN, { 
+      this.pubsubSvc.publishEvent(UserConstant.EVENT_USER_LOGGEDIN, { 
         user: profile, 
         redirectToHome: true,
         pull: true

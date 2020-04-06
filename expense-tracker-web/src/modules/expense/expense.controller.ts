@@ -115,10 +115,12 @@ export class ExpenseController {
     //attachment
     if(mExp.attachmentId) {
       const attachment = await this.attachmentSvc.findOne(mExp.attachmentId);
-      mExp["attachment"] = {
-        ...attachment,
-        attachment: `${AppConstant.UPLOADED_PATH_FILES}/${attachment.guid}.${attachment.extension}`
-      };
+      if(!attachment.isDeleted) {
+        mExp["attachment"] = {
+          ...attachment,
+          attachment: `${AppConstant.UPLOADED_PATH_FILES}/${attachment.guid}.${attachment.extension}`
+        };
+      }
     }
 
     //remove 

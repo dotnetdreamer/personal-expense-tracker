@@ -1,6 +1,8 @@
 import { Component, OnInit, ViewEncapsulation, OnDestroy, NgZone } from '@angular/core';
 
-import { Subscription } from 'rxjs';
+import { Subscription, Observable } from 'rxjs';
+import { debounce, debounceTime } from 'rxjs/operators';
+
 import { AlertController, IonItemSliding } from '@ionic/angular';
 import * as moment from 'moment';
 
@@ -49,7 +51,10 @@ export class ExpenseListingPage extends BasePage implements OnInit, OnDestroy {
       to: toDate
     };
 
-    await this._getExpenses();
+    //fix: navigation lag
+    setTimeout(async () => {
+      await this._getExpenses();
+    }, 300);
   }
 
   async onMonthChanged(args: { start, end, month }) {
@@ -120,7 +125,7 @@ export class ExpenseListingPage extends BasePage implements OnInit, OnDestroy {
 
         await this.expenseSvc.putLocal(expense);
         
-        this.eventPub.$pub(SyncConstant.EVENT_SYNC_DATA_PUSH, SyncEntity.Expense);
+        this.pubsubSvc.publishEvent(SyncConstant.EVENT_SYNC_DATA_PUSH, SyncEntity.Expense);
         await this.helperSvc.presentToastGenericSuccess();
       }
     }
@@ -128,7 +133,7 @@ export class ExpenseListingPage extends BasePage implements OnInit, OnDestroy {
 
   async doRefresh(ev) {
     //reset
-    this.eventPub.$pub(SyncConstant.EVENT_SYNC_DATA_PUSH, SyncEntity.Expense);
+    this.pubsubSvc.publishEvent(SyncConstant.EVENT_SYNC_DATA_PUSH, SyncEntity.Expense);
 
     setTimeout(() => {
       ev.target.complete();
@@ -177,32 +182,60 @@ export class ExpenseListingPage extends BasePage implements OnInit, OnDestroy {
   }
 
   private _subscribeToEvents() {
-    // this._expenseCreatedOrUpdatedSub = this.eventPub.$sub(AppConstant.EVENT_EXPENSE_CREATED_OR_UPDATED, async (expense: IExpense) => {
+    // this._expenseCreatedOrUpdatedSub = this.pubsubSvc.subscribe(AppConstant.EVENT_EXPENSE_CREATED_OR_UPDATED, async (expense: IExpense) => {
     //   if(AppConstant.DEBUG) {
     //     console.log('ExpenseListingPage: EVENT_EXPENSE_CREATED_OR_UPDATED: expense', expense);
     //   }
     //   await this._getExpenses();
     // });
 
-    this._syncDataPushCompleteSub = this.eventPub.$sub(SyncConstant.EVENT_SYNC_DATA_PUSH_COMPLETE, async () => {
-      if(AppConstant.DEBUG) {
-        console.log('ExpenseListingPage:Event received: EVENT_SYNC_DATA_PUSH_COMPLETE');
-      }
-      //force refresh...
-      this.expenses = [];
-      setTimeout(async () => {
-        await this._getExpenses();
-      });
+    this.pubsubSvc.getEventObservable(SyncConstant.EVENT_SYNC_DATA_PUSH_COMPLETE)
+      .pipe(debounceTime(500))
+      .subscribe(() => {
+        if(AppConstant.DEBUG) {
+          console.log('ExpenseListingPage:Event received: EVENT_SYNC_DATA_PUSH_COMPLETE');
+        }
+        //force refresh...
+        this.expenses = [];
+        setTimeout(async () => {
+          await this._getExpenses();
+        });
     });
+
+    // this._syncDataPushCompleteSub = this.pubsubSvc.subscribe(SyncConstant.EVENT_SYNC_DATA_PUSH_COMPLETE, async () => {
+    //   if(AppConstant.DEBUG) {
+    //     console.log('ExpenseListingPage:Event received: EVENT_SYNC_DATA_PUSH_COMPLETE');
+    //   }
+    //   //force refresh...
+    //   this.expenses = [];
+    //   setTimeout(async () => {
+    //     await this._getExpenses();
+    //   });
+    // });
 
     //important to add here since the application loads and the view will show but there will be no data...
     //this is needed only when the application runs first time (i.e startup)
-    // this._syncInitSub = this.eventPub.$sub(SyncConstant.EVENT_SYNC_DATA_PULL_COMPLETE, async () => {
+    // this._syncInitSub = this.pubsubSvc.subscribe(SyncConstant.EVENT_SYNC_DATA_PULL_COMPLETE, async () => {
     //   if(AppConstant.DEBUG) {
     //     console.log('ExpenseListingPage:Event received: EVENT_SYNC_DATA_PULL_COMPLETE');
     //   }
     //   await this._getExpenses();
     // });
+  }
+
+  private _debounce(func, wait, immediate?) {
+    var timeout;
+    return function() {
+      var context = this, args = arguments;
+      var later = function() {
+        timeout = null;
+        if (!immediate) func.apply(context, args);
+      };
+      var callNow = immediate && !timeout;
+      clearTimeout(timeout);
+      timeout = setTimeout(later, wait);
+      if (callNow) func.apply(context, args);
+    };
   }
 
   private async _presentUpdateModal(expense: IExpense) {
@@ -256,8 +289,8 @@ export class ExpenseListingPage extends BasePage implements OnInit, OnDestroy {
               updatedOn: null
             });   
 
-            this.eventPub.$pub(SyncConstant.EVENT_SYNC_DATA_PUSH, SyncEntity.Expense);
-            // this.eventPub.$pub(SyncConstant.EVENT_SYNC_DATA_PUSH, SyncEntity.Expense);
+            this.pubsubSvc.publishEvent(SyncConstant.EVENT_SYNC_DATA_PUSH, SyncEntity.Expense);
+            // this.pubsubSvc.publishEvent(SyncConstant.EVENT_SYNC_DATA_PUSH, SyncEntity.Expense);
           }
         }
       ]

@@ -92,7 +92,7 @@ export class SettingPage extends BasePage implements OnInit, OnDestroy {
 
   async onSyncButtonClicked() {
     this.isSyncInProgress = true;
-    this.eventPub.$pub(SyncConstant.EVENT_SYNC_DATA_PUSH);
+    this.pubsubSvc.publishEvent(SyncConstant.EVENT_SYNC_DATA_PUSH);
   }
 
   async onDeleteDbClickec() {
@@ -112,7 +112,7 @@ export class SettingPage extends BasePage implements OnInit, OnDestroy {
   }
 
   private _subscribeToEvents() {
-    this._syncDataPushCompleteSub = this.eventPub.$sub(SyncConstant.EVENT_SYNC_DATA_PUSH_COMPLETE, async () => {
+    this._syncDataPushCompleteSub = this.pubsubSvc.subscribe(SyncConstant.EVENT_SYNC_DATA_PUSH_COMPLETE, async () => {
       if(AppConstant.DEBUG) {
         console.log('SettingPage:Event received: EVENT_SYNC_DATA_PUSH_COMPLETE');
       }
