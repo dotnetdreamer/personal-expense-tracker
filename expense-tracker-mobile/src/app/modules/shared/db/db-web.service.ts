@@ -169,7 +169,7 @@ export class DbWebService implements DbService {
 
     remove(store, key): Promise<any> {
         return new Promise((resolve, reject) => {
-            this.db.remove(store, key).done(key => {
+            this.db.remove(store, key).done((result) => {
                 resolve(key);
             });
         });
@@ -177,8 +177,8 @@ export class DbWebService implements DbService {
 
     removeAll(store) {
         return new Promise((resolve, reject) => {
-            this.db.clear(store).done(key => {
-                resolve(key);
+            this.db.clear(store).done(result => {
+                resolve(result);
             });
         });
     }
