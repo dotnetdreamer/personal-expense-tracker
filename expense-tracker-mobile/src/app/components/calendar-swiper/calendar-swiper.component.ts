@@ -113,7 +113,7 @@ export class CalendarSwiperComponent implements AfterViewInit, OnDestroy {
 
             setTimeout(() => {
                 //month starts from 1, let's make it index...
-                swiper.slideTo(currentMonth - 1, 100);	
+                swiper.slideTo(currentMonth - 1, 0);	
                 setTimeout(() => {
                     this._swiperLoaded = true;
                 }, 300)
