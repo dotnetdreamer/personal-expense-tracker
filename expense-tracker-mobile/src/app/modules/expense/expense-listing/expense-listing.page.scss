@@ -12,21 +12,8 @@ page-expense-listing {
         }
     }
     .expenses {
-        ion-item-sliding {
-            ion-item {
-                
-            }
+        ion-item {
             
-            ion-item-options {
-                ion-item-option {
-                    width: 60px;
-
-                    ion-icon {
-                        font-size: 24px;
-                    }
-                }
-            }
         }
-
     }
 }

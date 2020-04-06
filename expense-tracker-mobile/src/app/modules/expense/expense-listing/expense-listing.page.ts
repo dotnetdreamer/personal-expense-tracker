@@ -99,35 +99,11 @@ export class ExpenseListingPage extends BasePage implements OnInit, OnDestroy {
   }
 
   async onExpenseItemClicked(ev: CustomEvent, expense: IExpense
-    , action: 'detail' | 'edit' | 'delete', slidingItem: IonItemSliding) {
+    , action: 'detail' | 'edit' | 'delete') {
     ev.stopImmediatePropagation();
-    await slidingItem.close();
     
     if(action == 'detail') {
       await this.navigate({ path: '/expense/expense-detail', params: { id: expense.id }});
-    } else if(action === 'edit') {
-      //wait till item is synced...
-      // if(expense.markedForAdd || expense.markedForUpdate || expense.markedForDelete) {
-      //   return;
-      // }
-      // await this._presentUpdateModal(expense);
-      await this.navigate({ 
-        path: '/expense/expense-create-or-update', 
-        params: { 
-          id: expense.id 
-        } 
-      });
-    } else if(action === 'delete') {
-      const res = await this.helperSvc.presentConfirmDialog();
-      if(res) {
-        expense.markedForDelete = true;
-        expense.updatedOn = null;
-
-        await this.expenseSvc.putLocal(expense);
-        
-        this.pubsubSvc.publishEvent(SyncConstant.EVENT_SYNC_DATA_PUSH, SyncEntity.Expense);
-        await this.helperSvc.presentToastGenericSuccess();
-      }
     }
   }
 

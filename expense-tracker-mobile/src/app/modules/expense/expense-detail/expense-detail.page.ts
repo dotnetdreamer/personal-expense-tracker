@@ -10,6 +10,10 @@ import { ExpenseService } from '../expense.service';
 import { IExpense } from '../expense.model';
 import { IAttachment } from '../../attachment/attachment.model';
 import { Subscription } from 'rxjs';
+import { PopoverController } from '@ionic/angular';
+import { ExpenseDetailOption } from './expense-option.popover';
+import { SyncConstant } from '../../shared/sync/sync-constant';
+import { SyncEntity } from '../../shared/sync/sync.model';
 
 @Component({
   selector: 'page-expense-detail',
@@ -24,6 +28,7 @@ export class ExpenseDetailPage extends BasePage implements OnInit, OnDestroy {
 
   private _routeParamsSub: Subscription;
   constructor(private activatedRoute: ActivatedRoute
+    , private popoverCtrl: PopoverController
     , private expenseSvc: ExpenseService) {
     super();
   }
@@ -44,6 +49,39 @@ export class ExpenseDetailPage extends BasePage implements OnInit, OnDestroy {
       await Browser.open({ url: `${AppConstant.BASE_URL}${expense.attachment.attachment}` });
     }
   }
+
+  async onMoreOptionsClicked(eve) {
+    const popCtrl = await this.popoverCtrl.create({
+      component: ExpenseDetailOption,
+      event: eve,
+      componentProps: {
+        expense: this.expense
+      }
+    });
+    await popCtrl.present();
+
+    const { data } = await popCtrl.onDidDismiss();
+    if(data == 'delete') {
+      const res = await this.helperSvc.presentConfirmDialog();
+      if(res) {
+        this.expense.markedForDelete = true;
+        this.expense.updatedOn = null;
+
+        await this.expenseSvc.putLocal(this.expense);
+        
+        this.pubsubSvc.publishEvent(SyncConstant.EVENT_SYNC_DATA_PUSH, SyncEntity.Expense);
+        await this.helperSvc.presentToastGenericSuccess();
+      }
+    } else if(data == 'edit') {
+      await this.navigate({ 
+        path: '/expense/expense-create-or-update', 
+        params: { 
+          id: this.expense.id
+        } 
+      });
+    }
+  }
+  
 
   ngOnDestroy() {
     if(this._routeParamsSub) {

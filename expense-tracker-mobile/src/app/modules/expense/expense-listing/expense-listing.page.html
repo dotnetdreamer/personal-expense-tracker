@@ -22,50 +22,38 @@
 
   <no-data *ngIf="!expenses.length"></no-data>
   <ion-virtual-scroll [items]="expenses" approxItemHeight="85px" class="expenses">
-    <!-- <ion-item-sliding *ngFor="let item of expenses"> -->
-    <ion-item-sliding #slidingItem *virtualItem="let item;let index=index;">
-        <ion-item lines="none" (click)="onExpenseItemClicked($event, item, 'detail', slidingItem)">
-        <div class="expense-item" [class.expense-item-even]="index % 2">
-          <div class="icon-container">
-            <ion-icon [attr.name]="item.category.icon" 
-              *ngIf="!item.markedForAdd && !item.markedForUpdate && !item.markedForDelete"></ion-icon>
-            <ion-icon name="refresh" class="animated infinite spin" 
-              *ngIf="item.markedForAdd || item.markedForUpdate || item.markedForDelete"></ion-icon>
+    <ion-item lines="none" *virtualItem="let item;let index=index;" 
+      (click)="onExpenseItemClicked($event, item, 'detail')">
+      <div class="expense-item" [class.expense-item-even]="index % 2">
+        <div class="icon-container">
+          <ion-icon [attr.name]="item.category.icon" 
+            *ngIf="!item.markedForAdd && !item.markedForUpdate && !item.markedForDelete"></ion-icon>
+          <ion-icon name="refresh" class="animated infinite spin" 
+            *ngIf="item.markedForAdd || item.markedForUpdate || item.markedForDelete"></ion-icon>
+        </div>
+        <div class="category-description-amount">
+          <div class="category-description">
+            <div class="description" [innerHTML]="(item.description | slice:0:40) | highlightsearch: searchTerm"></div>
+            <div class="category-notes-attachment">
+              <div class="category" [innerHTML]=" item.category?.name | highlightsearch: searchTerm"></div>
+              <ion-icon slot="icon-only" name="reader-outline" *ngIf="item.notes"></ion-icon>        
+              <ion-icon slot="icon-only" name="receipt-outline" *ngIf="item.attachment"></ion-icon>        
+            </div>
           </div>
-          <div class="category-description-amount">
-            <div class="category-description">
-              <div class="description" [innerHTML]="(item.description | slice:0:40) | highlightsearch: searchTerm"></div>
-              <div class="category-notes-attachment">
-                <div class="category" [innerHTML]=" item.category?.name | highlightsearch: searchTerm"></div>
-                <ion-icon slot="icon-only" name="reader-outline" *ngIf="item.notes"></ion-icon>        
-                <ion-icon slot="icon-only" name="receipt-outline" *ngIf="item.attachment"></ion-icon>        
+          <div class="amount-date">
+            <div class="amount">{{item.amount}}&nbsp;{{workingCurrency}}</div>
+            <ng-container *ngIf="dates.todayDate">
+              <div class="date" *ngIf="dates?.todayDate != (item.createdOn | formateDate | async)">
+                {{item.createdOn | formateDate | async}}
               </div>
-            </div>
-            <div class="amount-date">
-              <div class="amount">{{item.amount}}&nbsp;{{workingCurrency}}</div>
-              <ng-container *ngIf="dates.todayDate">
-                <div class="date" *ngIf="dates?.todayDate != (item.createdOn | formateDate | async)">
-                  {{item.createdOn | formateDate | async}}
-                </div>
-                <div class="date" *ngIf="dates?.todayDate == (item.createdOn | formateDate | async)">
-                  {{'expense.today' | localizedresource | async}}
-                </div>  
-              </ng-container>
-            </div>
+              <div class="date" *ngIf="dates?.todayDate == (item.createdOn | formateDate | async)">
+                {{'expense.today' | localizedresource | async}}
+              </div>  
+            </ng-container>
           </div>
         </div>
-      </ion-item>
-      <!-- <ng-container *ngIf="!item.markedForAdd && !item.markedForUpdate && !item.markedForDelete"> -->
-        <ion-item-options side="end">
-          <ion-item-option (click)="onExpenseItemClicked($event, item, 'edit', slidingItem)">
-            <ion-icon name="pencil"></ion-icon>
-          </ion-item-option>
-          <ion-item-option color="danger" (click)="onExpenseItemClicked($event, item, 'delete', slidingItem)">
-            <ion-icon name="trash"></ion-icon>
-          </ion-item-option>
-        </ion-item-options>
-      <!-- </ng-container> -->
-    </ion-item-sliding>
+      </div>
+    </ion-item>
   </ion-virtual-scroll>
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
     <ion-fab-button (click)="onAddClicked()">
