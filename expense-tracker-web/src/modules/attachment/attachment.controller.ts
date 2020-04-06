@@ -70,8 +70,6 @@ export class AttachmentController {
   
           const item = await this.attachmentSvc.save(toAdd);
           returnedItem = item;        
-          
-          delete returnedItem.markedForAdd;
         } else if(model.markedForUpdate) {
           const toUpdate = await this.attachmentSvc.findOne(model.id);
           if(!toUpdate) {
@@ -80,8 +78,6 @@ export class AttachmentController {
       
           let updated = await this._updateOrDelete(toUpdate, model, false);
           returnedItem = updated;
-  
-          delete returnedItem.markedForUpdate;
         } else if(model.markedForDelete) {
           const toDelete = await this.attachmentSvc.findOne(model.id);
           if(!toDelete) {
@@ -90,8 +86,6 @@ export class AttachmentController {
   
           let deleted = await this._updateOrDelete(toDelete, model, true);
           returnedItem = deleted;
-          
-          delete returnedItem.markedForDelete;
         }
 
         returnedItem = await this._prepare(returnedItem);
@@ -106,7 +100,7 @@ export class AttachmentController {
     private async _updateOrDelete(toUpdateOrDelete: Attachment, model, shouldDelete?: boolean) {
       //no need to update
       delete toUpdateOrDelete.createdOn;
-      toUpdateOrDelete.isDeleted = shouldDelete;
+      model.isDeleted = shouldDelete;
   
       let updated = Object.assign(toUpdateOrDelete, model);
       await this.attachmentSvc.save(updated);
