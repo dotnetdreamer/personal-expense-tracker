@@ -86,8 +86,9 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit, OnDes
       this.f.amount.setValue(this._expense.amount);
       this.f.notes.setValue(this._expense.notes);
 
-      this.f.date.setValue(this._expense.createdOn);
-      this.todayDate = this._expense.createdOn;
+      const cr = moment(this._expense.createdOn).local().format(AppConstant.DEFAULT_DATE_FORMAT);
+      this.f.date.setValue(cr);
+      this.todayDate = cr;
 
       if(this._expense.attachment) {
         this.attachment = this._expense.attachment;
@@ -117,6 +118,13 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit, OnDes
     if(this._expense) {
       exp.id = this._expense.id;
       exp.markedForUpdate = true;
+
+      //do not change the date if same, otherwise it will update the time of createdOn also
+      const cr = moment(this._expense.createdOn).local().format(AppConstant.DEFAULT_DATE_FORMAT);
+      if(cr == args.date) {
+        exp.createdOn = moment(this._expense.createdOn).local()
+        .format(AppConstant.DEFAULT_DATETIME_FORMAT);
+      }
     }
     if(AppConstant.DEBUG) {
       console.log('ExpenseCreateOrUpdatePage: onSaveClick: exp', exp)
