@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewEncapsulation, OnDestroy, NgZone } from '@angular/core';
 
 import { Subscription, Observable } from 'rxjs';
-import { debounce, debounceTime } from 'rxjs/operators';
+import { debounceTime } from 'rxjs/operators';
 
 import { AlertController, IonItemSliding } from '@ionic/angular';
 import * as moment from 'moment';
@@ -189,9 +189,16 @@ export class ExpenseListingPage extends BasePage implements OnInit, OnDestroy {
     //   await this._getExpenses();
     // });
 
-    this.pubsubSvc.getEventObservable(SyncConstant.EVENT_SYNC_DATA_PUSH_COMPLETE)
-      .pipe(debounceTime(500))
-      .subscribe(() => {
+    //EVENT_SYNC_DATA_PUSH_COMPLETE is fired by multiple sources, we debounce subscription to execute this once
+    const obv = new Observable(observer => {
+      //next will call the observable and pass parameter to subscription
+      const callback = (params) => observer.next(params);
+      const subc = this.pubsubSvc.subscribe(SyncConstant.EVENT_SYNC_DATA_PUSH_COMPLETE, callback);
+      //will be called when unsubscribe calls
+      return () => subc.unsubscribe()
+    });
+    this._syncDataPushCompleteSub = obv.pipe(debounceTime(500))
+    .subscribe(() => {
         if(AppConstant.DEBUG) {
           console.log('ExpenseListingPage:Event received: EVENT_SYNC_DATA_PUSH_COMPLETE');
         }

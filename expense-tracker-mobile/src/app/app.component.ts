@@ -3,6 +3,8 @@ import { Component, ViewEncapsulation, Renderer2, Inject } from '@angular/core';
 import { Plugins } from '@capacitor/core';
 const { SplashScreen, StatusBar, Device } = Plugins;
 import { Platform } from '@ionic/angular';
+import { Subscription, Observable } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
 
 import { AppSettingService } from './modules/shared/app-setting.service';
 import { Router } from '@angular/router';
@@ -116,20 +118,12 @@ export class AppComponent {
       }
     });
 
+    
     this.pubsubSvc.subscribe(SyncConstant.EVENT_SYNC_DATA_PUSH, async (table?) => {
       if(AppConstant.DEBUG) {
         console.log('HomePage: EVENT_SYNC_DATA_PUSH: table:', table);
       }
       await this.syncHelperSvc.push(table);
-    });
-
-    this.pubsubSvc.subscribe(SyncConstant.EVENT_SYNC_DATA_PUSH_COMPLETE, async (totalTables) => {
-      if(AppConstant.DEBUG) {
-        console.log('AppComponent: EVENT_SYNC_DATA_PUSH_COMPLETE: totalTables', totalTables);
-      }
-      // setTimeout(() => {
-      //   this.isSyncing = false;
-      // }, 1000);
     });
 
     this.pubsubSvc.subscribe(SyncConstant.EVENT_SYNC_DATA_PULL, async (table?) => {
@@ -183,6 +177,20 @@ export class AppComponent {
 
       //redirect to login...
       await this._navigateTo('/authentication/login', null, true);
+    });
+
+    //EVENT_SYNC_DATA_PUSH_COMPLETE is fired by multiple sources, we debounce subscription to execute this once
+    const obv = new Observable(observer => {
+      //next will call the observable and pass parameter to subscription
+      const callback = (params) => observer.next(params);
+      const subc = this.pubsubSvc.subscribe(SyncConstant.EVENT_SYNC_DATA_PUSH_COMPLETE, callback);
+      //will be called when unsubscribe calls
+      return () => subc.unsubscribe()
+    }).pipe(debounceTime(500))
+      .subscribe((totalTables) => {
+      if(AppConstant.DEBUG) {
+        console.log('AppComponent: EVENT_SYNC_DATA_PUSH_COMPLETE: totalTables', totalTables);
+      }
     });
   }
 

@@ -1,12 +1,13 @@
 import { Component, OnInit, ViewEncapsulation, ViewChild, ElementRef, AfterViewInit, OnDestroy } from '@angular/core';
 
 import * as moment from 'moment';
+import { Subscription, Observable } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
 
 import { ExpenseService } from '../../expense/expense.service';
 import { AppConstant } from '../../shared/app-constant';
 import { BasePage } from '../../shared/base.page';
 import { SyncConstant } from '../../shared/sync/sync-constant';
-import { Subscription } from 'rxjs';
 import { CurrencySettingService } from '../../currency/currency-setting.service';
 
 import {
@@ -286,12 +287,22 @@ export class DashboardPage extends BasePage implements AfterViewInit, OnDestroy 
     });
 
     //we add item...after successfuly sync, reload to hide that spinner icon from each expense item
-    this._syncDataPushCompleteSub = this.pubsubSvc.subscribe(SyncConstant.EVENT_SYNC_DATA_PUSH_COMPLETE, async () => {
-      if(AppConstant.DEBUG) {
-        console.log('DashboardPage:Event received: EVENT_SYNC_DATA_PUSH_COMPLETE');
-      }
-      await this._getTodayExpenses();
-      await this._renderCharts(this.selectedFromDate, this.selectedToDate);
+    //EVENT_SYNC_DATA_PUSH_COMPLETE is fired by multiple sources, we debounce subscription to execute this once
+    const obv = new Observable(observer => {
+      //next will call the observable and pass parameter to subscription
+      const callback = (params) => observer.next(params);
+      const subc = this.pubsubSvc.subscribe(SyncConstant.EVENT_SYNC_DATA_PUSH_COMPLETE, callback);
+      //will be called when unsubscribe calls
+      return () => subc.unsubscribe()
+    });
+    this._syncDataPushCompleteSub = obv.pipe(debounceTime(500))
+    .subscribe(async () => {
+        if(AppConstant.DEBUG) {
+          console.log('DashboardPage:Event received: EVENT_SYNC_DATA_PUSH_COMPLETE');
+        }
+
+        await this._getTodayExpenses();
+        await this._renderCharts(this.selectedFromDate, this.selectedToDate);
     });
     
   }
