@@ -36,7 +36,7 @@ export class CategoryService extends BaseService {
                     await this.putAllLocal(items, true, true);
                 }
                 resolve();
-            }catch (e) {
+            } catch (e) {
                 reject(e);
             }
         });

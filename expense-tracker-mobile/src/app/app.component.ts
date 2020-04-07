@@ -130,7 +130,11 @@ export class AppComponent {
       if(AppConstant.DEBUG) {
         console.log('HomePage: EVENT_SYNC_DATA_PULL: table:', table);
       }
-      await this.syncHelperSvc.pull(table);
+      try {
+        await this.syncHelperSvc.pull(table);
+      } catch(e) {
+        //ignore...
+      }
     });
 
     this.pubsubSvc.subscribe(SyncConstant.EVENT_SYNC_DATA_PULL_COMPLETE, async () => {
