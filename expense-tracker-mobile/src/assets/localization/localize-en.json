@@ -56,6 +56,9 @@
         "profile": "Profile",
         "email": "Email",
         "password": "Password",
+        "confirm_password": "Confirm password",
+        "mobile": "Mobile",
+        "name": "Name",
         "forgot_password": "Forgot Password?",
 
         "login": {

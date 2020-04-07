@@ -14,6 +14,9 @@ export class BasePage {
     protected localizationSvc: LocalizationService;
     protected pubsubSvc: NgxPubSubService;
 
+    //used in BackButtonDisableService
+    protected canDeactivate = false;
+
     constructor() {
         const injector = AppInjector.getInjector();
 

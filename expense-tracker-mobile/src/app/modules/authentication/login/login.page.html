@@ -15,7 +15,7 @@
         </ion-item>
         <ion-item>
           <ion-label position="floating">{{'user.password' | localizedresource | async}}</ion-label>
-          <ion-input></ion-input>
+          <ion-input type="password"></ion-input>
         </ion-item>
       </ion-list>
       <div class="buttons-container">
@@ -27,7 +27,7 @@
         <ion-button fill="clear">
           {{'user.forgot_password' | localizedresource | async}}
         </ion-button>
-        <ion-button fill="clear">
+        <ion-button fill="clear" (click)="onRegisterClicked()">
           {{'user.register.title' | localizedresource | async}}
         </ion-button>
       </div>

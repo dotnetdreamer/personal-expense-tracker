@@ -18,8 +18,8 @@ import { AppConstant } from '../../shared/app-constant';
 export class LoginPage extends BasePage implements OnInit, OnDestroy {
   @ViewChild('gSigninButton') gSigninButton: ElementRef;
 
-  //used in BackButtonDisableService
-  canDeactivate = false;
+  // //used in BackButtonDisableService
+  // canDeactivate = false;
 
   constructor(private authSvc: AuthenticationService
     , private userSettingSvc: UserSettingService) { 
@@ -42,8 +42,21 @@ export class LoginPage extends BasePage implements OnInit, OnDestroy {
     }
   }
 
+  async onRegisterClicked() { 
+    this.canDeactivate = true;
+    await this.navigate({ path: '/authentication/register' });
+
+    this._resetDeactivate();
+  }
+
   ngOnDestroy() {
 
+  }
+
+  private _resetDeactivate() {
+    setTimeout(() => {
+      this.canDeactivate = false;
+    });
   }
 
 }

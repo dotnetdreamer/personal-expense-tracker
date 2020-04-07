@@ -21,23 +21,6 @@ page-auth-login {
         // }
 
         .container {
-            height: 100%;
-            text-align: center;
-            position: relative;
-            display: flex;
-            align-items: center;
-            flex-direction: column;
-            justify-content: center;
-
-            > ion-icon { 
-                font-size: 100px;
-            }
-
-            .custom-form {
-                min-width: 320px;
-                width: auto;
-            }
-
             .social-media-container {
                 position: absolute;
                 width: 100%;

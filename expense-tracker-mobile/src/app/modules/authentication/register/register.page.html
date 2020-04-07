@@ -1,0 +1,43 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>{{'user.register.title' | localizedresource | async}}</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="container">
+    <ion-icon name="person-add"></ion-icon>
+    <form class="custom-form">
+      <ion-list>
+        <ion-item>
+          <ion-label position="floating">{{'user.email' | localizedresource | async}}*</ion-label>
+          <ion-input></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="floating">{{'user.name' | localizedresource | async}}*</ion-label>
+          <ion-input></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="floating">{{'user.mobile' | localizedresource | async}}</ion-label>
+          <ion-input type="tel"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="floating">{{'user.password' | localizedresource | async}}*</ion-label>
+          <ion-input type="password"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="floating">{{'user.confirm_password' | localizedresource | async}}*</ion-label>
+          <ion-input type="confirmPassword"></ion-input>
+        </ion-item>
+      </ion-list>
+      <div class="buttons-container">
+        <ion-button type="submit">
+          {{'user.register.title' | localizedresource | async}}
+        </ion-button>
+      </div>
+    </form>
+  </div>
+</ion-content>
