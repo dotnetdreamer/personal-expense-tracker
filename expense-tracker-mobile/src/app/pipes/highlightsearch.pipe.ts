@@ -15,6 +15,10 @@ export class HighlightSearchPipe implements PipeTransform {
             return;
         }
 
+        if(term.length < 3) {
+            return originalText;
+        }
+
         // if(typeof originalText === 'Object') {
         //     return originalText;
         // }
