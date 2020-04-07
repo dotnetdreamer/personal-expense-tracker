@@ -56,6 +56,7 @@
         "profile": "Profile",
         "email": "Email",
         "password": "Password",
+        "forgot_password": "Forgot Password?",
 
         "login": {
             "title": "Login",
