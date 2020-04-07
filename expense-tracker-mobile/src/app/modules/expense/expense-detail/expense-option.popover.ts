@@ -14,8 +14,13 @@ import { IExpense } from '../expense.model';
             </ion-item>
             <!-- only can delete newly added item -->
             <ion-item (click)="dismiss('delete')" [disabled]="expense.markedForUpdate || expense.markedForDelete">
-                <ion-icon slot="start" name="trash"></ion-icon>
+                <ion-icon color="danger" slot="start" name="trash"></ion-icon>
                 <ion-label>{{'common.delete' | localizedresource | async }}</ion-label>
+            </ion-item>
+            <!-- forcely delete even if it is marked for edit/update -->
+            <ion-item (click)="dismiss('delete_force')" [disabled]="expense.markedForAdd || !(expense.markedForUpdate || expense.markedForDelete)">
+                <ion-icon color="danger" slot="start" name="trash"></ion-icon>
+                <ion-label>{{'common.delete_force' | localizedresource | async }}</ion-label>
             </ion-item>
         </ion-list>
     `,
@@ -30,7 +35,7 @@ export class ExpenseDetailOption implements OnInit {
     ngOnInit() {
     }
 
-    async dismiss(opt: 'edit' | 'delete') {
+    async dismiss(opt: 'edit' | 'delete' | 'delete_force') {
         await this.popoverCtrl.dismiss(opt);
     }
 }

@@ -5,6 +5,7 @@
         "ok": "OK",
         "edit": "Edit",
         "delete": "Delete",
+        "delete_force": "Force Delete",
         "cancel": "Cancel",
         "yes": "Yes",
         "no": "No",

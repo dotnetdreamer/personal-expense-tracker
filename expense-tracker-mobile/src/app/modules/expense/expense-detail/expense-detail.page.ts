@@ -62,16 +62,21 @@ export class ExpenseDetailPage extends BasePage implements OnInit, OnDestroy {
     await popCtrl.present();
 
     const { data } = await popCtrl.onDidDismiss();
-    if(data == 'delete') {
+    if(data == 'delete' || data == 'delete_force') {
       const res = await this.helperSvc.presentConfirmDialog();
       if(res) {
         //if newly added item, then remove it completly 
-        if(this.expense.markedForAdd) {
+        if(data == 'delete') {
+          if(this.expense.markedForAdd) {
+            await this.expenseSvc.remove(this.expense.id);
+          } else {
+            this.expense.markedForDelete = true;
+            this.expense.updatedOn = null;
+
+            await this.expenseSvc.putLocal(this.expense);
+          }
+        } else if(data == 'delete_force') {
           await this.expenseSvc.remove(this.expense.id);
-        } else {
-          this.expense.markedForDelete = true;
-          this.expense.updatedOn = null;
-          await this.expenseSvc.putLocal(this.expense);
         }
 
         await this.location.back();
@@ -84,7 +89,8 @@ export class ExpenseDetailPage extends BasePage implements OnInit, OnDestroy {
         path: '/expense/expense-create-or-update', 
         params: { 
           id: this.expense.id
-        } 
+        },
+        extras: { replaceUrl: true }
       });
     }
   }
