@@ -1,4 +1,5 @@
 import { Component, OnInit, ViewEncapsulation, ViewChild, ElementRef, OnDestroy } from '@angular/core';
+import { Location } from '@angular/common';
 
 import { Plugins } from '@capacitor/core';
 const { Browser } = Plugins;
@@ -28,7 +29,7 @@ export class ExpenseDetailPage extends BasePage implements OnInit, OnDestroy {
 
   private _routeParamsSub: Subscription;
   constructor(private activatedRoute: ActivatedRoute
-    , private popoverCtrl: PopoverController
+    , private popoverCtrl: PopoverController, private location: Location
     , private expenseSvc: ExpenseService) {
     super();
   }
@@ -64,10 +65,16 @@ export class ExpenseDetailPage extends BasePage implements OnInit, OnDestroy {
     if(data == 'delete') {
       const res = await this.helperSvc.presentConfirmDialog();
       if(res) {
-        this.expense.markedForDelete = true;
-        this.expense.updatedOn = null;
+        //if newly added item, then remove it completly 
+        if(this.expense.markedForAdd) {
+          await this.expenseSvc.remove(this.expense.id);
+        } else {
+          this.expense.markedForDelete = true;
+          this.expense.updatedOn = null;
+          await this.expenseSvc.putLocal(this.expense);
+        }
 
-        await this.expenseSvc.putLocal(this.expense);
+        await this.location.back();
         
         this.pubsubSvc.publishEvent(SyncConstant.EVENT_SYNC_DATA_PUSH, SyncEntity.Expense);
         await this.helperSvc.presentToastGenericSuccess();

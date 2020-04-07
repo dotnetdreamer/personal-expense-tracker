@@ -12,8 +12,8 @@ import { IExpense } from '../expense.model';
                 <ion-icon slot="start" name="pencil"></ion-icon>
                 <ion-label>{{'common.edit' | localizedresource | async }}</ion-label>
             </ion-item>
-            <ion-item (click)="dismiss('delete')" 
-                [disabled]="expense.markedForAdd || expense.markedForUpdate || expense.markedForDelete">
+            <!-- only can delete newly added item -->
+            <ion-item (click)="dismiss('delete')" [disabled]="expense.markedForUpdate || expense.markedForDelete">
                 <ion-icon slot="start" name="trash"></ion-icon>
                 <ion-label>{{'common.delete' | localizedresource | async }}</ion-label>
             </ion-item>
