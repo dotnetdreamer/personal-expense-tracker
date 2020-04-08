@@ -8,6 +8,7 @@ import { SyncConstant } from '../../shared/sync/sync-constant';
 import { AuthenticationService } from '../authentication.service';
 import { Subscription } from 'rxjs';
 import { AppConstant } from '../../shared/app-constant';
+import { FormGroup, Validators, FormBuilder } from '@angular/forms';
 
 @Component({
   selector: 'page-auth-login',
@@ -18,28 +19,49 @@ import { AppConstant } from '../../shared/app-constant';
 export class LoginPage extends BasePage implements OnInit, OnDestroy {
   @ViewChild('gSigninButton') gSigninButton: ElementRef;
 
+  loginFormGroup: FormGroup;
+
   // //used in BackButtonDisableService
   // canDeactivate = false;
 
-  constructor(private authSvc: AuthenticationService
+  constructor(private formBuilder: FormBuilder
+    , private authSvc: AuthenticationService
     , private userSettingSvc: UserSettingService) { 
       super();
+
+      this.loginFormGroup = this.formBuilder.group({
+        email: ['', Validators.required],
+        password: ['', Validators.required],
+      });
     }
 
   ngOnInit() {
   }
 
-  async onLoginClicked(type) {
-    const profile = await this.authSvc.login(type);
-    if(profile) {
-      this.canDeactivate = true;
+  get f() { return this.loginFormGroup.controls; }
 
-      this.pubsubSvc.publishEvent(UserConstant.EVENT_USER_LOGGEDIN, { 
-        user: profile, 
-        redirectToHome: true,
-        pull: true
-      });
+  async onLoginClicked(type) {
+    let args = null;
+    
+    switch(type) {
+      case LoginType.STANDARD:
+        args = { email: this.f.email.value, password: this.f.password.value };
+      break;
+      default:
+      break;
     }
+    
+    const profile = await this.authSvc.login(type, args);
+    if(!profile) {
+      return;
+    }
+
+    this.canDeactivate = true;
+    this.pubsubSvc.publishEvent(UserConstant.EVENT_USER_LOGGEDIN, { 
+      user: profile, 
+      redirectToHome: true,
+      pull: true
+    });
   }
 
   async onRegisterClicked() { 

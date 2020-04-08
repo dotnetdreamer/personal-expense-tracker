@@ -7,14 +7,17 @@ export class User extends BaseEntity {
   @Column()
   name: string;
 
-  @Column({ nullable: true })
-  mobile: string;
-
   @Column()
   email: string;
 
   @Column()
   password: string;
+
+  @Column({ nullable: true })
+  photo?: string
+  
+  @Column({ nullable: true })
+  mobile?: string;
 
   @Column()
   isDeleted: boolean

@@ -24,6 +24,7 @@
     "@nestjs/core": "^6.10.14",
     "@nestjs/platform-express": "^6.10.14",
     "@nestjs/typeorm": "^7.0.0",
+    "bcrypt": "^4.0.1",
     "brain.js": "^2.0.0-alpha.12",
     "class-transformer": "^0.2.3",
     "moment": "^2.24.0",

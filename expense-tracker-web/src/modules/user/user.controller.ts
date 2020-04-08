@@ -1,6 +1,6 @@
 import { Controller, Get, Query, Body, Post, UseInterceptors, ClassSerializerInterceptor } from '@nestjs/common';
 
-import { IRegistrationParams } from './user.model';
+import { IRegistrationParams, ILoginParams } from './user.model';
 import { UserService } from './user.service';
 
 
@@ -13,6 +13,12 @@ export class UserController {
 //   getAll() {
 //     // return this.categorySvc.findAll();
 //   }
+
+    @UseInterceptors(ClassSerializerInterceptor)
+    @Post('authenticate')
+    async authenticate(@Body() model: ILoginParams) {
+        return this.userSvc.validateUser({ email: model.email, password: model.password });
+    }
 
     @UseInterceptors(ClassSerializerInterceptor)
     @Post('register')

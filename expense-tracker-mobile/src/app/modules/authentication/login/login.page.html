@@ -7,19 +7,19 @@
 <ion-content class="ion-padding">
   <div class="container">
     <ion-icon name="person-circle"></ion-icon>
-    <form class="custom-form">
+    <form class="custom-form" [formGroup]="loginFormGroup" (ngSubmit)="onLoginClicked('standard')">
       <ion-list>
         <ion-item>
           <ion-label position="floating">{{'user.email' | localizedresource | async}}</ion-label>
-          <ion-input></ion-input>
+          <ion-input type="email" formControlName="email"></ion-input>
         </ion-item>
         <ion-item>
           <ion-label position="floating">{{'user.password' | localizedresource | async}}</ion-label>
-          <ion-input type="password"></ion-input>
+          <ion-input type="password" formControlName="password"></ion-input>
         </ion-item>
       </ion-list>
       <div class="buttons-container">
-        <ion-button (click)="onLoginClicked('standard')">
+        <ion-button type="submit">
           {{'user.login.title' | localizedresource | async}}
         </ion-button>
       </div>

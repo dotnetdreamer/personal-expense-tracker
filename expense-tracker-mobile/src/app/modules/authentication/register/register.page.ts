@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { Location } from '@angular/common';
 
 import { EtValidators } from '../../shared/et.validators';
 import { BasePage } from '../../shared/base.page';
@@ -16,7 +17,7 @@ export class RegisterPage extends BasePage implements OnInit {
   registratioFormGroup: FormGroup;
 
   constructor(private formBuilder: FormBuilder
-    , private authSvc: AuthenticationService) { 
+    , private authSvc: AuthenticationService, private location: Location) { 
     super();
     this.registratioFormGroup = this.formBuilder.group({
       name: ['', Validators.required],
@@ -38,14 +39,31 @@ export class RegisterPage extends BasePage implements OnInit {
   get f() { return this.registratioFormGroup.controls; }
 
   async onRegisterationFormSubmit(args) {
-    const response = await this.authSvc.register({
-      email: args.email,
-      mobile: args.mobile,
-      name: args.name,
-      password: args.password
-    });
-    if(AppConstant.DEBUG) {
-      console.log(response);
+    const loader = await this.helperSvc.loader;
+    await loader.present();
+
+    try {
+      const response = await this.authSvc.register({
+        email: args.email,
+        mobile: args.mobile,
+        name: args.name,
+        password: args.password
+      });
+      if(AppConstant.DEBUG) {
+        console.log('RegisterPage: response', response);
+      }
+  
+      if(!response.data) {
+        await this.helperSvc.presentToast(response.message, false);
+        return;
+      }
+
+      await this.helperSvc.presentToastGenericSuccess();
+      this.location.back();
+    } catch(e) {
+      ///
+    } finally {
+      await loader.dismiss();
     }
 
     // if(response.status != 200) {
@@ -63,8 +81,8 @@ export class RegisterPage extends BasePage implements OnInit {
     this.f.name.setValue(`${rand}`);
     this.f.email.setValue(`${rand}@example.com`);
     this.f.mobile.setValue(`${rand}`);
-    this.f.password.setValue(`${rand}`);
-    this.f.confirmPassword.setValue(`${rand}`);
+    this.f.password.setValue(`password`);
+    this.f.confirmPassword.setValue(`password`);
   }
 }
 

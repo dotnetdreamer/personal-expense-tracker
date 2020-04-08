@@ -1,8 +1,8 @@
 export interface IUser {
-    uuid
+    uuid?
     name: string
     email: string
-    photo: string
+    photo?: string
     mobile?: string
     externalAuthResponse?: IGoogleAuthResponse | any
 }
