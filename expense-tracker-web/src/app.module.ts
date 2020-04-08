@@ -14,6 +14,7 @@ import { Attachment } from './modules/attachment/attachment.entity';
 import { MlModule } from './modules/ml/ml.module';
 import { UserModule } from './modules/user/user.module';
 import { User } from './modules/user/user.entity';
+import { AuthModule } from './modules/user/auth/auth.module';
 
 @Module({
   imports: [
@@ -28,7 +29,8 @@ import { User } from './modules/user/user.entity';
     ExpenseModule,
     AttachmentModule,
     MlModule,
-    UserModule
+    UserModule,
+    AuthModule
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -1,14 +1,17 @@
-import { Controller, Get, Query, Body, Post, UseInterceptors, ClassSerializerInterceptor } from '@nestjs/common';
-
+import { Controller, Get, Query, Body, Post, UseInterceptors
+  , ClassSerializerInterceptor, UseGuards 
+} from '@nestjs/common';
 
 import { CategoryService } from './category.service';
 import { ICategoryParams } from './category.model';
 import { Category } from './category.entity';
+import { JwtAuthGuard } from '../user/auth/jwt-auth.guard';
 
 @Controller('category')
 export class CategoryController {
   constructor(private readonly categorySvc: CategoryService) {}
 
+  @UseGuards(JwtAuthGuard)
   @UseInterceptors(ClassSerializerInterceptor)
   @Get('getAll')
   getAll() {
