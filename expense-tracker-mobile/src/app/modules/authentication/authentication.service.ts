@@ -11,6 +11,8 @@ import { UserConstant } from './user-constant';
     providedIn: 'root'
 })
 export class AuthenticationService extends BaseService {
+  private readonly BASE_URL = "user";
+
     constructor(private userSettingSvc: UserSettingService
         , private googleAuthSvc: AuthenticationGoogleService) {
         super();
@@ -48,6 +50,21 @@ export class AuthenticationService extends BaseService {
         }
         await this.helperSvc.presentToast(msg, false);
       }
+    }
+
+    register(args: { email, mobile, name, password }) {
+      return new Promise(async (resolve, reject) => {
+        try {
+          const res = await this.postData({ 
+            url: `${this.BASE_URL}/register`,
+            body: args
+          });
+
+          resolve(res);
+        } catch(e) {
+          reject(e);
+        }
+      });
     }
 
     async getUserProfileLocal(username?): Promise<IUserProfile> {

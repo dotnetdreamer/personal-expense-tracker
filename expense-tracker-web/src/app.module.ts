@@ -12,20 +12,23 @@ import { SharedModule } from './modules/shared/shared.module';
 import { AttachmentModule } from './modules/attachment/attachment.module';
 import { Attachment } from './modules/attachment/attachment.entity';
 import { MlModule } from './modules/ml/ml.module';
+import { UserModule } from './modules/user/user.module';
+import { User } from './modules/user/user.entity';
 
 @Module({
   imports: [
     TypeOrmModule.forRoot({
       type: 'sqlite',
       database: './_db/expense-tracker.db',
-      entities: [Category, Expense, Attachment],
+      entities: [Category, Expense, Attachment, User],
       synchronize: true,
     }),
     SharedModule,
     CategoryModule,
     ExpenseModule,
     AttachmentModule,
-    MlModule
+    MlModule,
+    UserModule
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -4,6 +4,7 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { EtValidators } from '../../shared/et.validators';
 import { BasePage } from '../../shared/base.page';
 import { AuthenticationService } from '../authentication.service';
+import { AppConstant } from '../../shared/app-constant';
 
 @Component({
   selector: 'page-auth-register',
@@ -29,19 +30,23 @@ export class RegisterPage extends BasePage implements OnInit {
   }
 
   ngOnInit() {
+    if(AppConstant.DEBUG) {
+      this._prefill();
+    }
   }
 
   get f() { return this.registratioFormGroup.controls; }
 
-
   async onRegisterationFormSubmit(args) {
-    // const response = await this.authSvc.register({
-    //   email: args.email,
-    //   mobile: args.mobile,
-    //   name: args.name,
-    //   password: args.password,
-    //   confirmPassword: args.confirmPassword
-    // });
+    const response = await this.authSvc.register({
+      email: args.email,
+      mobile: args.mobile,
+      name: args.name,
+      password: args.password
+    });
+    if(AppConstant.DEBUG) {
+      console.log(response);
+    }
 
     // if(response.status != 200) {
     //   await this.helperSvc.presentToast(response.message, false);
@@ -51,4 +56,15 @@ export class RegisterPage extends BasePage implements OnInit {
     // await this.helperSvc.presentInfoDialog(response.message);
     // await this.router.navigate(['/home'], { replaceUrl: true });
   }
+
+  private _prefill() {
+    const rand = this.helperSvc.getRandomNumber();
+    
+    this.f.name.setValue(`${rand}`);
+    this.f.email.setValue(`${rand}@example.com`);
+    this.f.mobile.setValue(`${rand}`);
+    this.f.password.setValue(`${rand}`);
+    this.f.confirmPassword.setValue(`${rand}`);
+  }
 }
+
