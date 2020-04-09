@@ -1,4 +1,4 @@
-import { Controller, UseInterceptors, Get, ClassSerializerInterceptor, Post, Body, Query } from "@nestjs/common";
+import { Controller, UseInterceptors, Get, ClassSerializerInterceptor, Post, Body, Query, UseGuards } from "@nestjs/common";
 
 import { ExpenseService } from "./expense.service";
 import { IExpenseParams } from "./expense.model";
@@ -6,12 +6,14 @@ import { Expense } from "./expense.entity";
 import { AttachmentService } from "../attachment/attachment.service";
 import { CategoryService } from "../category/category.service";
 import { AppConstant } from "../shared/app-constant";
+import { JwtAuthGuard } from "../user/auth/jwt-auth.guard";
 
 @Controller('expense')
 export class ExpenseController {
   constructor(private readonly expenseSvc: ExpenseService
     , private attachmentSvc: AttachmentService, private categorySvc: CategoryService) {}
 
+  @UseGuards(JwtAuthGuard)
   @UseInterceptors(ClassSerializerInterceptor)
   @Get('getAll')
   async getAll(@Query() filters?: { term?: string, fromDate?: string, toDate?: string }) {
@@ -25,6 +27,7 @@ export class ExpenseController {
     return Promise.all(model);
   }
 
+  @UseGuards(JwtAuthGuard)
   @UseInterceptors(ClassSerializerInterceptor)
   @Get('getReport')
   async getReport(@Query() filters: { fromDate: string, toDate: string }) {
@@ -33,6 +36,7 @@ export class ExpenseController {
     return items;
   }
 
+  @UseGuards(JwtAuthGuard)
   @UseInterceptors(ClassSerializerInterceptor)
   @Post('sync')
   async sync(@Body() models: IExpenseParams[]) {

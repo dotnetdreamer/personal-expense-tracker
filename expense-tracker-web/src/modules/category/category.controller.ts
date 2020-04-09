@@ -18,6 +18,7 @@ export class CategoryController {
     return this.categorySvc.findAll();
   }
 
+  @UseGuards(JwtAuthGuard)
   @UseInterceptors(ClassSerializerInterceptor)
   @Post('sync')
   async sync(@Body() models: ICategoryParams[]) {

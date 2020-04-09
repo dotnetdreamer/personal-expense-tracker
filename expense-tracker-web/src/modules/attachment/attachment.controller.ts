@@ -1,4 +1,4 @@
-import { Controller, Get, Query, Body, Post, UseInterceptors, ClassSerializerInterceptor, UploadedFiles, Req, UploadedFile } from '@nestjs/common';
+import { Controller, Get, Query, Body, Post, UseInterceptors, ClassSerializerInterceptor, UploadedFiles, Req, UploadedFile, UseGuards } from '@nestjs/common';
 
 import { FilesInterceptor, AnyFilesInterceptor, FileInterceptor, MulterModule } from '@nestjs/platform-express'
 import { diskStorage } from 'multer';
@@ -8,6 +8,7 @@ import { IAttachmentParams } from './attachment.model';
 import { imageFileFilter, editFileName } from './attachment.utils';
 import { Attachment } from './attachment.entity';
 import { AttachmentService } from './attachment.service';
+import { JwtAuthGuard } from '../user/auth/jwt-auth.guard';
 
 
 @Controller('attachment')
@@ -27,6 +28,7 @@ export class AttachmentController {
     // async sync(@UploadedFiles() attachment) {
     // sync(@Req() request: Request, @UploadedFile() file) {
     // @UseInterceptors(AnyFilesInterceptor())
+    @UseGuards(JwtAuthGuard)
     @Post('sync')   
     @UseInterceptors(FilesInterceptor('files[]', 10, {
       storage: diskStorage({

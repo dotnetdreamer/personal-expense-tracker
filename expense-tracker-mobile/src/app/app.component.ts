@@ -173,9 +173,9 @@ export class AppComponent {
       }
     });
     
-    this.pubsubSvc.subscribe(UserConstant.EVENT_USER_LOGGEDOUT, async () => {
+    this.pubsubSvc.subscribe(UserConstant.EVENT_USER_LOGGEDOUT, async (args) => {
       if(AppConstant.DEBUG) {
-        console.log('AppComponent: EVENT_USER_LOGGEDOUT');
+        console.log('AppComponent: EVENT_USER_LOGGEDOUT: args', args);
       }
       this.currentUser = null;
 

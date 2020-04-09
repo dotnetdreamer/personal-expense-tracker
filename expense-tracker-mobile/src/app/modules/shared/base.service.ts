@@ -14,6 +14,7 @@ import { LocalizationService } from './localization.service';
 import { DbWebService } from './db/db-web.service'; 
 import { NgxPubSubService } from '@pscoped/ngx-pub-sub';
 import { UserSettingService } from '../authentication/user-setting.service';
+import { UserConstant } from '../authentication/user-constant';
 
 @Injectable({
     providedIn: 'root'
@@ -130,23 +131,34 @@ export class BaseService {
         });
     }
 
-    protected handleError(e: HttpErrorResponse, args: HttpParams) {
+    protected async handleError(e: HttpErrorResponse, args: HttpParams) {
         if(AppConstant.DEBUG) {
             console.log('BaseService: handleError', e);
         }
-        if(!args.errorCallback) {
-            let msg;
-            //the error might be thrown by e.g a plugin wasn't install properly. In that case text() will not be available
-            if(e.message) {
-                msg = e.message;            
-            } else {
-                msg = e.error.toString();
-            }
-            // setTimeout(async () => {
-            //     await this.helperSvc.alert(msg);
-            // });
-        } else {
-            args.errorCallback(e, args);
+        switch(e.status) {
+            case 401:
+                const u = await this.userSettingSvc.getCurrentUser();
+                if(u) {
+                    //kickout...
+                    this.pubsubSvc.publishEvent(UserConstant.EVENT_USER_LOGGEDOUT);
+                }
+            break;
+            default:
+                if(!args.errorCallback) {
+                    let msg;
+                    //the error might be thrown by e.g a plugin wasn't install properly. In that case text() will not be available
+                    if(e.message) {
+                        msg = e.message;            
+                    } else {
+                        msg = e.error.toString();
+                    }
+                    // setTimeout(async () => {
+                    //     await this.helperSvc.alert(msg);
+                    // });
+                } else {
+                    args.errorCallback(e, args);
+                }
+            break;
         }
     }
     
