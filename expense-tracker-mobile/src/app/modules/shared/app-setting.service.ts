@@ -17,7 +17,7 @@ export class AppSettingService {
     
 
     protected dbService: DbService;
-    protected schemaService: SchemaService;
+    protected schemaSvc: SchemaService;
     protected platform: Platform;
  
     constructor() {
@@ -29,12 +29,12 @@ export class AppSettingService {
         // } else {
             this.dbService = injector.get(DbWebService);
         // }
-        this.schemaService = injector.get(SchemaService);
+        this.schemaSvc = injector.get(SchemaService);
         this.platform = injector.get(Platform);
     }
 
     putWorkingLanguage(lang) {
-        return this.dbService.putLocal(this.schemaService.tables.setting, {
+        return this.dbService.putLocal(this.schemaSvc.tables.setting, {
             key: AppConstant.KEY_WORKING_LANGUAGE,
             value: lang
         }).then(() => {
@@ -54,7 +54,7 @@ export class AppSettingService {
             });
         }
         else {
-            return this.dbService.get<any>(this.schemaService.tables.setting, key)
+            return this.dbService.get<any>(this.schemaSvc.tables.setting, key)
                 .then(setting => {
                     if (setting && setting.value) {
                         AppSettingService.settingCache.set(key, setting.value);
@@ -66,7 +66,7 @@ export class AppSettingService {
     }
 
     put(key: string, values) {
-        return this.dbService.putLocal(this.schemaService.tables.setting, {
+        return this.dbService.putLocal(this.schemaSvc.tables.setting, {
             key: key,
             value: values
         }).then(() => {

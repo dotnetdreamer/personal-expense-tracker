@@ -179,7 +179,7 @@ export class ExpenseService extends BaseService {
     getUnSyncedLocal(): Promise<Array<IExpense>> {
         return new Promise(async (resolve, reject) => {
             const db = this.dbService.Db;
-            const iter = new ydn.db.ValueIterator(this.schemaService.tables.expense);
+            const iter = new ydn.db.ValueIterator(this.schemaSvc.tables.expense);
 
             const unSynced = [];
             let req = db.open(x => {
@@ -225,7 +225,7 @@ export class ExpenseService extends BaseService {
             // new ydn.db.IndexValueIterator(store, opt.key, key_range, (pageSize == 0 ? undefined : pageSize), (skip > 0 ? skip: undefined), false);
             //https://github.com/yathit/ydn-db/blob/8d217ba5ff58a1df694b5282e20ebc2c52104197/test/qunit/ver_1_iteration.js#L117
             //(store_name, key_range, reverse)
-            const iter = new ydn.db.ValueIterator(this.schemaService.tables.expense);
+            const iter = new ydn.db.ValueIterator(this.schemaSvc.tables.expense);
             
             // let idx = 0;
             let req = db.open(x => {
@@ -320,7 +320,7 @@ export class ExpenseService extends BaseService {
     getReportLocal(fromDate: string, toDate: string, totalItems = 10): Promise<IExpenseDashboardReport> {
         return new Promise((resolve, reject) => {
             const db = this.dbService.Db;
-            const iter = new ydn.db.ValueIterator(this.schemaService.tables.expense);
+            const iter = new ydn.db.ValueIterator(this.schemaSvc.tables.expense);
 
             const items = [];
             let req = db.open(x => {
@@ -390,7 +390,7 @@ export class ExpenseService extends BaseService {
     }
 
     getByIdLocal(id) {
-        return this.dbService.get<IExpense>(this.schemaService.tables.expense, id);
+        return this.dbService.get<IExpense>(this.schemaSvc.tables.expense, id);
     }
 
     async putLocal(item: IExpense, ignoreFiringEvent?: boolean, ignoreDefaults?: boolean) {
@@ -437,7 +437,7 @@ export class ExpenseService extends BaseService {
             item.updatedOn = moment(item.updatedOn).utc().toISOString();
         }
 
-        return this.dbService.putLocal(this.schemaService.tables.expense, item)
+        return this.dbService.putLocal(this.schemaSvc.tables.expense, item)
         .then((affectedRows) => {
             if(!ignoreFiringEvent) {
                 this.pubsubSvc.publishEvent(AppConstant.EVENT_EXPENSE_CREATED_OR_UPDATED, item);
@@ -460,11 +460,11 @@ export class ExpenseService extends BaseService {
     }
 
     remove(id) {
-        return this.dbService.remove(this.schemaService.tables.expense, id);
+        return this.dbService.remove(this.schemaSvc.tables.expense, id);
     }
 
     removeAll() {
-        return this.dbService.removeAll(this.schemaService.tables.expense);
+        return this.dbService.removeAll(this.schemaSvc.tables.expense);
     }
 
     private _mapAll(expenses: Array<IExpense>) {

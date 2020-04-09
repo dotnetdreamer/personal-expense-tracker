@@ -13,8 +13,7 @@ import { UserConstant } from './user-constant';
 export class AuthenticationService extends BaseService {
   private readonly BASE_URL = "user";
 
-  constructor(private userSettingSvc: UserSettingService
-      , private googleAuthSvc: AuthenticationGoogleService) {
+  constructor(private googleAuthSvc: AuthenticationGoogleService) {
       super();
   }
 
@@ -81,42 +80,6 @@ export class AuthenticationService extends BaseService {
     });
   }
 
-  async getUserProfileLocal(username?): Promise<IUserProfile> {
-      return new Promise<IUser>(async (resolve, reject) => {
-          if(!username) {
-            username = await this.userSettingSvc.getCurrentUser();
-          }
-          if(!username) {
-            resolve();
-            return;
-          }
-          username = username.toLowerCase();
-          let profile = await this.dbService.get<IUser>(this.schemaService.tables.user, username);
-          profile = this.setUserDefaults(profile);
-
-          resolve(profile);
-      });
-  }
-  
-  removeUserProfileLocal(username) {
-      username = username.toLowerCase();
-      return this.dbService.remove(this.schemaService.tables.user, username);
-  }
-
-  putUserProfileLocal(user: IUser) {
-      user.email = user.email.toLowerCase();
-      return this.dbService.putLocal(this.schemaService.tables.user, user);
-  }   
-  
-  setUserDefaults(user: IUser): IUserProfile {
-      const profile: IUserProfile = { ...user };
-      if(profile.photo) {
-          profile.photoStyle = `url('${profile.photo}')`;
-      }
-
-      return profile;
-  }
-
   logout(username?) {
       return new Promise(async (resolve, reject) => {
           const loginType = await this.userSettingSvc.getLoggedInMethod();
@@ -135,7 +98,7 @@ export class AuthenticationService extends BaseService {
           }
 
           await Promise.all([
-              this.removeUserProfileLocal(username), 
+              this.userSettingSvc.removeUserProfileLocal(username), 
               this.userSettingSvc.removeCurrentUser(), 
               this.userSettingSvc.removeLoggedInMethod(),
               this.userSettingSvc.removeCurrentUserPassword()
@@ -149,7 +112,7 @@ export class AuthenticationService extends BaseService {
   private async _handleLoginResponse(args: ILoginParams, loader?: HTMLIonLoadingElement) {
     const promises = [];
 
-    let profilePromise = this.putUserProfileLocal(args.user);
+    let profilePromise = this.userSettingSvc.putUserProfileLocal(args.user);
     promises.push(profilePromise);
 
     let loginTypePromise = this.userSettingSvc.putLoggedInMethod(args.loginType);
@@ -168,7 +131,7 @@ export class AuthenticationService extends BaseService {
       await Promise.all(promises);
 
       //fire the user loggedin event
-      const profile = this.setUserDefaults(args.user);
+      const profile = this.userSettingSvc.setUserDefaults(args.user);
       return profile;
     } catch(e) {
       throw e;

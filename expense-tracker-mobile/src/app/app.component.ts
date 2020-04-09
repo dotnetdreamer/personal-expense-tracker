@@ -216,7 +216,7 @@ export class AppComponent {
 
   private async _setDefaults() {
     const res = await Promise.all([
-      this.authSvc.getUserProfileLocal()
+      this.userSettingSvc.getUserProfileLocal()
       , this.appSettingSvc.getWorkingLanguage(), this.currencySettingSvc.getWorkingCurrency()
     ]);
 

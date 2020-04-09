@@ -6,6 +6,9 @@ export class AppConstant {
     public static readonly UPLOADED_PATH_FILES = "_uploaded";
 
     public static readonly DEFAULT_JWT_SECRET_KEY = "123456";
+    //must be in seconds
+    public static readonly DEFAULT_JWT_TOKEN_EXPIRATION = "60s";
+    public static readonly DEFAULT_JWT_REFRESH_TOKEN_EXPIRATION = "120s";
 
     public static readonly UPLOADED_PATH_ML = "_ml";
     public static readonly UPLOADED_PATH_ML_WITH_FILE_NAME = `${AppConstant.UPLOADED_PATH_ML}/trained-net-category.json`;

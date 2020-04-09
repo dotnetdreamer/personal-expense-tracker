@@ -114,7 +114,7 @@ export class CategoryService extends BaseService {
     getUnSyncedLocal(): Promise<Array<ICategory>> {
         return new Promise(async (resolve, reject) => {
             const db = this.dbService.Db;
-            const iter = new ydn.db.ValueIterator(this.schemaService.tables.category);
+            const iter = new ydn.db.ValueIterator(this.schemaSvc.tables.category);
 
             const unSynced = [];
             let req = db.open(x => {
@@ -136,7 +136,7 @@ export class CategoryService extends BaseService {
     getCategoryListLocal(): Promise<ICategory[]> {
         return new Promise(async (resolve, reject) => {
             const db = this.dbService.Db;
-            const iter = new ydn.db.ValueIterator(this.schemaService.tables.category);
+            const iter = new ydn.db.ValueIterator(this.schemaSvc.tables.category);
 
             const items = [];
             let req = db.open(x => {
@@ -152,7 +152,7 @@ export class CategoryService extends BaseService {
     }
 
     getByIdLocal(categoryId) {
-        return this.dbService.get<ICategory>(this.schemaService.tables.category, categoryId);
+        return this.dbService.get<ICategory>(this.schemaSvc.tables.category, categoryId);
     }
 
     putLocal(item: ICategory, ignoreFiringEvent?: boolean, ignoreDefaults?: boolean) {
@@ -182,7 +182,7 @@ export class CategoryService extends BaseService {
             item.updatedOn = moment(item.updatedOn).utc().toISOString();
         }
 
-        return this.dbService.putLocal(this.schemaService.tables.category, item).then((affectedRows) => {
+        return this.dbService.putLocal(this.schemaSvc.tables.category, item).then((affectedRows) => {
             if(!ignoreFiringEvent) {
                 this.pubsubSvc.publishEvent(AppConstant.EVENT_CATEGORY_CREATED_OR_UPDATED, item);
             }
@@ -204,15 +204,15 @@ export class CategoryService extends BaseService {
     }
 
     remove(id) {
-        return this.dbService.remove(this.schemaService.tables.category, id);
+        return this.dbService.remove(this.schemaSvc.tables.category, id);
     }
 
 
     removeAll() {
-        return this.dbService.removeAll(this.schemaService.tables.category);
+        return this.dbService.removeAll(this.schemaSvc.tables.category);
     }
 
     count() {
-        return this.dbService.count(this.schemaService.tables.category);
+        return this.dbService.count(this.schemaSvc.tables.category);
     }
 }

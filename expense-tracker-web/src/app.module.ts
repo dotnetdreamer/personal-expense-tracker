@@ -15,13 +15,15 @@ import { MlModule } from './modules/ml/ml.module';
 import { UserModule } from './modules/user/user.module';
 import { User } from './modules/user/user.entity';
 import { AuthModule } from './modules/user/auth/auth.module';
+import { TokenModule } from './modules/user/token/token.module';
+import { AccessToken } from './modules/user/token/token.entity';
 
 @Module({
   imports: [
     TypeOrmModule.forRoot({
       type: 'sqlite',
       database: './_db/expense-tracker.db',
-      entities: [Category, Expense, Attachment, User],
+      entities: [Category, Expense, Attachment, User, AccessToken],
       synchronize: true,
     }),
     SharedModule,
@@ -30,7 +32,8 @@ import { AuthModule } from './modules/user/auth/auth.module';
     AttachmentModule,
     MlModule,
     UserModule,
-    AuthModule
+    AuthModule,
+    TokenModule
   ],
   controllers: [AppController],
   providers: [AppService],

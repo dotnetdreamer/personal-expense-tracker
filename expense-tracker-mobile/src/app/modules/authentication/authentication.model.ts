@@ -4,6 +4,7 @@ export interface IUser {
     email: string
     photo?: string
     mobile?: string
+    access_token?: string
     externalAuthResponse?: IGoogleAuthResponse | any
 }
 

@@ -13,6 +13,7 @@ import { HelperService } from './helper.service';
 import { LocalizationService } from './localization.service';
 import { DbWebService } from './db/db-web.service'; 
 import { NgxPubSubService } from '@pscoped/ngx-pub-sub';
+import { UserSettingService } from '../authentication/user-setting.service';
 
 @Injectable({
     providedIn: 'root'
@@ -21,8 +22,9 @@ export class BaseService {
     protected http: HttpClient;
     protected platform: Platform;
     protected dbService: DbService;
-    protected schemaService: SchemaService;
-    protected appSettingService: AppSettingService;
+    protected schemaSvc: SchemaService;
+    protected appSettingSvc: AppSettingService;
+    protected userSettingSvc: UserSettingService;
     protected helperSvc: HelperService;
     protected localizationSvc: LocalizationService;
     protected pubsubSvc: NgxPubSubService;
@@ -32,8 +34,9 @@ export class BaseService {
 
         this.http = injector.get(HttpClient);
         this.platform = injector.get(Platform);
-        this.schemaService = injector.get(SchemaService);
-        this.appSettingService = injector.get(AppSettingService);
+        this.schemaSvc = injector.get(SchemaService);
+        this.appSettingSvc = injector.get(AppSettingService);
+        this.userSettingSvc = injector.get(UserSettingService);
         this.helperSvc = injector.get(HelperService);
         this.localizationSvc = injector.get(LocalizationService);
         this.pubsubSvc = injector.get(NgxPubSubService);
@@ -49,26 +52,26 @@ export class BaseService {
     }
 
     protected getData<T>(args: HttpParams): Promise<T> {
-        let headers: any = this.prepareHeaders(args); 
+        return new Promise(async (resolve, reject) => {
+            let headers: HttpHeaders = await this.prepareHeaders(args);
 
-        args.body = args.body || {};  
-        if(!args.overrideUrl) {
-            let newUrl = `${AppConstant.BASE_API_URL + args.url}`;
+            args.body = args.body || {};  
+            if(!args.overrideUrl) {
+                let newUrl = `${AppConstant.BASE_API_URL + args.url}`;
 
-            for(let prop in args.body) {
-                if(args.body.hasOwnProperty(prop)) {
-                    if(newUrl.includes('?')) {
-                        newUrl += '&';
-                    } else {
-                        newUrl += '?';
+                for(let prop in args.body) {
+                    if(args.body.hasOwnProperty(prop)) {
+                        if(newUrl.includes('?')) {
+                            newUrl += '&';
+                        } else {
+                            newUrl += '?';
+                        }
+                        newUrl += `${prop}=${args.body[prop] || ''}`;
                     }
-                    newUrl += `${prop}=${args.body[prop] || ''}`;
-                }
-            }   
-            args.url = newUrl;
-        }
-        
-        return new Promise((resolve, reject) => {
+                }   
+                args.url = newUrl;
+            }
+            
             this.http.get<T>(args.url, {
                 headers: headers
             })
@@ -86,31 +89,31 @@ export class BaseService {
     }
 
     protected postData<T>(args: HttpParams): Promise<T> {
-        let headers: HttpHeaders = this.prepareHeaders(args);
+        return new Promise(async (resolve, reject) => {
+            let headers: HttpHeaders = await this.prepareHeaders(args);
 
-        let newUrl;
-        if(!args.overrideUrl) {
-            newUrl = `${AppConstant.BASE_API_URL + args.url}`;
-        } else {
-            newUrl = args.url;
-        }
+            let newUrl;
+            if(!args.overrideUrl) {
+                newUrl = `${AppConstant.BASE_API_URL + args.url}`;
+            } else {
+                newUrl = args.url;
+            }
 
-        // let data;
-        // for(let prop in args.body) {
-        //     if(args.body.hasOwnProperty(prop)) {
-        //         if(data) {
-        //             data += '&';
-        //         } else {
-        //             //initialize
-        //             data = '';
-        //         }
-        //         data += `${prop}=${args.body[prop]}`;
-        //     }
-        // }   
-        // args.body = data || {};   
-        args.url = newUrl;
+            // let data;
+            // for(let prop in args.body) {
+            //     if(args.body.hasOwnProperty(prop)) {
+            //         if(data) {
+            //             data += '&';
+            //         } else {
+            //             //initialize
+            //             data = '';
+            //         }
+            //         data += `${prop}=${args.body[prop]}`;
+            //     }
+            // }   
+            // args.body = data || {};   
+            args.url = newUrl;
 
-        return new Promise((resolve, reject) => {
             this.http.post<T>(args.url, args.body, {
                 headers: headers
             })
@@ -147,10 +150,14 @@ export class BaseService {
         }
     }
     
-    private prepareHeaders(args: HttpParams) {
+    private async prepareHeaders(args: HttpParams) {
         let headers = new HttpHeaders();
         if(!args.ignoreContentType) {
             headers = headers.append('Content-Type', 'application/json;charset=utf-8');            
+        }
+        const profile = await this.userSettingSvc.getUserProfileLocal();
+        if(profile) {
+            headers = headers.append('Authorization', `Bearer ${profile.access_token}`);            
         }
 
         if(args.httpHeaders) {

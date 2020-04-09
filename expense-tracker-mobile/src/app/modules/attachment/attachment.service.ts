@@ -155,7 +155,7 @@ export class AttachmentService extends BaseService {
             item.updatedOn = moment(item.updatedOn).utc().toISOString();
         }
 
-        return this.dbService.putLocal(this.schemaService.tables.attachment, item)
+        return this.dbService.putLocal(this.schemaSvc.tables.attachment, item)
         .then((insertId) => {
             if(!ignoreFiringEvent) {
                 this.pubsubSvc.publishEvent(AppConstant.EVENT_ATTACHMENT_CREATED_OR_UPDATED, item);
@@ -182,7 +182,7 @@ export class AttachmentService extends BaseService {
     getUnSyncedLocal(): Promise<Array<IAttachment>> {
         return new Promise(async (resolve, reject) => {
             const db = this.dbService.Db;
-            const iter = new ydn.db.ValueIterator(this.schemaService.tables.attachment);
+            const iter = new ydn.db.ValueIterator(this.schemaSvc.tables.attachment);
 
             const unSynced = [];
             let req = db.open(x => {
@@ -198,15 +198,15 @@ export class AttachmentService extends BaseService {
     }
 
     getByIdLocal(id) {
-        return this.dbService.get<IAttachment>(this.schemaService.tables.attachment, id);
+        return this.dbService.get<IAttachment>(this.schemaSvc.tables.attachment, id);
     }
 
     remove(id) {
-        return this.dbService.remove(this.schemaService.tables.attachment, id);
+        return this.dbService.remove(this.schemaSvc.tables.attachment, id);
     }
 
     removeAll() {
-        return this.dbService.removeAll(this.schemaService.tables.attachment);
+        return this.dbService.removeAll(this.schemaSvc.tables.attachment);
     }
 
     private async _dependentDataCallback(item: IAttachment

@@ -13,7 +13,7 @@ export class CurrencySettingService extends AppSettingService {
 
 
     putWorkingCurrency(currency) {
-        return this.dbService.putLocal(this.schemaService.tables.setting, {
+        return this.dbService.putLocal(this.schemaSvc.tables.setting, {
             key: CurrencyConstant.KEY_WORKING_CURRENCY,
             value: currency
         }).then(() => {

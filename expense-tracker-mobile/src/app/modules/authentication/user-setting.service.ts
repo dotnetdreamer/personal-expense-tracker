@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core";
 
 import { UserConstant } from './user-constant';
 import { AppSettingService } from '../shared/app-setting.service';
-import { LoginType } from './authentication.model';
+import { LoginType, IUserProfile, IUser } from './authentication.model';
 
 
 @Injectable({
@@ -14,7 +14,7 @@ export class UserSettingService extends AppSettingService {
     }
 
     putFingerprintEnabled(value = true) {
-        return this.dbService.putLocal(this.schemaService.tables.setting, {
+        return this.dbService.putLocal(this.schemaSvc.tables.setting, {
             key: UserConstant.KEY_FINGERPRINT_ENABLED,
             value: value == true ? 'yes' : 'no'
         }).then(() => {
@@ -38,7 +38,7 @@ export class UserSettingService extends AppSettingService {
     }
 
     putCurrentUser(values) {
-        return this.dbService.putLocal(this.schemaService.tables.setting, {
+        return this.dbService.putLocal(this.schemaSvc.tables.setting, {
             key: UserConstant.KEY_CURRENT_USER,
             value: values
         }).then(() => {
@@ -47,7 +47,7 @@ export class UserSettingService extends AppSettingService {
     }
 
     removeCurrentUser() {
-        return this.dbService.remove(this.schemaService.tables.setting, UserConstant.KEY_CURRENT_USER)
+        return this.dbService.remove(this.schemaSvc.tables.setting, UserConstant.KEY_CURRENT_USER)
         .then(() => {
             AppSettingService.settingCache.delete(UserConstant.KEY_CURRENT_USER);
         });
@@ -61,7 +61,7 @@ export class UserSettingService extends AppSettingService {
     } 
 
     putLoggedInMethod(values) {
-        return this.dbService.putLocal(this.schemaService.tables.setting, {
+        return this.dbService.putLocal(this.schemaSvc.tables.setting, {
             key: UserConstant.KEY_LOGGEDIN_METHOD,
             value: values
         }).then(() => {
@@ -70,14 +70,14 @@ export class UserSettingService extends AppSettingService {
     }
 
     removeLoggedInMethod() {
-        return this.dbService.remove(this.schemaService.tables.setting, UserConstant.KEY_LOGGEDIN_METHOD)
+        return this.dbService.remove(this.schemaSvc.tables.setting, UserConstant.KEY_LOGGEDIN_METHOD)
         .then(() => {
             AppSettingService.settingCache.delete(UserConstant.KEY_LOGGEDIN_METHOD);
         });
     }
 
     putCurrentUserPassword(values) {
-        return this.dbService.putLocal(this.schemaService.tables.setting, {
+        return this.dbService.putLocal(this.schemaSvc.tables.setting, {
             key: UserConstant.KEY_CURRENT_USER_PASSWORD,
             value: values
         }).then(() => {
@@ -86,7 +86,7 @@ export class UserSettingService extends AppSettingService {
     }
     
     removeCurrentUserPassword() {
-        return this.dbService.remove(this.schemaService.tables.setting, UserConstant.KEY_CURRENT_USER_PASSWORD)
+        return this.dbService.remove(this.schemaSvc.tables.setting, UserConstant.KEY_CURRENT_USER_PASSWORD)
         .then(() => {
             AppSettingService.settingCache.delete(UserConstant.KEY_CURRENT_USER_PASSWORD);
         });
@@ -98,5 +98,43 @@ export class UserSettingService extends AppSettingService {
             .then(currentUserPassword => {
                 return currentUserPassword;
             });
+    }
+
+    
+    async getUserProfileLocal(username?): Promise<IUserProfile> {
+        return new Promise<IUser>(async (resolve, reject) => {
+            if(!username) {
+            username = await this.getCurrentUser();
+            }
+            if(!username) {
+            resolve();
+            return;
+            }
+            username = username.toLowerCase();
+            let profile = await this.dbService.get<IUser>(this.schemaSvc.tables.user, username);
+            profile = this.setUserDefaults(profile);
+
+            resolve(profile);
+        });
+    }
+
+    removeUserProfileLocal(username) {
+        username = username.toLowerCase();
+        return this.dbService.remove(this.schemaSvc.tables.user, username);
+    }
+
+    putUserProfileLocal(user: IUser) {
+        user.email = user.email.toLowerCase();
+        return this.dbService.putLocal(this.schemaSvc.tables.user, user);
+    }   
+
+      
+  setUserDefaults(user: IUser): IUserProfile {
+        const profile: IUserProfile = { ...user };
+        if(profile.photo) {
+            profile.photoStyle = `url('${profile.photo}')`;
+        }
+
+        return profile;
     }
 }
