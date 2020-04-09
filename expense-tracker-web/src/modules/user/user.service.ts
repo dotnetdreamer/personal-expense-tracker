@@ -62,7 +62,7 @@ export class UserService {
     }
 
     private _prepareUser(user: User) {
-        const { password, isDeleted, id, ...result } = user;
+        const { password, isDeleted, createdOn, updatedOn, ...result } = user;
         return result;
     }
 }

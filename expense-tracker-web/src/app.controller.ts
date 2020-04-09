@@ -23,7 +23,7 @@ export class AppController {
   @UseGuards(LocalAuthGuard)
   @UseInterceptors(ClassSerializerInterceptor)
   @Post('authenticate')
-  async login(@Request() req) {
+  async authenticate(@Request() req) {
     return this.authSvc.login(req.user);
   }
 

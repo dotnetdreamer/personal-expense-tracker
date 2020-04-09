@@ -20,7 +20,7 @@ export class AuthenticationService extends BaseService {
 
   authenticate(args: { email, password }) {
     return this.postData<any>({ 
-      url: `${this.BASE_URL}/authenticate`,
+      url: `app/authenticate`,
       body: {
         email: args.email,
         password: args.password
