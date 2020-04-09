@@ -1,0 +1,14 @@
+{
+  "appId": "net.dotnetdreamer.xpensive",
+  "appName": "Xpensive",
+  "bundledWebRuntime": false,
+  "npmClient": "npm",
+  "webDir": "www",
+  "cordova": {},
+  "plugins": {
+    "GoogleAuth": {
+      "scopes": ["profile", "email"],
+      "serverClientId": "481765426823-3c4gmsn2bbk3mrghqm0q6ng70d7mrqbl.apps.googleusercontent.com"
+    }
+  }
+}
