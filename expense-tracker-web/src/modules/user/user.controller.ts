@@ -8,15 +8,15 @@ import { UserService } from './user.service';
 export class UserController {
   constructor(private readonly userSvc: UserService) {}
 
-//   @UseInterceptors(ClassSerializerInterceptor)
-//   @Get('getAll')
-//   getAll() {
-//     // return this.categorySvc.findAll();
-//   }
+  @UseInterceptors(ClassSerializerInterceptor)
+  @Get('getByEmail')
+  getByEmail(@Query() email: string) {
+    return this.userSvc.getUserByEmail(email);
+  }
 
-    @UseInterceptors(ClassSerializerInterceptor)
-    @Post('register')
-    async register(@Body() model: IRegistrationParams) {
-        return this.userSvc.register(model);
-    }
+  @UseInterceptors(ClassSerializerInterceptor)
+  @Post('register')
+  async register(@Body() model: IRegistrationParams) {
+    return this.userSvc.register(model);
+  }
 }

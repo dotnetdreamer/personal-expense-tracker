@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 
 
-import { IUser, IUserProfile, LoginType, ILoginParams, IGoogleAuthResponse } from './authentication.model';
+import { IUser, IUserProfile, LoginType, ILoginParams, IGoogleAuthResponse, IExternalAuth } from './authentication.model';
 import { UserSettingService } from './user-setting.service';
 import { BaseService } from '../shared/base.service';
 import { AuthenticationGoogleService } from './authentication-google.service';
@@ -17,6 +17,15 @@ export class AuthenticationService extends BaseService {
       super();
   }
 
+  getByEmail(email) {
+    return this.getData({ 
+      url: `${this.BASE_URL}/getByEmail`, 
+      body: {
+        email: email
+      }
+    });
+  }
+
   authenticate(args: { email, password }) {
     return this.postData<any>({ 
       url: `app/authenticate`,
@@ -27,15 +36,17 @@ export class AuthenticationService extends BaseService {
     });
   }
 
-  async login(loginType: LoginType, args?: { email, password }) {
-    let loader;
+  async login(loginType: LoginType, args?: { email, password }) {   
+    let loader = await this.helperSvc.loader;
+    await loader.present();
+
     try {
       let user: IUser;
 
       switch(loginType) {
         case LoginType.STANDARD:
           user = await this.authenticate({ email: args.email, password: args.password });
-          break;
+        break;
         case LoginType.GOOGLE:
           user = await this.googleAuthSvc.login();
         break;
@@ -45,10 +56,29 @@ export class AuthenticationService extends BaseService {
         return null;
       }
 
-      loader = await this.helperSvc.loader;
-      await loader.present();
+      if(loginType != LoginType.STANDARD) {
+        // //if user is registered as normal, notify
+        // const existingUser = await this.getByEmail(user.email);
+        // if(!existingUser) {
+        //   //external auth: check if user not exist, register it
 
-      return this._handleLoginResponse({ loginType: loginType, user: user }, loader);
+        // }
+        const regRes = await this.register({ 
+          email: user.email, 
+          name: user.name, 
+          externalAuth: user.externalAuth
+        });
+
+        //grab the updated user
+        if(regRes.data) {
+          user = regRes.data;
+        } else {
+          await this.helperSvc.presentToast(regRes.message, false);
+          return null;
+        }
+      }
+
+      return this._handleLoginResponse({ loginType: loginType, user: user });
     } catch (e) {
       if(loader) {
         await loader.dismiss();
@@ -61,10 +91,14 @@ export class AuthenticationService extends BaseService {
         msg += "\n" + e.error.error_description;
       }
       await this.helperSvc.presentToast(msg, false);
+    } finally {
+      if(loader) {
+        await loader.dismiss();
+      }
     }
   }
 
-  register(args: { email, mobile, name, password })
+  register(args: { email, name, mobile?, password?, externalAuth?: IExternalAuth })
     : Promise<{ data?, message? }> {
     return new Promise(async (resolve, reject) => {
       try {
@@ -109,7 +143,7 @@ export class AuthenticationService extends BaseService {
       });
   }
 
-  private async _handleLoginResponse(args: ILoginParams, loader?: HTMLIonLoadingElement) {
+  private async _handleLoginResponse(args: ILoginParams) {
     const promises = [];
 
     let profilePromise = this.userSettingSvc.putUserProfileLocal(args.user);
@@ -135,10 +169,6 @@ export class AuthenticationService extends BaseService {
       return profile;
     } catch(e) {
       throw e;
-    } finally {
-      if(loader) {
-        await loader.dismiss();
-      }
     }
   }
 }

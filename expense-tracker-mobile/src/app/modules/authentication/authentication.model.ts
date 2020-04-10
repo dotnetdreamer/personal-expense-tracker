@@ -5,7 +5,7 @@ export interface IUser {
     photo?: string
     mobile?: string
     access_token?: string
-    externalAuthResponse?: IGoogleAuthResponse | any
+    externalAuth?: IExternalAuth
 }
 
 export interface IUserProfile extends IUser {
@@ -34,4 +34,12 @@ export interface IGoogleAuthResponse {
     name: string
     authentication: { accessToken: string, idToken: string }
     serverAuthCode: string
+}
+
+export interface IExternalAuth {
+    userId?: number
+    email: string
+    externalIdentifier: string
+    oAuthAccessToken?: string
+    providerSystemName: LoginType
 }

@@ -3,7 +3,7 @@ import { Injectable, NgZone } from '@angular/core';
 
 import { Plugins } from '@capacitor/core';
 
-import { IUser, IGoogleAuthResponse } from './authentication.model';
+import { IUser, IGoogleAuthResponse, LoginType } from './authentication.model';
 
 @Injectable({
     providedIn: 'root'
@@ -11,7 +11,6 @@ import { IUser, IGoogleAuthResponse } from './authentication.model';
 export class AuthenticationGoogleService {
     constructor(private ngZone: NgZone) {
     }
-
 
     login(): Promise<IUser> {
         // Plugins.GoogleAuth.addListener('userChange', (googleUser) => {
@@ -27,8 +26,11 @@ export class AuthenticationGoogleService {
                     email: result.email,
                     name: result.name,
                     photo: result.imageUrl,
-                    externalAuthResponse: result
-                    // mobile: result.
+                    externalAuth: {
+                        email: result.email,
+                        externalIdentifier: result.id,
+                        providerSystemName: LoginType.GOOGLE
+                    }
                 };
                 resolve(user);
             } catch (e) {

@@ -3,6 +3,7 @@ export interface IRegistrationParams {
     name: string
     mobile: string
     password: string
+    externalAuth?: any
 }
 
 

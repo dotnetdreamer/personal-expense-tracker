@@ -13,8 +13,8 @@ export class ExternalAuth extends BaseEntity {
     @Column()
     externalIdentifier: string;
 
-    @Column()
-    oAuthAccessToken: string;
+    @Column({ nullable: true })
+    oAuthAccessToken?: string;
 
     @Column()
     providerSystemName: string;

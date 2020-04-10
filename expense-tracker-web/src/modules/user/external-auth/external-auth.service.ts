@@ -24,14 +24,14 @@ export class ExternalAuthService {
         const existingAuth = await this.findByEmail(externalAuth.email);
         if(existingAuth) {
             newOrUpdated = Object.assign({}, existingAuth);
-            if(typeof newOrUpdated.updatedOn === 'undefined') {
+            if(!newOrUpdated.updatedOn) {
                 newOrUpdated.updatedOn = <any>moment().format(AppConstant.DEFAULT_DATETIME_FORMAT);
             }
         } else {
             newOrUpdated = Object.assign({}, externalAuth);
         }
         
-        if(typeof newOrUpdated.createdOn === 'undefined') {
+        if(!newOrUpdated.createdOn) {
             newOrUpdated.createdOn = <any>moment().format(AppConstant.DEFAULT_DATETIME_FORMAT);
         }
     
