@@ -4,13 +4,23 @@ page-expense-create-or-update {
             display: flex;
             align-items: center;
 
-            > ion-button {
-                margin-right: 10px;
+            .category-container {
+                position: relative;
+                padding: 10px;                
                 height: 100px;
                 width: 110px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                flex-direction: column;
+                text-align: center;
 
                 ion-icon {
                     font-size: 40px;
+                }
+
+                ion-label {
+                    font-size: 10px;
                 }
             }
 
