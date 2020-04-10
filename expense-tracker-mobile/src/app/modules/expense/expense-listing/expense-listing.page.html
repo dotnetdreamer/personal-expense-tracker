@@ -20,7 +20,7 @@
     (ionChange)="onSearchInputChanged($event)" (ionClear)="onSearchInputCleared($event)"
     [placeholder]="'search.title' | localizedresource | async"></ion-searchbar>
 
-  <no-data *ngIf="!expenses.length"></no-data>
+  <no-data *ngIf="!expenses.length && dataLoaded"></no-data>
   <ion-virtual-scroll [items]="expenses" approxItemHeight="85px" class="expenses">
     <ion-item lines="none" *virtualItem="let item;let index=index;" 
       (click)="onExpenseItemClicked($event, item, 'detail')">

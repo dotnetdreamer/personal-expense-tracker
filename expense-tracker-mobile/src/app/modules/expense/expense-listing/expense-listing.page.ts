@@ -25,6 +25,7 @@ export class ExpenseListingPage extends BasePage implements OnInit, OnDestroy {
   searchTerm: string;
   sum = 0;
   dates: { selectedDate?: { from, to }, todayDate? } = {};
+  dataLoaded = false;
   workingCurrency = ''; //fix for undefined showing in title
 
   private _syncInitSub: Subscription;
@@ -129,6 +130,8 @@ export class ExpenseListingPage extends BasePage implements OnInit, OnDestroy {
   }
 
   private async _getExpenses(args?: { term? }) {
+    this.dataLoaded = false;
+
     let filters:any = {
       fromDate: this.dates.selectedDate.from,
       toDate: this.dates.selectedDate.to
@@ -154,6 +157,8 @@ export class ExpenseListingPage extends BasePage implements OnInit, OnDestroy {
       if(AppConstant.DEBUG) {
         console.log('ExpenseListingPage: _getExpenses: expenses', this.expenses);
       }
+
+      this.dataLoaded = true;
     });
   }
 
@@ -193,81 +198,5 @@ export class ExpenseListingPage extends BasePage implements OnInit, OnDestroy {
     //   }
     //   await this._getExpenses();
     // });
-  }
-
-  private _debounce(func, wait, immediate?) {
-    var timeout;
-    return function() {
-      var context = this, args = arguments;
-      var later = function() {
-        timeout = null;
-        if (!immediate) func.apply(context, args);
-      };
-      var callNow = immediate && !timeout;
-      clearTimeout(timeout);
-      timeout = setTimeout(later, wait);
-      if (callNow) func.apply(context, args);
-    };
-  }
-
-  private async _presentUpdateModal(expense: IExpense) {
-    const resources = await Promise.all([
-      this.localizationSvc.getResource('expense.title')
-      , this.localizationSvc.getResource('expense.description')
-      , this.localizationSvc.getResource('expense.amount')
-      , this.localizationSvc.getResource('common.cancel')
-    ]);
-
-    const title = resources[0];
-    const alert = await this.alertCtrl.create({
-      header: title,
-      inputs: [
-        {
-          name: 'description',
-          type: 'text',
-          value: expense.description,
-          placeholder: resources[1]
-        },
-        {
-          name: 'amount',
-          type: 'number',
-          value: expense.amount,
-          placeholder: resources[2]
-        }
-      ],
-      buttons: [
-        {
-          text: resources[3],
-          role: 'cancel',
-          cssClass: 'secondary',
-          // handler: () => {
-          // }
-        }, {
-          text: 'Ok',
-          handler: async (data) => {
-            if(!data.description && !data.amount) {
-              return;
-            }
-
-            if(!data.description.trim().length) {
-              return;
-            }
-
-            await this.expenseSvc.putLocal({
-              ...expense,
-              description: data.description,
-              amount: data.amount,
-              markedForUpdate: true,
-              updatedOn: null
-            });   
-
-            this.pubsubSvc.publishEvent(SyncConstant.EVENT_SYNC_DATA_PUSH, SyncEntity.Expense);
-            // this.pubsubSvc.publishEvent(SyncConstant.EVENT_SYNC_DATA_PUSH, SyncEntity.Expense);
-          }
-        }
-      ]
-    });
-
-    await alert.present();
   }
 }
