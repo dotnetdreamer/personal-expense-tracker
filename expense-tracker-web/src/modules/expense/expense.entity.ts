@@ -1,9 +1,9 @@
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
-import { BaseEntity } from '../base.entity';
+import { BaseComplexEntity } from '../shared/entity/base-complex.entity';
 
 @Entity()
-export class Expense extends BaseEntity {
+export class Expense extends BaseComplexEntity {
   @Column()
   description: string;
   
@@ -18,13 +18,4 @@ export class Expense extends BaseEntity {
 
   @Column({ nullable: true })
   attachmentId: number;
-
-  @Column()
-  isDeleted: boolean
-
-  @Column()
-  createdOn: Date
-
-  @Column({ nullable: true })
-  updatedOn?: Date
 }

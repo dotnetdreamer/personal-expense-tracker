@@ -1,9 +1,9 @@
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
-import { BaseEntity } from '../base.entity';
+import { BaseComplexEntity } from '../shared/entity/base-complex.entity';
 
 @Entity()
-export class Category extends BaseEntity {
+export class Category extends BaseComplexEntity {
   @Column()
   name: string;
   
@@ -12,13 +12,4 @@ export class Category extends BaseEntity {
 
   @Column({ nullable: true })
   icon: string
-
-  @Column()
-  isDeleted: boolean
-
-  @Column()
-  createdOn: Date
-
-  @Column({ nullable: true })
-  updatedOn?: Date
 }

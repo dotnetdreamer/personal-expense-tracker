@@ -1,11 +1,11 @@
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
-import { BaseEntity } from '../../base.entity';
+import { BaseEntity } from '../../shared/entity/base.entity';
 
 @Entity()
 export class AccessToken extends BaseEntity {
-    @Column()
-    userId: number;
+  @Column()
+  userId: number;
     
   @Column()
   accessToken: string;
@@ -18,10 +18,4 @@ export class AccessToken extends BaseEntity {
 
   @Column()
   refreshTokenExpiresOn: Date;
-
-  @Column()
-  createdOn?: Date
-
-  @Column({ nullable: true })
-  updatedOn?: Date
 }

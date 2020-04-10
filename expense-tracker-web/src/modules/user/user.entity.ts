@@ -1,9 +1,9 @@
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
-import { BaseEntity } from '../base.entity';
+import { BaseComplexEntity } from '../shared/entity/base-complex.entity';
 
 @Entity()
-export class User extends BaseEntity {
+export class User extends BaseComplexEntity {
   @Column()
   name: string;
 
@@ -18,13 +18,4 @@ export class User extends BaseEntity {
   
   @Column({ nullable: true })
   mobile?: string;
-
-  @Column()
-  isDeleted: boolean
-
-  @Column()
-  createdOn: Date
-
-  @Column({ nullable: true })
-  updatedOn?: Date
 }

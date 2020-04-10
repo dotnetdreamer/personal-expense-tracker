@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
-import { BaseEntity } from '../../base.entity';
+import { BaseEntity } from '../../shared/entity/base.entity';
 
 @Entity()
 export class ExternalAuth extends BaseEntity {
@@ -18,10 +18,4 @@ export class ExternalAuth extends BaseEntity {
 
     @Column()
     providerSystemName: string;
-
-    @Column()
-    createdOn?: Date
-
-    @Column({ nullable: true })
-    updatedOn?: Date
 }

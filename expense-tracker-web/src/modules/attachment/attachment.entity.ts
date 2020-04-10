@@ -1,9 +1,9 @@
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
-import { BaseEntity } from '../base.entity';
+import { BaseComplexEntity } from '../shared/entity/base-complex.entity';
 
 @Entity()
-export class Attachment extends BaseEntity {
+export class Attachment extends BaseComplexEntity {
   @Column()
   filename: string;
   
@@ -18,13 +18,4 @@ export class Attachment extends BaseEntity {
 
   // @Column()
   // attachment: blob
-
-  @Column()
-  isDeleted: boolean
-
-  @Column()
-  createdOn: Date
-
-  @Column({ nullable: true })
-  updatedOn?: Date
 }
