@@ -1,9 +1,9 @@
-import { Component, OnInit, ViewEncapsulation, OnDestroy, NgZone } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation, OnDestroy, NgZone, ViewChild } from '@angular/core';
 
 import { Subscription, Observable } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 
-import { AlertController, IonItemSliding } from '@ionic/angular';
+import { AlertController, IonItemSliding, IonContent } from '@ionic/angular';
 import * as moment from 'moment';
 
 import { BasePage } from '../../shared/base.page';
@@ -21,6 +21,8 @@ import { SyncEntity } from '../../shared/sync/sync.model';
   encapsulation: ViewEncapsulation.None
 })
 export class ExpenseListingPage extends BasePage implements OnInit, OnDestroy {
+  @ViewChild('epListingContent') epListingContent: IonContent;
+
   expenses: Array<IExpense> = [];
   searchTerm: string;
   sum = 0;
@@ -130,6 +132,8 @@ export class ExpenseListingPage extends BasePage implements OnInit, OnDestroy {
   }
 
   private async _getExpenses(args?: { term? }) {
+    //reset
+    await this.epListingContent.scrollToTop();
     this.dataLoaded = false;
 
     let filters:any = {
@@ -146,19 +150,22 @@ export class ExpenseListingPage extends BasePage implements OnInit, OnDestroy {
       const fromDateMonth = moment(filters.fromDate).format('M');
       const toDateMonth = moment(filters.toDate).format('M');
 
-      //if changed month is not same as current month, then we don't have entries local..
-      if(currentMonth != fromDateMonth || currentMonth != toDateMonth) {
-        this.expenses = await this.expenseSvc.getExpenses(filters);
-      } else {
-        this.expenses = await this.expenseSvc.getExpenseListLocal(filters);
+      try {
+        //if changed month is not same as current month, then we don't have entries local..
+        if(currentMonth != fromDateMonth || currentMonth != toDateMonth) {
+          this.expenses = await this.expenseSvc.getExpenses(filters);
+        } else {
+          this.expenses = await this.expenseSvc.getExpenseListLocal(filters);
+        }
+      } catch(e) {
+        this.expenses = [];
+      } finally {
+        this.sum = this.expenses.reduce((a, b) => a + (+b.amount), 0);
+        if(AppConstant.DEBUG) {
+          console.log('ExpenseListingPage: _getExpenses: expenses', this.expenses);
+        }
+        this.dataLoaded = true;
       }
-
-      this.sum = this.expenses.reduce((a, b) => a + (+b.amount), 0);
-      if(AppConstant.DEBUG) {
-        console.log('ExpenseListingPage: _getExpenses: expenses', this.expenses);
-      }
-
-      this.dataLoaded = true;
     });
   }
 
