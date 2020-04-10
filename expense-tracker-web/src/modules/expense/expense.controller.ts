@@ -1,4 +1,6 @@
-import { Controller, UseInterceptors, Get, ClassSerializerInterceptor, Post, Body, Query, UseGuards } from "@nestjs/common";
+import { Controller, UseInterceptors, Get, ClassSerializerInterceptor, Post, Body, Query, UseGuards, Req } from "@nestjs/common";
+
+import { Request } from "express";
 
 import { ExpenseService } from "./expense.service";
 import { IExpenseParams } from "./expense.model";
@@ -7,6 +9,7 @@ import { AttachmentService } from "../attachment/attachment.service";
 import { CategoryService } from "../category/category.service";
 import { AppConstant } from "../shared/app-constant";
 import { JwtAuthGuard } from "../user/auth/jwt-auth.guard";
+import { ICurrentUser } from "../shared/shared.model";
 
 @Controller('expense')
 export class ExpenseController {
@@ -16,8 +19,13 @@ export class ExpenseController {
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(ClassSerializerInterceptor)
   @Get('getAll')
-  async getAll(@Query() filters?: { term?: string, fromDate?: string, toDate?: string }) {
-    const expenses = await this.expenseSvc.findAll(filters);
+  async getAll(@Req() req: Request,
+   @Query() filters?: { term?: string, fromDate?: string, toDate?: string }) {
+    // const u = <ICurrentUser>req.user;
+
+    const expenses = await this.expenseSvc.findAll({
+      ...filters
+    });
 
     //map it
     const model = expenses.map(async (e) => {
