@@ -119,8 +119,16 @@
     </ion-card-content>
   </ion-card>
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-    <ion-fab-button (click)="onAddClick()">
+    <ion-fab-button>
       <ion-icon name="add"></ion-icon>
     </ion-fab-button>
+    <ion-fab-list side="top">
+      <ion-fab-button (click)="onAddClick('expense')">
+        <ion-icon ios="expense" md="expense"></ion-icon>
+      </ion-fab-button>
+      <ion-fab-button (click)="onAddClick('group')">
+        <ion-icon ios="add-group" md="add-group"></ion-icon>
+      </ion-fab-button>
+    </ion-fab-list>
   </ion-fab>
 </ion-content>
