@@ -30,7 +30,7 @@ export class AuthenticationGoogleService {
                     externalAuthResponse: result
                     // mobile: result.
                 };
-                resolve(user)
+                resolve(user);
             } catch (e) {
                 const exp = <{ error: 'popup_closed_by_user' }>e;
                 reject(exp);

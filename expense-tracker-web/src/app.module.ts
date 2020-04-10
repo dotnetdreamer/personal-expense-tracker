@@ -17,13 +17,15 @@ import { User } from './modules/user/user.entity';
 import { AuthModule } from './modules/user/auth/auth.module';
 import { TokenModule } from './modules/user/token/token.module';
 import { AccessToken } from './modules/user/token/token.entity';
+import { ExternalAuth } from './modules/user/external-auth/external-auth.entity';
+import { ExternalAuthModule } from './modules/user/external-auth/external-auth.module';
 
 @Module({
   imports: [
     TypeOrmModule.forRoot({
       type: 'sqlite',
       database: './_db/expense-tracker.db',
-      entities: [Category, Expense, Attachment, User, AccessToken],
+      entities: [Category, Expense, Attachment, User, AccessToken, ExternalAuth],
       synchronize: true,
     }),
     SharedModule,
@@ -33,7 +35,8 @@ import { AccessToken } from './modules/user/token/token.entity';
     MlModule,
     UserModule,
     AuthModule,
-    TokenModule
+    TokenModule,
+    ExternalAuthModule
   ],
   controllers: [AppController],
   providers: [AppService],
