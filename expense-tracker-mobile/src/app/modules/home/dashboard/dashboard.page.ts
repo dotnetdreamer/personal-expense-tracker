@@ -15,6 +15,7 @@ import {
   ApexNonAxisChartSeries, ApexLegend, ApexYAxis, ApexGrid, ApexStroke, ApexTitleSubtitle
 } from "ng-apexcharts";
 import { IExpenseDashboardReport, IExpense } from '../../expense/expense.model';
+import { AlertController } from '@ionic/angular';
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
@@ -70,7 +71,9 @@ export class DashboardPage extends BasePage implements AfterViewInit, OnDestroy 
   private _syncDataPullCompleteSub: Subscription;
   private _eventCreatedOrUpdatedSub: Subscription;
 
-  constructor(private expenseSvc: ExpenseService, private currencySettingSvc: CurrencySettingService) { 
+  constructor(private alertCtrl: AlertController
+    , private expenseSvc: ExpenseService
+    , private currencySettingSvc: CurrencySettingService) { 
     super();
     
     this._subscribeToEvents();
@@ -91,8 +94,12 @@ export class DashboardPage extends BasePage implements AfterViewInit, OnDestroy 
       , prop == 'toDate' ? d : this.selectedToDate);
   }
 
-  async onAddClick() {
-    await this.navigate({ path: '/expense/expense-create-or-update'})
+  async onAddClick(actionType: 'expense' | 'group') {
+    if(actionType == 'expense') {
+      await this.navigate({ path: '/expense/expense-create-or-update'})
+    } else if(actionType === 'group') {
+      await this._presentAddGroupModal();
+    }
   }
 
   async doRefresh(ev) {
@@ -136,6 +143,52 @@ export class DashboardPage extends BasePage implements AfterViewInit, OnDestroy 
     }
   }
 
+  private async _presentAddGroupModal() {
+      const resources = await Promise.all([
+        this.localizationSvc.getResource('group.add')
+        , this.localizationSvc.getResource('group.name')
+        , this.localizationSvc.getResource('common.cancel')
+      ]);
+
+      const title = resources[0];
+      const alert = await this.alertCtrl.create({
+        header: title,
+        inputs: [
+          {
+            name: 'name',
+            type: 'text',
+            placeholder: resources[1]
+          }
+        ],
+        buttons: [
+          {
+            text: resources[2],
+            role: 'cancel',
+            cssClass: 'secondary',
+            // handler: () => {
+            // }
+          }, {
+            text: 'Ok',
+            handler: async (data) => {
+              if(!data.name) {
+                return;
+              }
+  
+              if(!data.name.trim().length) {
+                return;
+              }
+  
+              // await this.expenseSvc.putLocal({
+              //   name: data.name,
+              // });   
+                // this.pubsubSvc.publishEvent(SyncConstant.EVENT_SYNC_DATA_PUSH, SyncEntity.Expense);
+            }
+          }
+        ]
+    });
+    await alert.present();
+  }
+    
   private async _getTodayExpenses() {
     this.todayExpenses = await this.expenseSvc.getExpenseListLocal({ 
       fromDate: this.todayDate, 

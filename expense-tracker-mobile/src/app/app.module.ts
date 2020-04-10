@@ -11,6 +11,7 @@ import { PipesModule } from './pipes/pipes.module';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
 import { NgxPubSubModule } from '@pscoped/ngx-pub-sub';
+import { AccordionModule } from './components/accordion';
 
 @NgModule({
   declarations: [AppComponent],
@@ -22,6 +23,7 @@ import { NgxPubSubModule } from '@pscoped/ngx-pub-sub';
     IonicModule.forRoot(),
     AppRoutingModule,
     NgxPubSubModule,
+    AccordionModule,
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production })
   ],
   providers: [

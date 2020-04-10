@@ -39,6 +39,35 @@ app-root {
             position: relative;
             margin-bottom: 30px !important;
         }
+
+        .menu-accordion {
+            .panel-group {
+                .panel  {
+                    .panel-heading {
+                        display: flex;
+                        align-items: center;
+                        justify-content: space-between;
+                        padding: 10px 20px;
+
+                        .panel-title {
+                            width: 100%;
+
+                            accordion-heading {
+                                display: flex;
+                                justify-content: space-between;
+                                align-items: center;
+                            }
+                        }
+                    }
+
+                    .panel-collaps {
+                        .panel-body {
+
+                        }
+                    }
+                }
+            }
+        }
     }
     ion-footer {
         ion-title {

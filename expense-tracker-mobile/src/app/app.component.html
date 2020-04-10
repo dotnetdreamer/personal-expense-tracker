@@ -32,14 +32,19 @@
             </ion-item>
           </ion-menu-toggle>
         </ion-list>
-        <!-- <ion-list>
-          <ion-menu-toggle auto-hide="false">
-            <ion-item (click)="onItemClicked('/expense')">
-              <ion-icon slot="start" ios="expense" md="expense"></ion-icon>
-              <ion-label>{{'expense.title_listing' | localizedresource | async}}</ion-label>
-            </ion-item>
-          </ion-menu-toggle>
-        </ion-list> -->
+        <ion-list>
+          <accordion showArrows="false" class="menu-accordion">
+            <accordion-group>
+                <accordion-heading>
+                  <a role="button" data-toggle="collapse"><ion-label>Test Group</ion-label></a>
+                </accordion-heading>
+                <ion-item lines="full" detail="false">
+                  <ion-icon slot="start" ios="expense" md="expense"></ion-icon>
+                  <ion-label>{{'label.news.title' | localizedresource | async}}</ion-label>
+                </ion-item>
+            </accordion-group>
+        </accordion>
+        </ion-list>
       </ion-content>
       <ion-footer>
         <ion-toolbar>

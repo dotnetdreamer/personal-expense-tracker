@@ -36,6 +36,11 @@
         "today": "Today",
         "total": "Total"
     },
+    "group": {
+        "title": "Group",
+        "add": "Add group",
+        "name": "Name"
+    },
     "home": {
         "title": "Home",
         "dashboard": {

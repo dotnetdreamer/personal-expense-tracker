@@ -53,6 +53,11 @@ export class AppComponent {
     });
   }
 
+  onAddGroupClicked(ev: CustomEvent) {
+    ev.stopImmediatePropagation();
+    ev.stopPropagation();
+  }
+
   async onItemClicked(url, timeout?) {
     setTimeout(async () => {
       switch(url) {
