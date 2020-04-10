@@ -1,9 +1,10 @@
-import { Controller, Get, UseGuards, Post, Request, UseInterceptors, ClassSerializerInterceptor } from '@nestjs/common';
+import { Controller, Get, UseGuards, Post, Request, UseInterceptors, ClassSerializerInterceptor, Body } from '@nestjs/common';
 
 import { AppService } from './app.service';
 import { CategoryService } from './modules/category/category.service';
 import { AuthService } from './modules/user/auth/auth.service';
 import { LocalAuthGuard } from './modules/user/auth/local-auth.guard';
+import { IRegistrationParams } from './modules/user/user.model';
 
 @Controller('app')
 export class AppController {
@@ -25,6 +26,12 @@ export class AppController {
   @Post('authenticate')
   async authenticate(@Request() req) {
     return this.authSvc.login(req.user);
+  }
+  
+  @UseInterceptors(ClassSerializerInterceptor)
+  @Post('register')
+  async register(@Body() model: IRegistrationParams) {
+    return this.authSvc.register(model);
   }
 
   private async _populate() {

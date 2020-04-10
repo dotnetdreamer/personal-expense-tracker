@@ -102,7 +102,7 @@ export class AuthenticationService extends BaseService {
     return new Promise(async (resolve, reject) => {
       try {
         const res = await this.postData<{ data?, message? }> ({ 
-          url: `${this.BASE_URL}/register`,
+          url: `app/register`,
           body: args
         });
 

@@ -13,10 +13,4 @@ export class UserController {
   getByEmail(@Query() email: string) {
     return this.userSvc.getUserByEmail(email);
   }
-
-  @UseInterceptors(ClassSerializerInterceptor)
-  @Post('register')
-  async register(@Body() model: IRegistrationParams) {
-    return this.userSvc.register(model);
-  }
 }

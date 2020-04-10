@@ -6,6 +6,7 @@ import { TokenService } from '../token/token.service';
 import { AppConstant } from 'src/modules/shared/app-constant';
 import * as moment from 'moment';
 import { User } from '../user.entity';
+import { IRegistrationParams } from '../user.model';
 
 @Injectable()
 export class AuthService {
@@ -16,6 +17,19 @@ export class AuthService {
 
   validateUser(email: string, password: string): Promise<any> {
     return  this.userSvc.validateUser({ email, password });
+  }
+
+  async register(model: IRegistrationParams) {
+    const response = await this.userSvc.register(model);
+    //do not return token info when user is registering through normal registration form
+    if(response.data && model.externalAuth) {
+      const data = await this.login(response.data);
+      response.data = data;
+    } else {
+      response.data = true;
+    }
+
+    return response;
   }
 
   async login(user: User) {
@@ -33,7 +47,7 @@ export class AuthService {
     const refreshTokenExpiresOn = moment.utc().add(rtExpFormat, 's').toISOString();
 
     //save
-    this.tokenSvc.save({
+    await this.tokenSvc.save({
       id: undefined,
       accessToken: token,
       refreshToken: refreshToken,
