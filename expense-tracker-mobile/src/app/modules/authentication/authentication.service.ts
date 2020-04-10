@@ -80,11 +80,10 @@ export class AuthenticationService extends BaseService {
 
       return this._handleLoginResponse({ loginType: loginType, user: user });
     } catch (e) {
-      if(loader) {
-        await loader.dismiss();
-      }
       let msg = e.toString();
-      if(e.error) {
+      if(e.message) {
+        msg = e.message;
+      } else if(e.error) {
         msg = e.error.toString();
       }
       if(e.error.error_description) {
