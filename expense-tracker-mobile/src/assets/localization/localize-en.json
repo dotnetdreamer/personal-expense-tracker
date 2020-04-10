@@ -27,6 +27,7 @@
     "expense": {
         "title": "Expense",
         "title_listing": "Expenses",
+        "non_group": "Non-group expenses",
         "add": "Add expense",
         "description": "Description",
         "amount": "Amount",

@@ -28,14 +28,18 @@
             </ion-item>
             <ion-item (click)="onItemClicked('/expense')">
               <ion-icon slot="start" ios="expense" md="expense"></ion-icon>
-              <ion-label>{{'expense.title_listing' | localizedresource | async}}</ion-label>
-            </ion-item>
-            <ion-item (click)="onItemClicked('/category')">
-              <ion-icon slot="start" name="list"></ion-icon>
-              <ion-label>{{'category.title' | localizedresource | async}}</ion-label>
+              <ion-label>{{'expense.non_group' | localizedresource | async}}</ion-label>
             </ion-item>
           </ion-menu-toggle>
         </ion-list>
+        <!-- <ion-list>
+          <ion-menu-toggle auto-hide="false">
+            <ion-item (click)="onItemClicked('/expense')">
+              <ion-icon slot="start" ios="expense" md="expense"></ion-icon>
+              <ion-label>{{'expense.title_listing' | localizedresource | async}}</ion-label>
+            </ion-item>
+          </ion-menu-toggle>
+        </ion-list> -->
       </ion-content>
       <ion-footer>
         <ion-toolbar>

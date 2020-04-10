@@ -34,6 +34,11 @@ app-root {
                 margin: 5px 0;
             }
         }
+
+        ion-list {
+            position: relative;
+            margin-bottom: 30px !important;
+        }
     }
     ion-footer {
         ion-title {

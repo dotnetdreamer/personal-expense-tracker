@@ -111,6 +111,16 @@ export class SettingPage extends BasePage implements OnInit, OnDestroy {
     }
   }
 
+  async onItemClicked(url, timeout?) {
+    setTimeout(async () => {
+      switch(url) {
+        default:
+          await this.navigate({ path: url });
+        break;
+      }
+    }, typeof timeout !== 'undefined' ? timeout : 300);
+  }
+
   private _subscribeToEvents() {
     this._syncDataPushCompleteSub = this.pubsubSvc.subscribe(SyncConstant.EVENT_SYNC_DATA_PUSH_COMPLETE, async () => {
       if(AppConstant.DEBUG) {
