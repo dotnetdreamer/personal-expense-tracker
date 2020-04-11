@@ -6,6 +6,7 @@ import { Injectable } from '@angular/core';
 export class SchemaService {
     private _setting = "setting";
     private _category = "category";
+    private _group = "group";
     private _expense = "expense";
     private _attachment = "attachment";
     private _user = "user";
@@ -26,6 +27,34 @@ export class SchemaService {
                     type: 'TEXT' 
                 }, { 
                     name: 'icon', 
+                    type: 'TEXT' 
+                }, { 
+                    name: 'updatedOn', 
+                    type: 'TEXT' 
+                }, {
+                    name: 'createdOn', 
+                    type: 'TEXT'  
+                }, {
+                    name: 'markedForAdd', 
+                    type: 'TEXT'  
+                }, {
+                    name: 'markedForUpdate', 
+                    type: 'TEXT'  
+                }, {
+                    name: 'markedForDelete', 
+                    type: 'TEXT'  
+                }]
+            }, {
+                name: this._group,
+                columns: [{ 
+                    name: 'id', 
+                    isPrimaryKey: true, 
+                    type: 'INTEGER' 
+                }, { 
+                    name: 'name', 
+                    type: 'TEXT' 
+                }, { 
+                    name: 'entityName', 
                     type: 'TEXT' 
                 }, { 
                     name: 'updatedOn', 
@@ -137,6 +166,7 @@ export class SchemaService {
     tables = {
         setting: this._setting,
         category: this._category,
+        group: this._group,
         expense: this._expense,
         attachment: this._attachment,
         user: this._user

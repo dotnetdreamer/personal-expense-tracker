@@ -22,6 +22,8 @@ import { IUser, IUserProfile, LoginType } from './modules/authentication/authent
 import { AuthenticationService } from './modules/authentication/authentication.service';
 import { UserSettingService } from './modules/authentication/user-setting.service';
 import { NgxPubSubService } from '@pscoped/ngx-pub-sub';
+import { GroupService } from './modules/group/group.service';
+import { IGroup } from './modules/group/group.model';
 
 @Component({
   selector: 'app-root',
@@ -33,6 +35,7 @@ export class AppComponent {
   workingLanguage;
   appVersion;
   currentUser: IUserProfile;
+  groups: Map<string, IGroup[]>;
 
   constructor( private router: Router, @Inject(DOCUMENT) private document: Document
   , private renderer: Renderer2, private platform: Platform
@@ -41,6 +44,7 @@ export class AppComponent {
     , private appSettingSvc: AppSettingService, private syncHelperSvc: SyncHelperService
     , private categorySvc: CategoryService, private helperSvc: HelperService
     , private authSvc: AuthenticationService, private userSettingSvc: UserSettingService
+    , private groupSvc: GroupService
   ) {
     this.initializeApp();
   }
@@ -151,6 +155,9 @@ export class AppComponent {
       this.appVersion = appVersion;
 
       try {
+        //groups
+        await this._getGroups();
+
         SplashScreen.hide();
       } catch(e) { }
     });
@@ -196,10 +203,13 @@ export class AppComponent {
       //will be called when unsubscribe calls
       return () => subc.unsubscribe()
     }).pipe(debounceTime(500))
-      .subscribe((totalTables) => {
+      .subscribe(async (totalTables) => {
       if(AppConstant.DEBUG) {
         console.log('AppComponent: EVENT_SYNC_DATA_PUSH_COMPLETE: totalTables', totalTables);
       }
+
+      //groups
+      await this._getGroups();
     });
   }
 
@@ -216,6 +226,18 @@ export class AppComponent {
       } finally {
         await loader.dismiss();
       }
+    }
+  }
+
+  private async _getGroups() {
+    const groups = await this.groupSvc.getGroupListLocal();
+    if(!groups.length) {
+      return;
+    }
+    this.groups = new Map();
+    const byEntity = groups.groupBy<IGroup>(g => g.entityName);
+    for(let e in byEntity) {
+      this.groups.set(e, byEntity[e]);
     }
   }
 

@@ -16,6 +16,7 @@ export class AppConstant {
     public static readonly EVENT_DB_INITIALIZED = "event:dbInitialized"; 
     public static readonly EVENT_CATEGORY_CREATED_OR_UPDATED = "event:categoryCreatedOrUpdated"; 
     public static readonly EVENT_EXPENSE_CREATED_OR_UPDATED = "event:expenseCreatedOrUpdated"; 
+    public static readonly EVENT_GROUP_CREATED_OR_UPDATED = "event:groupCreatedOrUpdated"; 
     public static readonly EVENT_ATTACHMENT_CREATED_OR_UPDATED = "event:attachmentCreatedOrUpdated"; 
     public static readonly EVENT_LANGUAGE_CHANGED = "event:languageChanged";
 

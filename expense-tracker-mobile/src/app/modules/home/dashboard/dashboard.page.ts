@@ -16,6 +16,8 @@ import {
 } from "ng-apexcharts";
 import { IExpenseDashboardReport, IExpense } from '../../expense/expense.model';
 import { AlertController } from '@ionic/angular';
+import { GroupService } from '../../group/group.service';
+import { SyncEntity } from '../../shared/sync/sync.model';
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
@@ -72,7 +74,7 @@ export class DashboardPage extends BasePage implements AfterViewInit, OnDestroy 
   private _eventCreatedOrUpdatedSub: Subscription;
 
   constructor(private alertCtrl: AlertController
-    , private expenseSvc: ExpenseService
+    , private expenseSvc: ExpenseService, private groupSvc: GroupService
     , private currencySettingSvc: CurrencySettingService) { 
     super();
     
@@ -178,10 +180,11 @@ export class DashboardPage extends BasePage implements AfterViewInit, OnDestroy 
                 return;
               }
   
-              // await this.expenseSvc.putLocal({
-              //   name: data.name,
-              // });   
-                // this.pubsubSvc.publishEvent(SyncConstant.EVENT_SYNC_DATA_PUSH, SyncEntity.Expense);
+              await this.groupSvc.putLocal({
+                name: data.name,
+                entityName: SyncEntity.Expense
+              });   
+              this.pubsubSvc.publishEvent(SyncConstant.EVENT_SYNC_DATA_PUSH, SyncEntity.Group);
             }
           }
         ]

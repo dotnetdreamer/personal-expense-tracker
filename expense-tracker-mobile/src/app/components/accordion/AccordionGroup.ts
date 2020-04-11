@@ -38,7 +38,6 @@ import {AccordionToggle} from "./AccordionToggle";
 `
 })
 export class AccordionGroup {
-
     @Input()
     heading: string;
 
@@ -61,12 +60,7 @@ export class AccordionGroup {
     disabled: boolean = false;
 
     constructor(@Host() @Inject(forwardRef(() => Accordion)) public accordion: Accordion,
-                private cdr: ChangeDetectorRef) {
-    }
-
-    ngAfterContentInit() {
-        //fix: if attribute is passed from html, its type is in string.
-        this.isOpened = (<any>this.isOpened) === 'true';
+        private cdr: ChangeDetectorRef) {
     }
 
     checkAndToggle() {

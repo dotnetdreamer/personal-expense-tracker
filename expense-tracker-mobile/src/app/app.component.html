@@ -32,18 +32,21 @@
             </ion-item>
           </ion-menu-toggle>
         </ion-list>
-        <ion-list>
-          <accordion showArrows="false" class="menu-accordion">
-            <accordion-group>
-                <accordion-heading>
-                  <a role="button" data-toggle="collapse"><ion-label>Test Group</ion-label></a>
-                </accordion-heading>
-                <ion-item lines="full" detail="false">
-                  <ion-icon slot="start" ios="expense" md="expense"></ion-icon>
-                  <ion-label>{{'label.news.title' | localizedresource | async}}</ion-label>
-                </ion-item>
-            </accordion-group>
-        </accordion>
+        <!-- Groups -->
+        <ion-list *ngIf="groups">
+          <ng-container *ngFor="let group of groups | keyvalue">
+            <accordion [showArrows]="true" class="menu-accordion">
+              <accordion-group [isOpened]="true">
+                  <accordion-heading>
+                    <a role="button" data-toggle="collapse"><ion-label>{{ group.key + ".title_listing" | localizedresource | async }}</ion-label></a>
+                  </accordion-heading>
+                  <ion-item lines="full" detail="false" *ngFor="let item of group.value">
+                    <ion-icon slot="start" ios="group" md="group"></ion-icon>
+                    <ion-label>{{ item.name }}</ion-label>
+                  </ion-item>
+              </accordion-group>
+          </accordion>
+          </ng-container>
         </ion-list>
       </ion-content>
       <ion-footer>

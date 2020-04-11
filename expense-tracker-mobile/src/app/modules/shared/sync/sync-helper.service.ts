@@ -1,12 +1,14 @@
 import { Injectable } from "@angular/core";
 
+import { NgxPubSubService } from '@pscoped/ngx-pub-sub';
+
 import { SyncEntity } from './sync.model';
 import { CategoryService } from '../../category/category.service';
 import { SyncConstant } from './sync-constant';
 import { ExpenseService } from '../../expense/expense.service';
 import { AppConstant } from '../app-constant';
 import { AttachmentService } from '../../attachment/attachment.service';
-import { NgxPubSubService } from '@pscoped/ngx-pub-sub';
+import { GroupService } from '../../group/group.service';
 
 
 @Injectable({
@@ -15,7 +17,7 @@ import { NgxPubSubService } from '@pscoped/ngx-pub-sub';
 export class SyncHelperService {
     constructor(private pubsubSvc: NgxPubSubService
         , private categorySvc: CategoryService, private expenseSvc: ExpenseService
-        , private attachmentSvc: AttachmentService) {
+        , private attachmentSvc: AttachmentService, private groupSvc: GroupService) {
     }
 
     pull(table?: SyncEntity) {
@@ -30,6 +32,9 @@ export class SyncHelperService {
                     case SyncEntity.Attachment:
                         // promises.push(this.attachmentSvc.pull());
                     break;
+                    case SyncEntity.Group:
+                        promises.push(this.groupSvc.pull());
+                    break;
                     case SyncEntity.Expense:
                         promises.push(this.expenseSvc.pull());
                     break;
@@ -39,6 +44,8 @@ export class SyncHelperService {
             } else {   //sync all
                 //category
                 promises.push(this.categorySvc.pull());
+                //group
+                promises.push(this.groupSvc.pull());
                 //attachment
                 // promises.push(this.attachmentSvc.pull());
                 //expense
@@ -70,6 +77,9 @@ export class SyncHelperService {
                     case SyncEntity.Attachment:
                         promises.push(this.attachmentSvc.push());
                     break;
+                    case SyncEntity.Group:
+                        promises.push(this.groupSvc.push());
+                    break;
                     case SyncEntity.Expense:
                         promises.push(this.expenseSvc.push());
                     break;
@@ -81,6 +91,8 @@ export class SyncHelperService {
                 promises.push(this.categorySvc.push());
                 //attachment
                 promises.push(this.attachmentSvc.push());
+                //group
+                promises.push(this.groupSvc.push());
                 //expense
                 promises.push(this.expenseSvc.push());
             }
