@@ -6,9 +6,6 @@ import * as moment from 'moment';
 
 import { Group } from './group.entity';
 import { IGroupParams } from './group.model';
-import { HelperService } from '../shared/helper.service';
-import { IAttachmentParams } from '../attachment/attachment.model';
-import { ICategoryParams } from '../category/category.model';
 
 @Injectable()
 export class GroupService {
@@ -18,11 +15,14 @@ export class GroupService {
   ) {}
 
 
-  async findAll(args?: { name?: string, entityName?: string, fromDate?: string, toDate?: string, showHidden?: boolean }): Promise<Group[]> {
+  async findAll(args?: { 
+      name?: string, entityName?: string, userIds?: number[], 
+      fromDate?: string, toDate?: string, showHidden?: boolean 
+    }): Promise<Group[]> {
     let qb = await getRepository(Group)
       .createQueryBuilder('grp'); 
       
-    if(args && (args.name || args.entityName || args.fromDate || args.toDate)) {
+    if(args && (args.name || args.entityName || args.userIds || args.fromDate || args.toDate)) {
       if(args.name) {
         const name = args.name.trim().toLowerCase();
         qb = qb.andWhere('(grp.description like :name)', { name: `%${name}%` });
@@ -30,7 +30,11 @@ export class GroupService {
 
       if(args.entityName) {
         const entityName = args.entityName.trim().toLowerCase();
-        qb = qb.andWhere('grp.entityName == :entityName', { entityName: entityName });
+        qb = qb.andWhere('grp.entityName = :entityName', { entityName: entityName });
+      }
+
+      if(args.userIds && args.userIds.length) {
+        qb = qb.andWhere("grp.createdBy IN (:...userIds)", { userIds: args.userIds })
       }
 
       if(args.fromDate) {

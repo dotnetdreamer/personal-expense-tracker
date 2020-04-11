@@ -34,6 +34,16 @@ export class CategoryService extends BaseService {
                     }
                     //now add
                     await this.putAllLocal(items, true, true);
+
+                    //find the difference and delete what's not in server (e.g deleted on server)
+                    const localItems = await this.getCategoryListLocal();
+                    const differItems = localItems.filter(li => !items.find(i => {
+                        const dItem = li.id == i.id || (li.markedForAdd || li.markedForUpdate || li.markedForDelete)
+                        return dItem;
+                    }));
+                    for(let d of differItems) {
+                        await this.remove(d.id);
+                    }
                 }
                 resolve();
             } catch (e) {

@@ -1,73 +1,75 @@
 app-root {
-    ion-content {
-        .button-setting {
-            position: absolute;
-            top: 0;
-            right: 0; 
-        }
-        .user-info {
-            background-image: url('/assets/images/background.png');
-            background-repeat: no-repeat;
-            background-size: cover;
-            background-position: 85px 50%;
-            padding: 20px;
-
-            .avatar {
-                > div {
-                    width: 80px;
-                    height: 80px;
-                    display: inline-block;
-                    background-size: cover;
-                    background-position: center;
-                    background-repeat: no-repeat;
-                    border-radius: 50%;
-                    overflow: hidden;
-                }
-
-                > ion-icon {
-                    font-size: 80px;
-                    height: 80px;
-                }
+    ion-menu {
+        ion-content {
+            .button-setting {
+                position: absolute;
+                top: 0;
+                right: 0; 
             }
+            .user-info {
+                background-image: url('/assets/images/background.png');
+                background-repeat: no-repeat;
+                background-size: cover;
+                background-position: 85px 50%;
+                padding: 20px;
 
-            .user-name {
-                margin: 5px 0;
-            }
-        }
-
-        ion-list {
-            position: relative;
-            margin-bottom: 30px !important;
-        }
-
-        .menu-accordion {
-            .panel-group {
-                .panel  {
-                    .panel-heading {
-                        display: flex;
-                        align-items: center;
-                        justify-content: space-between;
-                        padding: 10px 20px;
-
-                        .panel-title {
-                            width: 100%;
-
-                            accordion-heading {
-                                display: flex;
-                                justify-content: space-between;
-                                align-items: center;
-                            }
-                        }
+                .avatar {
+                    > div {
+                        width: 80px;
+                        height: 80px;
+                        display: inline-block;
+                        background-size: cover;
+                        background-position: center;
+                        background-repeat: no-repeat;
+                        border-radius: 50%;
+                        overflow: hidden;
                     }
 
-                    .panel-collapse {
-                        .panel-body {
-                            padding: 0 15px;
-                            ion-item {
-                                --min-height: 30px;
-                                
-                                ion-icon {
-                                    font-size: 18px;
+                    > ion-icon {
+                        font-size: 80px;
+                        height: 80px;
+                    }
+                }
+
+                .user-name {
+                    margin: 5px 0;
+                }
+            }
+
+            ion-list {
+                position: relative;
+                margin-bottom: 30px !important;
+            }
+
+            .menu-accordion {
+                .panel-group {
+                    .panel  {
+                        .panel-heading {
+                            display: flex;
+                            align-items: center;
+                            justify-content: space-between;
+                            padding: 10px 20px;
+
+                            .panel-title {
+                                width: 100%;
+
+                                accordion-heading {
+                                    display: flex;
+                                    justify-content: space-between;
+                                    align-items: center;
+                                }
+                            }
+                        }
+
+                        .panel-collapse {
+                            .panel-body {
+                                padding: 0 15px;
+                                ion-item {
+                                    --min-height: 30px;
+
+                                    ion-icon {
+                                        font-size: 18px;
+                                    }
                                 }
                             }
                         }
@@ -75,11 +77,12 @@ app-root {
                 }
             }
         }
-    }
-    ion-footer {
-        ion-title {
-            color: #ddd;
-            font-size: 12px;
+        ion-footer {
+            ion-title {
+                color: #ddd;
+                font-size: 12px;
+            }
         }
     }
+
 }

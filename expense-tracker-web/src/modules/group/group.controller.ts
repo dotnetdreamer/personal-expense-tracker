@@ -19,8 +19,13 @@ export class GroupController {
    @Query() filters?: { name?: string, entityName?: string, fromDate?: string, toDate?: string }) {
     const user = <ICurrentUser>req.user;
 
+    const userIds = [];
+    userIds.push(user.userId);
+    //TODO: need to add here other group members
+
     const groups = await this.groupSvc.findAll({
-      ...filters
+      ...filters,
+      userIds: userIds
     });
 
     //map it
