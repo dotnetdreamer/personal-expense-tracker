@@ -15,6 +15,9 @@ export class Expense extends BaseUserEntity {
   categoryId: number
 
   @Column({ nullable: true })
+  groupId?: number;
+
+  @Column({ nullable: true })
   notes: string;
 
   @Column({ nullable: true })

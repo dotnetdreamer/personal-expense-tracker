@@ -1,9 +1,11 @@
 import { ICategory } from '../category/category.model';
 import { IAttachment } from '../attachment/attachment.model';
+import { IGroup } from '../group/group.model';
 
 export interface IExpense {
     id?: number
     category?: ICategory
+    group?: IGroup
     description: string
     amount: string
     notes?: string

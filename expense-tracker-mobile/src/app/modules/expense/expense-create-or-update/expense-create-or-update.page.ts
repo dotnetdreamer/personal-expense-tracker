@@ -19,6 +19,8 @@ import { IAttachment } from '../../attachment/attachment.model';
 import { MlService } from '../../shared/ml/ml.service';
 import { AttachmentService } from '../../attachment/attachment.service';
 import { Subscription } from 'rxjs';
+import { IGroup } from '../../group/group.model';
+import { GroupService } from '../../group/group.service';
 
 @Component({
   selector: 'page-expense-create-or-update',
@@ -38,12 +40,14 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit, OnDes
 
   private _expense: IExpense;
   private _routeParamsSub: Subscription;
+  private _group: IGroup;
 
   constructor(private activatedRoute: ActivatedRoute
     , private formBuilder: FormBuilder, private location: Location
     , private alertCtrl: AlertController, private modalCtrl: ModalController
     , private expenseSvc: ExpenseService, private mlSvc: MlService
     , private categorySvc: CategoryService, private attachmentSvc: AttachmentService
+    , private groupSvc: GroupService
     ) {
     super();
 
@@ -64,7 +68,16 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit, OnDes
 
   async ngOnInit() {
     this._routeParamsSub = this.activatedRoute.params.subscribe(async (params) => {
-      let { id } = params;
+      let { id, groupId } = params;
+
+      if(groupId) {
+        groupId = +groupId;
+        this._group = await this.groupSvc.getByIdLocal(groupId);
+        if(AppConstant.DEBUG) {
+          console.log('ExpenseCreateOrUpdatePage: ngOnInit: group', this._group);
+        }
+      }
+      
       if(!id) {
         return;
       }
@@ -114,6 +127,12 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit, OnDes
       notes: args.notes,
       createdOn: args.date
     };
+
+    //group
+    if(this._group) {
+      exp.group = this._group;
+    }
+    
     //TODO: add update logic here
     if(this._expense) {
       exp.id = this._expense.id;
