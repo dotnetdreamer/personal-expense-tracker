@@ -62,7 +62,7 @@ export class AppComponent {
   async onGroupItemClicked(group: IGroup) {
     switch(group.entityName) {
       case SyncEntity.Expense:
-        await this._navigateTo('/expense/expense-create-or-update', {
+        await this._navigateTo('/expense/expense-listing', {
           groupId: group.id
         });
       break;

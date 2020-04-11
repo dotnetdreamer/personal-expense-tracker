@@ -112,6 +112,11 @@ page-home-dashboard {
     }
 }
 
+
+.hidden {
+    display: none !important;
+}
+
 .skeleton-loading {
     animation: loadingprd 1.5s linear infinite forwards;
     background: no-repeat #f1f1f1;

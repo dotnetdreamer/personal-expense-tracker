@@ -13,6 +13,9 @@ import { AppConstant } from '../../shared/app-constant';
 import { CurrencySettingService } from '../../currency/currency-setting.service';
 import { SyncConstant } from '../../shared/sync/sync-constant';
 import { SyncEntity } from '../../shared/sync/sync.model';
+import { ActivatedRoute } from '@angular/router';
+import { IGroup } from '../../group/group.model';
+import { GroupService } from '../../group/group.service';
 
 @Component({
   selector: 'page-expense-listing',
@@ -23,19 +26,24 @@ import { SyncEntity } from '../../shared/sync/sync.model';
 export class ExpenseListingPage extends BasePage implements OnInit, OnDestroy {
   @ViewChild('epListingContent') epListingContent: IonContent;
 
+  displayHeaderbar = true;
   expenses: Array<IExpense> = [];
   searchTerm: string;
+  displaySearch = false;
   sum = 0;
   dates: { selectedDate?: { from, to }, todayDate? } = {};
   dataLoaded = false;
   workingCurrency = ''; //fix for undefined showing in title
+  group: IGroup;
 
   private _syncInitSub: Subscription;
   private _expenseCreatedOrUpdatedSub: Subscription;
   private _syncDataPushCompleteSub: Subscription;
+  private _routeParamsSub: Subscription;
 
-  constructor(private ngZone: NgZone, private alertCtrl: AlertController
-    , private expenseSvc: ExpenseService
+  constructor(private ngZone: NgZone, private activatedRoute: ActivatedRoute
+    , private alertCtrl: AlertController
+    , private expenseSvc: ExpenseService, private groupSvc: GroupService
     , private currencySettingSvc: CurrencySettingService) { 
     super();
 
@@ -43,6 +51,18 @@ export class ExpenseListingPage extends BasePage implements OnInit, OnDestroy {
   }
 
   async ngOnInit() {    
+    this._routeParamsSub = this.activatedRoute.params.subscribe(async (params) => {
+      let { groupId } = params;
+
+      if(groupId) {
+        groupId = +groupId;
+        this.group = await this.groupSvc.getByIdLocal(groupId);
+        if(AppConstant.DEBUG) {
+          console.log('ExpenseListingPage: ngOnInit: group', this.group);
+        }
+      }
+    });
+
     this.workingCurrency = await this.currencySettingSvc.getWorkingCurrency();
 
     const fromDate = moment().startOf('M').format(AppConstant.DEFAULT_DATE_FORMAT);
@@ -92,7 +112,7 @@ export class ExpenseListingPage extends BasePage implements OnInit, OnDestroy {
     await this._getExpenses({ term: this.searchTerm });
   }
 
-  async onSearchInputCleared(args: CustomEvent) {
+  async onSearchInputCleared() {
     this.searchTerm = null;
     await this._getExpenses();
   }
@@ -110,6 +130,13 @@ export class ExpenseListingPage extends BasePage implements OnInit, OnDestroy {
     }
   }
 
+  async onSearchToggleClicked() {
+    this.displaySearch = !this.displaySearch;
+    if(!this.displaySearch) {
+      await this.onSearchInputCleared();
+    }
+  }
+
   async doRefresh(ev) {
     //reset
     this.pubsubSvc.publishEvent(SyncConstant.EVENT_SYNC_DATA_PUSH, SyncEntity.Expense);
@@ -119,7 +146,19 @@ export class ExpenseListingPage extends BasePage implements OnInit, OnDestroy {
     }, 300);
   }
 
+  onIonScrolling(ev: CustomEvent) {
+    const { scrollTop } = ev.detail;
+    if(scrollTop > 100) {
+      this.displayHeaderbar = false;
+    } else if(scrollTop <= 0) {
+      this.displayHeaderbar = true;
+    }
+  }
+
   ngOnDestroy() {
+    if(this._routeParamsSub) {
+      this._routeParamsSub.unsubscribe();
+    }
     if(this._expenseCreatedOrUpdatedSub) {
       this._expenseCreatedOrUpdatedSub.unsubscribe();
     }

@@ -3,23 +3,38 @@
     <ion-buttons slot="start">
       <ion-back-button></ion-back-button>
     </ion-buttons>
+    <ion-buttons slot="end">
+      <ion-button (click)="onSearchToggleClicked()">
+        <ion-icon name="search" *ngIf="!displaySearch"></ion-icon>
+        <ion-icon name="close" *ngIf="displaySearch"></ion-icon>
+      </ion-button>
+    </ion-buttons>
     <ion-title>{{ sum | currency: (workingCurrency + '&nbsp;')}}</ion-title>
   </ion-toolbar>
-  <ion-toolbar class="toolbar-calendar">
+  <ion-toolbar class="toolbar-calendar" [class.hidden]="!displayHeaderbar">
     <ion-label>{{ dates?.selectedDate?.from }}&nbsp;-&nbsp;{{ dates?.selectedDate?.to }}</ion-label>
     <calendar-swiper (monthChanged)="onMonthChanged($event)"></calendar-swiper>
   </ion-toolbar>
+  <ion-toolbar *ngIf="displaySearch" [class.hidden]="!displayHeaderbar">
+    <ion-searchbar slot="start" animated inputmode="search" debounce="500"
+      [(ngModel)]="searchTerm" 
+      (ionChange)="onSearchInputChanged($event)" (ionClear)="onSearchInputCleared()"
+      [placeholder]="'search.title' | localizedresource | async"></ion-searchbar>
+  </ion-toolbar>
+  <ion-toolbar class="toolbar-group" *ngIf="group" [class.hidden]="!displayHeaderbar">
+    <div class="group-container">
+      <div class="group-icon">
+        <ion-icon ios="group" md="group"></ion-icon>
+      </div>
+      <div class="group-title">{{ group.name }}</div>
+    </div>
+  </ion-toolbar>
 </ion-header>
 
-<ion-content #epListingContent>
+<ion-content #epListingContent [scrollEvents]="true" (ionScroll)="onIonScrolling($event)">
   <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
-  <ion-searchbar animated inputmode="search" debounce="500"
-    [(ngModel)]="searchTerm" 
-    (ionChange)="onSearchInputChanged($event)" (ionClear)="onSearchInputCleared($event)"
-    [placeholder]="'search.title' | localizedresource | async"></ion-searchbar>
-
   <no-data *ngIf="!expenses.length && dataLoaded"></no-data>
   <ion-virtual-scroll [items]="expenses" approxItemHeight="85px" class="expenses">
     <ion-item lines="none" *virtualItem="let item;let index=index;" 

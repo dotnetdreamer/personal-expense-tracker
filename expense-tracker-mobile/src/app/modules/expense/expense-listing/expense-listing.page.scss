@@ -9,11 +9,39 @@ page-expense-listing {
                     font-size: 0.8em;
                 }
             }
+
+            &.toolbar-group {
+                .group-container {
+                    text-align: center;
+                    padding: 0 20px;
+                    margin-bottom: 10px;
+
+                    .group-icon {
+                        width: 70px;
+                        height: 70px;
+                        border-radius: 50%;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        margin: auto;
+                        border: 1px solid #cdcdcd;
+                        margin-bottom: 10px;
+        
+                        > ion-icon {
+                            font-size: 35px;
+                        }
+                    }
+        
+                    .group-title {
+                        font-size: 1.1em;
+                        font-weight: bold;
+                    } 
+                }
+            }
         }
     }
-    .expenses {
-        ion-item {
-            
-        }
+
+    ion-content {
+
     }
 }
