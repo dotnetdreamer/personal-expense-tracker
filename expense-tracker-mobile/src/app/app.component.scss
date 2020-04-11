@@ -60,9 +60,16 @@ app-root {
                         }
                     }
 
-                    .panel-collaps {
+                    .panel-collapse {
                         .panel-body {
-
+                            padding: 0 15px;
+                            ion-item {
+                                --min-height: 30px;
+                                
+                                ion-icon {
+                                    font-size: 18px;
+                                }
+                            }
                         }
                     }
                 }

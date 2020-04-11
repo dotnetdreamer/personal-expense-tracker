@@ -24,6 +24,8 @@ import { UserSettingService } from './modules/authentication/user-setting.servic
 import { NgxPubSubService } from '@pscoped/ngx-pub-sub';
 import { GroupService } from './modules/group/group.service';
 import { IGroup } from './modules/group/group.model';
+import { SchemaService } from './modules/shared/db/schema.service';
+import { SyncEntity } from './modules/shared/sync/sync.model';
 
 @Component({
   selector: 'app-root',
@@ -57,9 +59,16 @@ export class AppComponent {
     });
   }
 
-  onAddGroupClicked(ev: CustomEvent) {
-    ev.stopImmediatePropagation();
-    ev.stopPropagation();
+  async onGroupItemClicked(group: IGroup) {
+    switch(group.entityName) {
+      case SyncEntity.Expense:
+        await this._navigateTo('/expense/expense-create-or-update', {
+          groupId: group.id
+        });
+      break;
+      default:
+      break;
+    }
   }
 
   async onItemClicked(url, timeout?) {

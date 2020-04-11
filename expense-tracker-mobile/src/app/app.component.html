@@ -40,10 +40,13 @@
                   <accordion-heading>
                     <a role="button" data-toggle="collapse"><ion-label>{{ group.key + ".title_listing" | localizedresource | async }}</ion-label></a>
                   </accordion-heading>
-                  <ion-item lines="full" detail="false" *ngFor="let item of group.value">
-                    <ion-icon slot="start" ios="group" md="group"></ion-icon>
-                    <ion-label>{{ item.name }}</ion-label>
-                  </ion-item>
+                  <ion-menu-toggle auto-hide="false">
+                    <ion-item lines="full" detail="false" *ngFor="let item of group.value" 
+                      (click)="onGroupItemClicked(item)">
+                      <ion-icon slot="start" ios="group" md="group"></ion-icon>
+                      <ion-label>{{ item.name }}</ion-label>
+                    </ion-item>
+                  </ion-menu-toggle>
               </accordion-group>
           </accordion>
           </ng-container>
