@@ -19,13 +19,15 @@ import { TokenModule } from './modules/user/token/token.module';
 import { AccessToken } from './modules/user/token/token.entity';
 import { ExternalAuth } from './modules/user/external-auth/external-auth.entity';
 import { ExternalAuthModule } from './modules/user/external-auth/external-auth.module';
+import { Group } from './modules/group/group.entity';
+import { GroupModule } from './modules/group/group.module';
 
 @Module({
   imports: [
     TypeOrmModule.forRoot({
       type: 'sqlite',
       database: './_db/expense-tracker.db',
-      entities: [Category, Expense, Attachment, User, AccessToken, ExternalAuth],
+      entities: [Category, Expense, Attachment, User, AccessToken, ExternalAuth, Group],
       synchronize: true,
     }),
     SharedModule,
@@ -36,7 +38,8 @@ import { ExternalAuthModule } from './modules/user/external-auth/external-auth.m
     UserModule,
     AuthModule,
     TokenModule,
-    ExternalAuthModule
+    ExternalAuthModule,
+    GroupModule
   ],
   controllers: [AppController],
   providers: [AppService],

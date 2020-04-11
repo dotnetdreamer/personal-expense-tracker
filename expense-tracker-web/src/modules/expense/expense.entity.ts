@@ -1,6 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
-import { BaseComplexEntity } from '../shared/entity/base-complex.entity';
 import { BaseUserEntity } from '../shared/entity/base-user.entity';
 
 @Entity()

@@ -1,0 +1,105 @@
+import { Controller, UseInterceptors, Get, ClassSerializerInterceptor, Post, Body, Query, UseGuards, Req } from "@nestjs/common";
+
+import { Request } from "express";
+
+import { GroupService } from "./group.service";
+import { IGroupParams } from "./group.model";
+import { Group } from "./group.entity";
+import { JwtAuthGuard } from "../user/auth/jwt-auth.guard";
+import { ICurrentUser } from "../shared/shared.model";
+
+@Controller('group')
+export class GroupController {
+  constructor(private readonly groupSvc: GroupService) {}
+
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(ClassSerializerInterceptor)
+  @Get('getAll')
+  async getAll(@Req() req: Request,
+   @Query() filters?: { name?: string, entityName?: string, fromDate?: string, toDate?: string }) {
+    const user = <ICurrentUser>req.user;
+
+    const groups = await this.groupSvc.findAll({
+      ...filters
+    });
+
+    //map it
+    const model = groups.map(async (e) => {
+      const mapped = await this._prepare(e);
+      return mapped;
+    });
+    return Promise.all(model);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(ClassSerializerInterceptor)
+  @Post('sync')
+  async sync(@Req() req: Request, @Body() models: IGroupParams[]) {
+    //local id and mapping server record
+    let items: Array<Map<number, any>> = [];
+    const user = <ICurrentUser>req.user;
+
+    for(let model of models) {
+      const itemMap: Map<number, IGroupParams> = new Map();
+      let returnedGroup: any;
+
+      if (model.markedForAdd) {
+        //generate new one..ignore id from client
+        let toAdd = Object.assign({}, model);
+        toAdd.createdBy = user.userId;
+        delete toAdd.id;
+
+        const item = await this.groupSvc.save(toAdd);
+        returnedGroup = item;        
+      } else if(model.markedForUpdate) {
+        const toUpdate = await this.groupSvc.findOne(model.id);
+        if(!toUpdate) {
+          continue;
+        }
+        toUpdate.updatedBy = user.userId;
+
+        let updated = await this._updateOrDelete(toUpdate, model, false);
+        returnedGroup = updated;
+      } else if(model.markedForDelete) {
+        const toDelete = await this.groupSvc.findOne(model.id);
+        if(!toDelete) {
+          continue;
+        }
+        toDelete.updatedBy = user.userId;
+
+        let deleted = await this._updateOrDelete(toDelete, model, true);
+        returnedGroup = deleted;
+      }
+
+      returnedGroup = await this._prepare(returnedGroup);
+
+      itemMap.set(model.id, returnedGroup);
+      items.push(itemMap);
+    }
+
+    return items;
+  }
+
+  private async _updateOrDelete(toUpdateOrDelete: Group, model, shouldDelete?: boolean) {
+    //no need to update
+    // delete model.createdOn;
+    // delete model.attachment;
+    model.isDeleted = shouldDelete;
+
+    let updated = Object.assign(toUpdateOrDelete, model);
+    await this.groupSvc.save(updated);
+
+    return updated;
+  }
+
+  private async _prepare(grp: Group) {
+    let mExp = Object.assign({}, grp);
+
+    //remove 
+    delete mExp['markedForAdd'];
+    delete mExp['markedForUpdate'];
+    delete mExp['markedForDelete'];
+
+    return mExp;
+  }
+}
