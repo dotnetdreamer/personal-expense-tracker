@@ -1,9 +1,11 @@
 import { ICategoryParams } from "../category/category.model";
 import { IAttachmentParams } from "../attachment/attachment.model";
+import { IGroupParams } from "../group/group.model";
 
 export interface IExpenseParams {
     id?: number
     category: number | ICategoryParams
+    group: number | IGroupParams
     description: string
     amount: string
     notes?: string

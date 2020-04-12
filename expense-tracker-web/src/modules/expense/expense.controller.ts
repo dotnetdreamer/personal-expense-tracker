@@ -39,8 +39,10 @@ export class ExpenseController {
   @UseInterceptors(ClassSerializerInterceptor)
   @Get('getReport')
   async getReport(@Query() filters: { fromDate: string, toDate: string }) {
-    const items = await this.expenseSvc.getReport(
-      filters.fromDate, filters.toDate);
+    const items = await this.expenseSvc.getReport({
+      fromDate: filters.fromDate,
+      toDate: filters.toDate,
+    });
     return items;
   }
 
@@ -81,21 +83,6 @@ export class ExpenseController {
         returnedExpense = deleted;
       }
 
-      // delete returnedExpense.markedForAdd;
-      // delete returnedExpense.markedForUpdate;
-      // delete returnedExpense.markedForDelete;
-
-      // if(returnedExpense.category) {
-      //   delete returnedExpense.category.markedForAdd;
-      //   delete returnedExpense.category.markedForUpdate;
-      //   delete returnedExpense.category.markedForDelete;
-      // }
-
-      // if(returnedExpense.attachment) {
-      //   delete returnedExpense.attachment.markedForAdd;
-      //   delete returnedExpense.attachment.markedForUpdate;
-      //   delete returnedExpense.attachment.markedForDelete;
-      // }
       returnedExpense = await this._prepare(returnedExpense);
 
       itemMap.set(model.id, returnedExpense);

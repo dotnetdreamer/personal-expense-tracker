@@ -11,6 +11,7 @@ import { AppConstant } from '../shared/app-constant';
 import { IAttachmentParams } from '../attachment/attachment.model';
 import { ICategoryParams } from '../category/category.model';
 import { Category } from '../category/category.entity';
+import { IGroupParams } from '../group/group.model';
 
 @Injectable()
 export class ExpenseService {
@@ -20,16 +21,27 @@ export class ExpenseService {
     , private helperSvc: HelperService
   ) {}
 
-  async findAll(args?: { term?: string, fromDate?: string, toDate?: string, showHidden?: boolean }): Promise<Expense[]> {
+  async findAll(args?: { 
+      term?: string, groupId?: number, userIds?: number[]
+    , fromDate?: string, toDate?: string, showHidden?: boolean 
+  }): Promise<Expense[]> {
     let qb = await getRepository(Expense)
       .createQueryBuilder('exp'); 
       
-    if(args && (args.term || args.fromDate || args.toDate)) {
+    if(args && (args.term || args.groupId || args.userIds || args.fromDate || args.toDate)) {
       if(args.term) {
         const term = args.term.trim().toLowerCase();
         qb = qb.innerJoinAndSelect(Category, "cat", "cat.id = exp.categoryId");
         qb = qb.andWhere('(exp.description like :term', { term: `%${term}%` })
           .orWhere('cat.name like :categoryTerm)', { categoryTerm: `%${term}`});
+      }
+
+      if(args.groupId) {
+        qb = qb.andWhere("exp.groupId = :groupId", { groupId: args.groupId })
+      }
+      
+      if(args.userIds && args.userIds.length) {
+        qb = qb.andWhere("exp.createdBy IN (:...userIds)", { userIds: args.userIds })
       }
 
       if(args.fromDate) {
@@ -52,15 +64,33 @@ export class ExpenseService {
     return qb.getMany();
   }
 
-  async getReport(fromDate: string, toDate: string, totalItems = 10, showHidden = false)
-    : Promise<{ categories: Array<{ label, total, totalAmount }>, dates: Array<{ label, total, totalAmount }> }> {
+  async getReport(args: {
+    fromDate: string, toDate: string, totalItems?: number, showHidden?: boolean
+    , groupId?: number, userIds?: number[]
+    }) : Promise<{ categories: Array<{ label, total, totalAmount }>, dates: Array<{ label, total, totalAmount }> }> {
+    //defaults
+    if(typeof args.totalItems === 'undefined') {
+      args.totalItems = 10;
+    }
+    if(typeof args.showHidden === 'undefined') {
+      args.showHidden = true;
+    }
+
     let qb = await getRepository(Expense)
       .createQueryBuilder("exp");
 
     qb = qb.innerJoinAndSelect(Category, "cat", "cat.id == categoryId");
-    qb = qb.andWhere('date(exp.createdOn) >= :createdOnFrom', { createdOnFrom: fromDate });
-    qb = qb.andWhere('date(exp.createdOn) <= :createdOnToDate', { createdOnToDate: toDate });
-    qb = qb.andWhere('exp.isDeleted <= :isDeleted', { isDeleted: showHidden });
+    qb = qb.andWhere('date(exp.createdOn) >= :createdOnFrom', { createdOnFrom: args.fromDate });
+    qb = qb.andWhere('date(exp.createdOn) <= :createdOnToDate', { createdOnToDate: args.toDate });
+    qb = qb.andWhere('exp.isDeleted <= :isDeleted', { isDeleted: args.showHidden });
+
+    if(args.groupId) {
+      qb = qb.andWhere("exp.groupId = :groupId", { groupId: args.groupId })
+    }
+    
+    if(args.userIds && args.userIds.length) {
+      qb = qb.andWhere("exp.createdBy IN (:...userIds)", { userIds: args.userIds })
+    }
 
     qb = qb.select("COUNT(exp.id)", "total")
     .addSelect("SUM(exp.amount)", "totalAmount");
@@ -69,7 +99,7 @@ export class ExpenseService {
     catQb = catQb.addSelect("cat.name", "label");
     catQb = catQb.groupBy("exp.categoryId");
     catQb = catQb.orderBy("total", 'ASC');
-    const categories: any = await catQb.limit(totalItems).getRawMany();
+    const categories: any = await catQb.limit(args.totalItems).getRawMany();
 
     let datQb = qb;
     datQb = datQb.addSelect("date(exp.createdOn)", "label");
@@ -121,9 +151,18 @@ export class ExpenseService {
       categoryId = expense.category;
     }
 
+    let groupId;
+    if(typeof expense.group !== 'number') {
+      const grp = <IGroupParams>expense.group;
+      groupId = grp.id;
+    } else {
+      groupId = expense.group;
+    }
+
     //now save
     return this.expenseRepo.save<Expense>({
       ...newOrUpdated,
+      groupId: groupId,
       attachmentId: attachmentId,
       categoryId: categoryId
     });
