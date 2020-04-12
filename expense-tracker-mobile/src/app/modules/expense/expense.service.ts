@@ -217,7 +217,7 @@ export class ExpenseService extends BaseService {
         });
     }
 
-    getExpenseListLocal(args?: { term?, fromDate?, toDate?, pageIndex?, pageSize? }): Promise<IExpense[]> {
+    getExpenseListLocal(args?: { term?, groupId?, fromDate?, toDate?, pageIndex?, pageSize? }): Promise<IExpense[]> {
         return new Promise(async (resolve, reject) => {
             let results = [];
 
@@ -263,13 +263,29 @@ export class ExpenseService extends BaseService {
                         }
                     }
 
-                    if(args.term) {
+                    if(item && args.term) {
                         const term = args.term.toLowerCase();
                         const desc = item ? item.description.toLowerCase() : v.description.toLowerCase();
                         const catName = item ? item.category.name.toLowerCase() : v.category.name.toLowerCase();
                         
                         if(!desc.includes(term) && !(catName.includes(term))) {
                             item = null;
+                        }
+                    }
+
+                    if(item) {
+                        //either show grouped or non-grouped or explicilty set groupId to null (e.g in dashboard)
+                        if(args.groupId) {
+                            if(!item.group) {
+                                item = null;
+                            } else if(item.group.id != args.groupId) {
+                                item = null;
+                            }
+                        } else if(args.groupId === null) {
+                            //do not show goruped items if null is passed
+                            if(item.group) {
+                                item = null;
+                            }
                         }
                     }
                 } else {

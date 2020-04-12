@@ -10,17 +10,20 @@ import { CategoryService } from "../category/category.service";
 import { AppConstant } from "../shared/app-constant";
 import { JwtAuthGuard } from "../user/auth/jwt-auth.guard";
 import { ICurrentUser } from "../shared/shared.model";
+import { GroupService } from "../group/group.service";
 
 @Controller('expense')
 export class ExpenseController {
   constructor(private readonly expenseSvc: ExpenseService
+    , private groupSvc: GroupService
     , private attachmentSvc: AttachmentService, private categorySvc: CategoryService) {}
 
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(ClassSerializerInterceptor)
   @Get('getAll')
   async getAll(@Req() req: Request,
-   @Query() filters?: { term?: string, fromDate?: string, toDate?: string }) {
+   @Query() filters?: { groupId?: number, term?: string, fromDate?: string, toDate?: string }) {
+    //TODO: add group access validation
     // const u = <ICurrentUser>req.user;
 
     const expenses = await this.expenseSvc.findAll({
@@ -38,10 +41,11 @@ export class ExpenseController {
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(ClassSerializerInterceptor)
   @Get('getReport')
-  async getReport(@Query() filters: { fromDate: string, toDate: string }) {
+  async getReport(@Query() filters: { groupId?: number, fromDate: string, toDate: string }) {
     const items = await this.expenseSvc.getReport({
       fromDate: filters.fromDate,
       toDate: filters.toDate,
+      groupId: filters.groupId
     });
     return items;
   }
@@ -107,6 +111,14 @@ export class ExpenseController {
   private async _prepare(exp: Expense) {
     let mExp = Object.assign({}, exp);
     
+    //group
+    if(mExp.groupId) {
+      const group = await this.groupSvc.findOne(mExp.groupId);
+      if(group) {
+        mExp["group"] = group;
+      }
+    }
+
     //category
     const category = await this.categorySvc.findOne(mExp.categoryId);
     mExp["category"] = category;
@@ -125,21 +137,10 @@ export class ExpenseController {
     //remove 
     delete mExp.attachmentId;
     delete mExp.categoryId;
+    delete mExp.groupId;
     delete mExp['markedForAdd'];
     delete mExp['markedForUpdate'];
     delete mExp['markedForDelete'];
-
-    // if(mExp.category) {
-    //   delete mExp.category.markedForAdd;
-    //   delete mExp.category.markedForUpdate;
-    //   delete mExp.category.markedForDelete;
-    // }
-
-    // if(mExp.attachment) {
-    //   delete mExp.attachment.markedForAdd;
-    //   delete mExp.attachment.markedForUpdate;
-    //   delete mExp.attachment.markedForDelete;
-    // }
 
     return mExp;
   }

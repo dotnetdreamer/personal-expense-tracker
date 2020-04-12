@@ -36,8 +36,12 @@ export class ExpenseService {
           .orWhere('cat.name like :categoryTerm)', { categoryTerm: `%${term}`});
       }
 
-      if(args.groupId) {
-        qb = qb.andWhere("exp.groupId = :groupId", { groupId: args.groupId })
+      args.groupId = +args.groupId;
+      if(args.groupId > 0) {
+        //show non-grouped only if no grouped is passed
+        qb = qb.andWhere("exp.groupId = :groupId", { groupId: args.groupId });
+      } else {
+        qb = qb.andWhere("(exp.groupId is null OR exp.groupId = 0)");
       }
       
       if(args.userIds && args.userIds.length) {
@@ -83,9 +87,13 @@ export class ExpenseService {
     qb = qb.andWhere('date(exp.createdOn) >= :createdOnFrom', { createdOnFrom: args.fromDate });
     qb = qb.andWhere('date(exp.createdOn) <= :createdOnToDate', { createdOnToDate: args.toDate });
     qb = qb.andWhere('exp.isDeleted <= :isDeleted', { isDeleted: args.showHidden });
-
-    if(args.groupId) {
-      qb = qb.andWhere("exp.groupId = :groupId", { groupId: args.groupId })
+    
+    args.groupId = +args.groupId;
+    if(args.groupId > 0) {
+      //show non-grouped only if no grouped is passed
+      qb = qb.andWhere("exp.groupId = :groupId", { groupId: args.groupId });
+    } else {
+      qb = qb.andWhere("(exp.groupId is null OR exp.groupId = 0)");
     }
     
     if(args.userIds && args.userIds.length) {
@@ -151,12 +159,14 @@ export class ExpenseService {
       categoryId = expense.category;
     }
 
-    let groupId;
-    if(typeof expense.group !== 'number') {
-      const grp = <IGroupParams>expense.group;
-      groupId = grp.id;
-    } else {
-      groupId = expense.group;
+    let groupId = undefined;
+    if (expense.group) {
+        if (typeof expense.group !== 'number') {
+            const grp = expense.group;
+            groupId = grp.id;
+        } else {
+            groupId = expense.group;
+        }
     }
 
     //now save

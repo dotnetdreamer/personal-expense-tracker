@@ -187,8 +187,12 @@ export class ExpenseListingPage extends BasePage implements OnInit, OnDestroy {
 
     let filters:any = {
       fromDate: this.dates.selectedDate.from,
-      toDate: this.dates.selectedDate.to
+      toDate: this.dates.selectedDate.to,
+      groupId: null
     };
+    if(this.group) {
+      filters.groupId = this.group.id;
+    }
  
     if(args && args.term) {
       filters.term = args.term;
