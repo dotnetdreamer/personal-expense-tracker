@@ -72,7 +72,11 @@
   </ion-virtual-scroll>
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
     <ion-fab-button (click)="onAddClicked()">
-      <ion-icon name="add"></ion-icon>
+      <ion-icon name="add" *ngIf="!group || !(group && (group.markedForAdd || group.markedForUpdate || group.markedForDelete))"></ion-icon>
+      <ion-icon name="refresh" class="animated infinite spin" 
+        *ngIf="group && (group.markedForAdd || group.markedForUpdate || group.markedForDelete)"></ion-icon>
     </ion-fab-button>
   </ion-fab>
+  <h1>{{group && !(group.markedForAdd && group.markedForUpdate && group.markedForDelete)}}</h1>
+  <h3>{{group && (group.markedForAdd || group.markedForUpdate || group.markedForDelete)}}</h3>
 </ion-content>

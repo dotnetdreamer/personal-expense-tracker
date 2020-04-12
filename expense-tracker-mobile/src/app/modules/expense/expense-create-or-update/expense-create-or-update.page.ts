@@ -37,10 +37,10 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit, OnDes
   suggestedCategory: ICategory;
   todayDate;
   attachment: IAttachment;
+  group: IGroup;
 
   private _expense: IExpense;
   private _routeParamsSub: Subscription;
-  private _group: IGroup;
 
   constructor(private activatedRoute: ActivatedRoute
     , private formBuilder: FormBuilder, private location: Location
@@ -72,9 +72,9 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit, OnDes
 
       if(groupId) {
         groupId = +groupId;
-        this._group = await this.groupSvc.getByIdLocal(groupId);
+        this.group = await this.groupSvc.getByIdLocal(groupId);
         if(AppConstant.DEBUG) {
-          console.log('ExpenseCreateOrUpdatePage: ngOnInit: group', this._group);
+          console.log('ExpenseCreateOrUpdatePage: ngOnInit: group', this.group);
         }
       }
       
@@ -129,8 +129,8 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit, OnDes
     };
 
     //group
-    if(this._group) {
-      exp.group = this._group;
+    if(this.group) {
+      exp.group = this.group;
     }
     
     //TODO: add update logic here

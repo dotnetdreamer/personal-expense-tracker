@@ -118,7 +118,17 @@ export class ExpenseListingPage extends BasePage implements OnInit, OnDestroy {
   }
 
   async onAddClicked() {
-    await this.navigate({ path: '/expense/expense-create-or-update' });
+    //unsynced group, you can't add item into it
+    if(this.group && (this.group.markedForAdd || this.group.markedForUpdate || this.group.markedForDelete)) {
+      return;
+    }
+
+    await this.navigate({ 
+      path: '/expense/expense-create-or-update',
+      params: {
+        groupId: this.group?.id || ''
+      } 
+    });
   }
 
   async onExpenseItemClicked(ev: CustomEvent, expense: IExpense
