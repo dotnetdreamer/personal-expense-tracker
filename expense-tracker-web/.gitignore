@@ -2,7 +2,7 @@
 /dist
 /node_modules
 /_uploaded
-/_db
+/_db/expense-tracker.db
 /_ml/*.json
 
 # Logs
