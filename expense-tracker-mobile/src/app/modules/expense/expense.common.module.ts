@@ -1,6 +1,9 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
+import { TransactionTypeModal } from './transaction-type/transaction-type.page';
+import { TransactionTypePageModule } from './transaction-type/transaction-type.module';
+
 const routes: Routes = [ 
     {
       path: '',
@@ -23,9 +26,10 @@ const routes: Routes = [
 
 @NgModule({
   imports: [
-    // ComponentsWithOutFormsModule,        
+    TransactionTypePageModule,        
     RouterModule.forChild(routes)
   ],
+  declarations: [],
   providers: []
 })
 export class ExpenseCommonModule {}

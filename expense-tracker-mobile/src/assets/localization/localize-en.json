@@ -34,7 +34,14 @@
         "date": "Date",
         "notes": "Notes",
         "today": "Today",
-        "total": "Total"
+        "total": "Total",
+        "transaction_type": {
+            "10": "Paid by you and split equally",
+            "20": "You owe full amount",
+            "30": "They owe full amount",
+            "40": "Paid by other person and split equally",
+            "50": "Multiple"
+        }
     },
     "group": {
         "title": "Group",

@@ -1,0 +1,37 @@
+<ion-header>
+  <ion-toolbar>
+    <!-- <ion-title>transaction-type</ion-title> -->
+    <ion-buttons slot="start">
+      <ion-button (click)="dismiss()">
+        <ion-icon name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-list>
+    <ion-radio-group [(ngModel)]="selectedType">
+      <ion-item (click)="onTypeClicked(TransactionType.PaidByYouAndSplitEqually)">
+        <ion-label>{{ 'expense.transaction_type.' + TransactionType.PaidByYouAndSplitEqually | localizedresource | async }}</ion-label>
+        <ion-radio [value]="TransactionType.PaidByYouAndSplitEqually" mode="ios"></ion-radio>
+      </ion-item>
+      <ion-item (click)="onTypeClicked(TransactionType.YouOweFullAmount)">
+        <ion-label>{{ 'expense.transaction_type.' + TransactionType.YouOweFullAmount | localizedresource | async }}</ion-label>
+        <ion-radio [value]="TransactionType.YouOweFullAmount" mode="ios"></ion-radio>
+      </ion-item>
+      <ion-item (click)="onTypeClicked(TransactionType.TheyOweFullAmount)">
+        <ion-label>{{ 'expense.transaction_type.' + TransactionType.TheyOweFullAmount | localizedresource | async }}</ion-label>
+        <ion-radio [value]="TransactionType.TheyOweFullAmount" mode="ios"></ion-radio>
+      </ion-item>
+      <ion-item (click)="onTypeClicked(TransactionType.PaidByOtherPersonAndSplitEqually)">
+        <ion-label>{{ 'expense.transaction_type.' + TransactionType.PaidByOtherPersonAndSplitEqually | localizedresource | async }}</ion-label>
+        <ion-radio [value]="TransactionType.PaidByOtherPersonAndSplitEqually" mode="ios"></ion-radio>
+      </ion-item>
+      <ion-item (click)="onTypeClicked(TransactionType.Mutiple)">
+        <ion-label>{{ 'expense.transaction_type.' + TransactionType.Mutiple | localizedresource | async }}</ion-label>
+        <ion-radio [value]="TransactionType.Mutiple" mode="ios"></ion-radio>
+      </ion-item>
+    </ion-radio-group>
+  </ion-list>
+</ion-content>

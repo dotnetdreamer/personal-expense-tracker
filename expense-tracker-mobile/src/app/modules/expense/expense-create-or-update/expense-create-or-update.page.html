@@ -35,6 +35,11 @@
         </ion-item>
       </ion-list>
     </div>
+    <div class="transaction-type-container">
+      <ion-button fill="clear" (click)="onTransactionTypeClicked()">
+        {{'expense.transaction_type.paidby' | localizedresource | async }}
+      </ion-button>
+    </div>
   </form>
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
     <ion-fab-button (click)="onSaveClick(formGroup.value)" [disabled]="!formGroup.valid">

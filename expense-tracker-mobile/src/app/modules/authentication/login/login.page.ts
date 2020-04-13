@@ -25,8 +25,7 @@ export class LoginPage extends BasePage implements OnInit, OnDestroy {
   // canDeactivate = false;
 
   constructor(private formBuilder: FormBuilder
-    , private authSvc: AuthenticationService
-    , private userSettingSvc: UserSettingService) { 
+    , private authSvc: AuthenticationService) { 
       super();
 
       this.loginFormGroup = this.formBuilder.group({

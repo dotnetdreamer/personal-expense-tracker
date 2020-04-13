@@ -17,7 +17,23 @@ export interface IExpense {
     markedForDelete?: boolean
 }
 
+export interface IExpenseTransaction {
+    expenseId: number
+    paidByUserEmail: string
+    transactionType: TransactionType
+    debit?: number
+    credit?: number
+}
+
 export interface IExpenseDashboardReport {
     categories: Array<{ label, total, totalAmount }>;
     dates: Array<{ label, total, totalAmount }>;
+}
+
+export enum TransactionType {
+    PaidByYouAndSplitEqually = 10,
+    YouOweFullAmount = 20,
+    TheyOweFullAmount = 30,
+    PaidByOtherPersonAndSplitEqually = 40,
+    Mutiple = 50
 }

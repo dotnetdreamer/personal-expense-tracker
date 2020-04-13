@@ -9,7 +9,7 @@ import * as moment from 'moment';
 import { BasePage } from '../../shared/base.page';
 import { ExpenseService } from '../expense.service';
 import { AppConstant } from '../../shared/app-constant';
-import { IExpense } from '../expense.model';
+import { IExpense, TransactionType, IExpenseTransaction } from '../expense.model';
 import { ICategory } from '../../category/category.model';
 import { CategoryService } from '../../category/category.service';
 import { CategoryPage } from '../../category/category.page';
@@ -21,6 +21,8 @@ import { AttachmentService } from '../../attachment/attachment.service';
 import { Subscription } from 'rxjs';
 import { IGroup } from '../../group/group.model';
 import { GroupService } from '../../group/group.service';
+import { TransactionTypeModal } from '../transaction-type/transaction-type.page';
+import { IUser, IUserProfile } from '../../authentication/authentication.model';
 
 @Component({
   selector: 'page-expense-create-or-update',
@@ -38,6 +40,8 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit, OnDes
   todayDate;
   attachment: IAttachment;
   group: IGroup;
+  selectedTransactionType: TransactionType.PaidByYouAndSplitEqually;
+  currentUser: IUserProfile;
 
   private _expense: IExpense;
   private _routeParamsSub: Subscription;
@@ -114,9 +118,8 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit, OnDes
     setTimeout(async () => {
       await this.descriptionInput.setFocus();
     }, 300);
-    // if(AppConstant.DEBUG) {
-    //   this._preFill();
-    // }
+    
+    this.currentUser = await this.userSettingSvc.getUserProfileLocal();
   }
 
   async onSaveClick(args) {
@@ -128,11 +131,6 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit, OnDes
       createdOn: args.date
     };
 
-    //group
-    if(this.group) {
-      exp.group = this.group;
-    }
-    
     //TODO: add update logic here
     if(this._expense) {
       exp.id = this._expense.id;
@@ -145,6 +143,7 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit, OnDes
         .format(AppConstant.DEFAULT_DATETIME_FORMAT);
       }
     }
+
     if(AppConstant.DEBUG) {
       console.log('ExpenseCreateOrUpdatePage: onSaveClick: exp', exp)
     }
@@ -155,6 +154,15 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit, OnDes
       exp.attachment = this.attachment;
     }
 
+    //group
+    if(this.group) {
+      exp.group = this.group;
+    }
+    // //TODO: move this to group condition
+    // const result = await this._distributeTransaction(exp, this.selectedTransactionType);
+    // console.log(result);
+    // return;
+    
     await this.expenseSvc.putLocal(exp);
     await this.helperSvc.presentToastGenericSuccess();
 
@@ -331,6 +339,23 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit, OnDes
     }
   }
 
+  async onTransactionTypeClicked() {
+    const modal = await this.modalCtrl.create({
+      component: TransactionTypeModal,
+      mode: 'md',
+      cssClass: 'modal-transaction-type',
+      componentProps: {
+        transactionType: this.selectedTransactionType
+      }
+    });
+    await modal.present();
+
+    const { data } = await modal.onDidDismiss();
+    if(data) {
+      this.selectedTransactionType = data;
+    }
+  }
+
   ngOnDestroy() {
     if(this._routeParamsSub) {
       this._routeParamsSub.unsubscribe();
@@ -339,6 +364,24 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit, OnDes
 
   private async _getCategoryList() {
     this.categories = await this.categorySvc.getCategoryListLocal();
+  }
+
+  private async _distributeTransaction(expense: IExpense, tranType: TransactionType) {
+    const total = +expense.amount;
+    let transactions: IExpenseTransaction[] = [];
+
+    switch(tranType) {
+      case TransactionType.PaidByYouAndSplitEqually:
+
+        transactions.push({
+          expenseId: expense.id,
+          transactionType: TransactionType.PaidByYouAndSplitEqually,
+          paidByUserEmail: this.currentUser.email,
+          credit: 0,
+          debit: 0
+        });
+      break;
+    }
   }
 
   private _preFill() {
