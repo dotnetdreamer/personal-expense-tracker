@@ -5,6 +5,7 @@ import { ExpenseListingPageRoutingModule } from './expense-listing-routing.modul
 import { ExpenseListingPage } from './expense-listing.page';
 import { PipesModule } from 'src/app/pipes/pipes.module';
 import { ComponentsWithFormsModule } from 'src/app/components/components-with-forms.module';
+import { ExpenseListingOption } from './expense-listing-options.popover';
 
 @NgModule({
   imports: [
@@ -12,6 +13,6 @@ import { ComponentsWithFormsModule } from 'src/app/components/components-with-fo
     PipesModule,
     ExpenseListingPageRoutingModule
   ],
-  declarations: [ExpenseListingPage]
+  declarations: [ExpenseListingPage, ExpenseListingOption]
 })
 export class ExpenseListingPageModule {}

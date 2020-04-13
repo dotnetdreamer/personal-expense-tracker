@@ -46,7 +46,8 @@
     "group": {
         "title": "Group",
         "add": "Add group",
-        "name": "Name"
+        "name": "Name",
+        "add_member": "Add member"
     },
     "home": {
         "title": "Home",

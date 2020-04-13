@@ -8,6 +8,9 @@
         <ion-icon name="search" *ngIf="!displaySearch"></ion-icon>
         <ion-icon name="close" *ngIf="displaySearch"></ion-icon>
       </ion-button>
+      <ion-button (click)="onMoreOptionsClicked($event)" *ngIf="group">
+        <ion-icon slot="icon-only" name="ellipsis-vertical"></ion-icon>
+      </ion-button>
     </ion-buttons>
     <ion-title>{{ sum | currency: (workingCurrency + '&nbsp;')}}</ion-title>
   </ion-toolbar>

@@ -3,7 +3,7 @@ import { Component, OnInit, ViewEncapsulation, OnDestroy, NgZone, ViewChild } fr
 import { Subscription, Observable } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 
-import { AlertController, IonItemSliding, IonContent } from '@ionic/angular';
+import { AlertController, IonItemSliding, IonContent, PopoverController } from '@ionic/angular';
 import * as moment from 'moment';
 
 import { BasePage } from '../../shared/base.page';
@@ -16,6 +16,7 @@ import { SyncEntity } from '../../shared/sync/sync.model';
 import { ActivatedRoute } from '@angular/router';
 import { IGroup } from '../../group/group.model';
 import { GroupService } from '../../group/group.service';
+import { ExpenseListingOption } from './expense-listing-options.popover';
 
 @Component({
   selector: 'page-expense-listing',
@@ -42,7 +43,7 @@ export class ExpenseListingPage extends BasePage implements OnInit, OnDestroy {
   private _routeParamsSub: Subscription;
 
   constructor(private ngZone: NgZone, private activatedRoute: ActivatedRoute
-    , private alertCtrl: AlertController
+    , private alertCtrl: AlertController, private popoverCtrl: PopoverController
     , private expenseSvc: ExpenseService, private groupSvc: GroupService
     , private currencySettingSvc: CurrencySettingService) { 
     super();
@@ -145,6 +146,23 @@ export class ExpenseListingPage extends BasePage implements OnInit, OnDestroy {
     if(!this.displaySearch) {
       await this.onSearchInputCleared();
     }
+  }
+
+  async onMoreOptionsClicked(eve) {
+    const popCtrl = await this.popoverCtrl.create({
+      component: ExpenseListingOption,
+      event: eve
+    });
+    await popCtrl.present();
+
+    const { data } = await popCtrl.onDidDismiss();
+    if(data == 'add_member') {
+      await this.onMemberAddClicked();
+    }
+  }
+
+  async onMemberAddClicked() {
+
   }
 
   async doRefresh(ev) {
