@@ -45,6 +45,8 @@
                       (click)="onGroupItemClicked(item)">
                       <ion-icon slot="start" ios="group" md="group"></ion-icon>
                       <ion-label>{{ item.name }}</ion-label>
+                      <ion-icon slot="end" name="alert-circle" 
+                        *ngIf="item.alert" color="danger"></ion-icon>
                     </ion-item>
                   </ion-menu-toggle>
               </accordion-group>

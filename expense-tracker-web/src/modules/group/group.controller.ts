@@ -17,23 +17,9 @@ export class GroupController {
   @Get('getAll')
   async getAll(@Req() req: Request,
    @Query() filters?: { name?: string, entityName?: string, fromDate?: string, toDate?: string }) {
-    const user = <ICurrentUser>req.user;
-
-    const userIds = [];
-    userIds.push(user.userId);
-    //TODO: need to add here other group members
-
-    const groups = await this.groupSvc.findAll({
-      ...filters,
-      userIds: userIds
+    return this.groupSvc.findAll({
+      ...filters
     });
-
-    //map it
-    const model = groups.map(async (e) => {
-      const mapped = await this._prepare(e);
-      return mapped;
-    });
-    return Promise.all(model);
   }
 
   @UseGuards(JwtAuthGuard)

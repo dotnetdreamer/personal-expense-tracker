@@ -23,7 +23,7 @@ import { AuthenticationService } from './modules/authentication/authentication.s
 import { UserSettingService } from './modules/authentication/user-setting.service';
 import { NgxPubSubService } from '@pscoped/ngx-pub-sub';
 import { GroupService } from './modules/group/group.service';
-import { IGroup } from './modules/group/group.model';
+import { IGroup, GroupMemberStatus } from './modules/group/group.model';
 import { SchemaService } from './modules/shared/db/schema.service';
 import { SyncEntity } from './modules/shared/sync/sync.model';
 
@@ -243,6 +243,14 @@ export class AppComponent {
     if(!groups.length) {
       return;
     }
+
+    //display alert icon
+    groups.map((g: IGroup) => {
+      const gm = g.members.filter(m => m.status == GroupMemberStatus.Pending)[0];
+      g['alert'] = gm != null;
+      return g;
+    });
+
     this.groups = new Map();
     const byEntity = groups.groupBy<IGroup>(g => g.entityName);
     for(let e in byEntity) {

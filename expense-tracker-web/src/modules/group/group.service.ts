@@ -26,14 +26,15 @@ export class GroupService {
 
 
   async findAll(args?: { 
-      name?: string, entityName?: string, userIds?: number[], 
-      fromDate?: string, toDate?: string, showHidden?: boolean 
-    }): Promise<Group[]> {
+      name?: string, entityName?: string
+      , fromDate?: string, toDate?: string, showHidden?: boolean 
+    }): Promise<any[]> {
     let qb = await getRepository(Group)
-      .createQueryBuilder('grp');
-      // .leftJoinAndSelect("grp.members", "groupmember");
+      .createQueryBuilder('grp')
+      .leftJoinAndSelect("grp.members", "grpMbr")
+      .leftJoinAndSelect("grpMbr.user", "usr");
       
-    if(args && (args.name || args.entityName || args.userIds || args.fromDate || args.toDate)) {
+    if(args && (args.name || args.entityName || args.fromDate || args.toDate)) {
       if(args.name) {
         const name = args.name.trim().toLowerCase();
         qb = qb.andWhere('(grp.description like :name)', { name: `%${name}%` });
@@ -42,10 +43,6 @@ export class GroupService {
       if(args.entityName) {
         const entityName = args.entityName.trim().toLowerCase();
         qb = qb.andWhere('grp.entityName = :entityName', { entityName: entityName });
-      }
-
-      if(args.userIds && args.userIds.length) {
-        qb = qb.andWhere("grp.createdBy IN (:...userIds)", { userIds: args.userIds })
       }
 
       if(args.fromDate) {
@@ -60,13 +57,24 @@ export class GroupService {
       }
       // console.log(qb.getQuery())
     }
-      
-    // .orWhere('user.email = :email', { email });
+
+    const user = <ICurrentUser>this.request.user;
+    // qb = qb.andWhere("grp.createdBy IN (:...userIds)", { userIds: args.userIds });
+    qb = qb.andWhere("(grp.createdBy = :currentUserId", { currentUserId: user.userId })
+      .orWhere("(usr.id = :currentUserId", { currentUserId: user.userId })
+      .andWhere("grpMbr.status IN (:...memberStatuses)))", { 
+        memberStatuses: [GroupMemberStatus.Aproved, GroupMemberStatus.Pending]
+      });
+
     qb = qb.andWhere('grp.isDeleted <= :isDeleted', { isDeleted: args && args.showHidden ? true : false });
     qb = qb.orderBy("grp.createdOn", 'DESC')
       .addOrderBy('grp.id', 'DESC');
 
-    return qb.getMany();
+    const data = await qb.getMany();
+
+    //map 
+    let result = data.map(g => this._prepareGroup(g));
+    return result;
   }
 
   findOne(id): Promise<Group> {
@@ -102,12 +110,10 @@ export class GroupService {
       .leftJoinAndSelect("gmbr.group", "grp")
       .leftJoinAndSelect("gmbr.user", "usr");
 
-
-
     qb = qb.andWhere('grp.id = :groupId', { groupId: args.groupId });
     const members = await qb.getMany();
     //map 
-    let result = members.map(m => this._prepareUser(m));
+    let result = members.map(m => this._prepareMember(m));
     return result;
   }
 
@@ -140,7 +146,7 @@ export class GroupService {
     }
 
     //already exist?
-    const existingMember = await this.memberRepo.findOne({ user: user });
+    const existingMember = await this.memberRepo.findOne({ user: user, group: group });
     if(existingMember) {
       result.alreadyMember = true;
       return result;
@@ -162,12 +168,12 @@ export class GroupService {
 
     //now save
     const member = await this.memberRepo.save<GroupMember>(newOrUpdated);
-    result.data = this._prepareUser(member);
+    result.data = this._prepareMember(member);
 
     return result;
   }
   
-  private _prepareUser(member: GroupMember) {
+  private _prepareMember(member: GroupMember) {
     return {
       id: member.id,
       status: member.status,
@@ -182,6 +188,27 @@ export class GroupService {
         guid: member.group.guid,
         entityName: member.group.entityName
       }
+    };
+  }
+
+  private _prepareGroup(group: Group) {
+    return {
+      createdBy: group.createdBy,
+      createdOn: group.createdOn,
+      entityName: group.entityName,
+      guid: group.guid,
+      id: group.id,
+      name: group.name,
+      members: group.members.map(m => {
+        return { 
+          status: m.status,
+          user: {
+            name: m.user.name,
+            email: m.user.email,
+            photo: m.user.photo
+          }
+        };
+      })
     };
   }
 }

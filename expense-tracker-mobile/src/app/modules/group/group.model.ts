@@ -4,7 +4,8 @@ export interface IGroup {
     id?: number
     guid: string
     name: string
-    entityName: string
+    entityName: string;
+    members?: IGroupMember[];
 
     createdOn?: string
     updatedOn?: string
