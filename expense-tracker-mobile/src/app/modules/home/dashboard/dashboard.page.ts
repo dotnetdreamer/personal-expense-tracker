@@ -182,7 +182,8 @@ export class DashboardPage extends BasePage implements AfterViewInit, OnDestroy 
   
               await this.groupSvc.putLocal({
                 name: data.name,
-                entityName: SyncEntity.Expense
+                entityName: SyncEntity.Expense,
+                guid: this.helperSvc.generateGuid()
               });   
               this.pubsubSvc.publishEvent(SyncConstant.EVENT_SYNC_DATA_PUSH, SyncEntity.Group);
             }

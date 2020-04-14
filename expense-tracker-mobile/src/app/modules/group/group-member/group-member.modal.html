@@ -1,0 +1,38 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>group-member</ion-title>
+    <ion-buttons slot="start">
+      <ion-button (click)="dismiss()">
+        <ion-icon name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+  <ion-toolbar>
+    <ion-searchbar slot="start" [(ngModel)]="email"></ion-searchbar>
+    <ion-buttons slot="end">
+      <ion-button (click)="onMemberSaveClicked()">
+        <ion-icon name="checkmark"></ion-icon>
+      </ion-button>
+      <ion-button>
+        <ion-icon name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+  <ion-list>
+    <ion-list-header lines="inset">
+      <ion-label>{{'group.members' | localizedresource | async}}</ion-label>
+      <ion-button>
+        <ion-icon name="add"></ion-icon>
+      </ion-button>
+    </ion-list-header>
+    <ion-item *ngFor="let member of members">
+      <ion-label>
+        <h2>{{ member.user.name }}</h2>
+        <h3>{{ member.user.email }}</h3>
+        <p>{{('group.status.' + member.status) | localizedresource | async }}</p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+</ion-content>

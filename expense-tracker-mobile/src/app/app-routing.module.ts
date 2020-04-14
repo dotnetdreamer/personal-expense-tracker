@@ -26,6 +26,10 @@ const routes: Routes = [
   {
     path: 'authentication',
     loadChildren: () => import('./modules/authentication/authentication.common.module').then( m => m.AuthenticationCommonModule)
+  },
+  {
+    path: 'group',
+    loadChildren: () => import('./modules/group/group.common.module').then( m => m.GroupCommonModule)
   }
 ];
 

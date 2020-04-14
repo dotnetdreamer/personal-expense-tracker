@@ -94,6 +94,15 @@ export class GroupController {
     return member;
   }
 
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(ClassSerializerInterceptor)
+  @Get('getAllMemberByGroupId')
+  async getAllMemberByGroupId(@Req() req: Request, @Query() filter: { groupId }) {
+    const members = await this.groupSvc.findAllMemberByGroupId(filter);
+    return members;
+  }
+
+
   private async _updateOrDelete(toUpdateOrDelete: Group, model, shouldDelete?: boolean) {
     //no need to update
     // delete model.createdOn;

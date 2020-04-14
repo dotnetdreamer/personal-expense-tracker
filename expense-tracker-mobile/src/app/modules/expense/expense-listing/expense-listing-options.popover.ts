@@ -7,8 +7,8 @@ import { PopoverController } from '@ionic/angular';
     template: `
         <ion-list>
             <ion-item (click)="dismiss('add_member')">
-                <ion-icon slot="start" name="person-add"></ion-icon>
-                <ion-label>{{'group.add_member' | localizedresource | async }}</ion-label>
+                <ion-icon slot="start" name="people"></ion-icon>
+                <ion-label>{{'group.members' | localizedresource | async }}</ion-label>
             </ion-item>
         </ion-list>
     `,

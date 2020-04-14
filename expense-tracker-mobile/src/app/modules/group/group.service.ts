@@ -1,10 +1,12 @@
 import { Injectable } from "@angular/core";
+import { ModalController } from '@ionic/angular';
 
 import * as moment from 'moment';
 
 import { BaseService } from '../shared/base.service';
-import { IGroup } from './group.model';
+import { IGroup, IGroupMemberAddOrUpdateResponse, IGroupMember } from './group.model';
 import { AppConstant } from '../shared/app-constant';
+import { GroupMemberModal } from './group-member/group-member.modal';
 
 declare const ydn: any;
 
@@ -14,7 +16,7 @@ declare const ydn: any;
 export class GroupService extends BaseService {
     private readonly BASE_URL = "group";
 
-    constructor() {
+    constructor(private modalCtrl: ModalController) {
         super();
     }
   
@@ -221,5 +223,41 @@ export class GroupService extends BaseService {
 
     removeAll() {
         return this.dbService.removeAll(this.schemaSvc.tables.group);
+    }
+
+
+    //member
+    async presentMemberModal(groupId, onDidDismiss?: (data?) => void) {
+        const modal = await this.modalCtrl.create({
+            component: GroupMemberModal,
+            cssClass: 'modal-group-member',
+            componentProps: {
+                groupId: groupId
+            }
+        });
+        await modal.present();
+        if(onDidDismiss) {
+            const { data } = await modal.onDidDismiss();
+            onDidDismiss(data);
+        }
+    }
+
+    addOrUpdateMember(email, groupId): Promise<IGroupMemberAddOrUpdateResponse> {
+        return this.postData({ 
+            url: `${this.BASE_URL}/addOrUpdateMember`,
+            body: {
+                email: email,
+                groupId: groupId
+            }
+        });
+    }
+
+    getAllMemberByGroupId(args: { groupId }) {
+        return this.getData<IGroupMember[]>({ 
+            url: `${this.BASE_URL}/getAllMemberByGroupId`,
+            body: {
+                groupId: args.groupId
+            }
+        })
     }
 }

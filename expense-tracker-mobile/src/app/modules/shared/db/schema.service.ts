@@ -54,6 +54,9 @@ export class SchemaService {
                     name: 'name', 
                     type: 'TEXT' 
                 }, { 
+                    name: 'guid', 
+                    type: 'TEXT' 
+                }, { 
                     name: 'entityName', 
                     type: 'TEXT' 
                 }, { 

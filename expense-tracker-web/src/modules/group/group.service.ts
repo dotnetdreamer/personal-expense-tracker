@@ -6,7 +6,7 @@ import * as moment from 'moment';
 import { Request } from 'express';
 
 import { Group } from './group.entity';
-import { IGroupParams, IGroupMemberParams } from './group.model';
+import { IGroupParams, IGroupMemberParams, GroupMemberStatus } from './group.model';
 import { GroupMember } from './group-member.entity';
 import { UserService } from '../user/user.service';
 import { REQUEST } from '@nestjs/core';
@@ -88,8 +88,27 @@ export class GroupService {
   }
 
 
+  /* 
+    Member
+  */
+
   findMemberByEmail(email) {
     // return this.memberRepo.find({ userId: })
+  }
+
+  async findAllMemberByGroupId(args: { groupId }) {
+    let qb = await getRepository(GroupMember)
+      .createQueryBuilder('gmbr')      
+      .leftJoinAndSelect("gmbr.group", "grp")
+      .leftJoinAndSelect("gmbr.user", "usr");
+
+
+
+    qb = qb.andWhere('grp.id = :groupId', { groupId: args.groupId });
+    const members = await qb.getMany();
+    //map 
+    let result = members.map(m => this._prepareUser(m));
+    return result;
   }
 
   async addMember(gm: IGroupMemberParams) {
@@ -97,6 +116,7 @@ export class GroupService {
       groupNotFound: false,
       memberNotFound: false,
       notAnOwner: false,
+      alreadyMember: false,
       data: null
     };
 
@@ -120,12 +140,20 @@ export class GroupService {
     }
 
     //already exist?
+    const existingMember = await this.memberRepo.findOne({ user: user });
+    if(existingMember) {
+      result.alreadyMember = true;
+      return result;
+    }
+
+    //TODO: owner can't add himself..
 
 
     let newOrUpdated: GroupMember = {
       user: user,
       group: group,
-      id: undefined
+      id: undefined,
+      status: GroupMemberStatus.Pending
     };
 
     if(!newOrUpdated.createdOn) {
@@ -134,8 +162,26 @@ export class GroupService {
 
     //now save
     const member = await this.memberRepo.save<GroupMember>(newOrUpdated);
-    result.data = member;
+    result.data = this._prepareUser(member);
 
     return result;
+  }
+  
+  private _prepareUser(member: GroupMember) {
+    return {
+      id: member.id,
+      status: member.status,
+      user: {
+        name: member.user.name,
+        email: member.user.email,
+        photo: member.user.photo
+      },
+      group: {
+        id: member.group.id,
+        name: member.group.name,
+        guid: member.group.guid,
+        entityName: member.group.entityName
+      }
+    };
   }
 }

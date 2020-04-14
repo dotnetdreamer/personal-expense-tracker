@@ -47,7 +47,13 @@
         "title": "Group",
         "add": "Add group",
         "name": "Name",
-        "add_member": "Add member"
+        "add_member": "Add member",
+        "members": "Members",
+        "status": {
+            "aproved": "Aproved",
+            "pending": "Pending",
+            "rejected": "Rejected"
+        }
     },
     "home": {
         "title": "Home",

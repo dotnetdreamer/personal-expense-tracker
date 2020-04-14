@@ -162,7 +162,7 @@ export class ExpenseListingPage extends BasePage implements OnInit, OnDestroy {
   }
 
   async onMemberAddClicked() {
-
+    await this.groupSvc.presentMemberModal(this.group.id);
   }
 
   async doRefresh(ev) {
@@ -181,7 +181,7 @@ export class ExpenseListingPage extends BasePage implements OnInit, OnDestroy {
     } else if(scrollTop <= 0) {
       this.displayHeaderbar = true;
     }
-  }
+  } 
 
   ngOnDestroy() {
     if(this._routeParamsSub) {

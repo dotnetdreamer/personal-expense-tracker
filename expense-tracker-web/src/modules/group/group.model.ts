@@ -19,4 +19,11 @@ export interface IGroupMemberParams {
     id?: number;
     email: string;
     groupId: number;
+    status?: GroupMemberStatus
+}
+
+export enum GroupMemberStatus {
+    Pending = 'pending',
+    Aproved = 'aproved',
+    Rejected = 'rejected'
 }
