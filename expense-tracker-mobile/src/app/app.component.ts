@@ -26,6 +26,7 @@ import { GroupService } from './modules/group/group.service';
 import { IGroup, GroupMemberStatus } from './modules/group/group.model';
 import { SchemaService } from './modules/shared/db/schema.service';
 import { SyncEntity } from './modules/shared/sync/sync.model';
+import { LocalizationService } from './modules/shared/localization.service';
 
 @Component({
   selector: 'app-root',
@@ -46,7 +47,7 @@ export class AppComponent {
     , private appSettingSvc: AppSettingService, private syncHelperSvc: SyncHelperService
     , private categorySvc: CategoryService, private helperSvc: HelperService
     , private authSvc: AuthenticationService, private userSettingSvc: UserSettingService
-    , private groupSvc: GroupService
+    , private groupSvc: GroupService, private localizationSvc: LocalizationService
   ) {
     this.initializeApp();
   }
@@ -60,6 +61,16 @@ export class AppComponent {
   }
 
   async onGroupItemClicked(group: IGroup) {
+    //is it in alert!
+    if(group['alert']) {
+      const msg = await this.localizationSvc.getResource('group.accept_request');
+      const res = await this.helperSvc.presentConfirmDialog(this.workingLanguage, msg);
+      //TODO: need to update group member request
+      if(!res) {
+        return;
+      }
+    }
+
     switch(group.entityName) {
       case SyncEntity.Expense:
         await this._navigateTo('/expense/expense-listing', {
@@ -246,7 +257,8 @@ export class AppComponent {
 
     //display alert icon
     groups.map((g: IGroup) => {
-      const gm = g.members.filter(m => m.status == GroupMemberStatus.Pending)[0];
+      const gm = g.members.filter(m => m.status == GroupMemberStatus.Pending 
+        && m.user.email == this.currentUser.email)[0];
       g['alert'] = gm != null;
       return g;
     });
