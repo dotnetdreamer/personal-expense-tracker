@@ -3,7 +3,7 @@ import { Controller, UseInterceptors, Get, ClassSerializerInterceptor, Post, Bod
 import { Request } from "express";
 
 import { GroupService } from "./group.service";
-import { IGroupParams } from "./group.model";
+import { IGroupParams, IGroupMemberParams } from "./group.model";
 import { Group } from "./group.entity";
 import { JwtAuthGuard } from "../user/auth/jwt-auth.guard";
 import { ICurrentUser } from "../shared/shared.model";
@@ -83,6 +83,15 @@ export class GroupController {
     }
 
     return items;
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(ClassSerializerInterceptor)
+  @Post('addOrUpdateMember')
+  async addOrUpdateMember(@Req() req: Request, @Body() model: IGroupMemberParams) {
+    const member = await this.groupSvc.addMember(model);
+
+    return member;
   }
 
   private async _updateOrDelete(toUpdateOrDelete: Group, model, shouldDelete?: boolean) {

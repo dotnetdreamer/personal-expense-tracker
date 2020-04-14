@@ -13,6 +13,6 @@ import { ExternalAuthModule } from './external-auth/external-auth.module';
   ],
   providers: [UserService],
   controllers: [UserController],
-  exports: [ UserService ]
+  exports: [UserService]
 })
 export class UserModule {}

@@ -21,13 +21,18 @@ import { ExternalAuth } from './modules/user/external-auth/external-auth.entity'
 import { ExternalAuthModule } from './modules/user/external-auth/external-auth.module';
 import { Group } from './modules/group/group.entity';
 import { GroupModule } from './modules/group/group.module';
+import { GroupMember } from './modules/group/group-member.entity';
 
 @Module({
   imports: [
     TypeOrmModule.forRoot({
       type: 'sqlite',
       database: './_db/expense-tracker.db',
-      entities: [Category, Expense, Attachment, User, AccessToken, ExternalAuth, Group],
+      entities: [
+        Category, Expense, Attachment, User
+        , AccessToken, ExternalAuth
+        , Group, GroupMember
+      ],
       synchronize: true,
     }),
     SharedModule,
