@@ -117,7 +117,7 @@ export class GroupService {
     return result;
   }
 
-  async addMember(gm: IGroupMemberParams) {
+  async addOrUpdateMember(gm: IGroupMemberParams) {
     let result = {
       groupNotFound: false,
       memberNotFound: false,
@@ -132,42 +132,44 @@ export class GroupService {
       return result;
     }
 
-    //only owner can add members
-    const currentUser = <ICurrentUser>this.request.user;
-    if(currentUser.userId != group.createdBy) {
-      result.notAnOwner = true;
-      return result;
-    }
-
     const user = await this.userRepo.findOne({ email: gm.email });
     if(!user) {
       result.memberNotFound = true;
       return result;
     }
 
-    //already exist?
-    const existingMember = await this.memberRepo.findOne({ user: user, group: group });
-    if(existingMember) {
-      result.alreadyMember = true;
-      return result;
-    }
-
     //TODO: owner can't add himself..
 
+    //already exist?. fetch relation also to be used in _prepare method
+    let toAddOrUpdate: GroupMember = await this.memberRepo.findOne(
+      { user: user, group: group }, { relations: ["user", "group"] }
+    );
+    if(toAddOrUpdate) {
+      toAddOrUpdate.status = gm.status || toAddOrUpdate.status;
+      toAddOrUpdate.updatedOn = <any>moment().format(AppConstant.DEFAULT_DATETIME_FORMAT);
+    } else {
+      //only owner can add members
+      const currentUser = <ICurrentUser>this.request.user;
+      if(currentUser.userId != group.createdBy) {
+        result.notAnOwner = true;
+        return result;
+      }
 
-    let newOrUpdated: GroupMember = {
-      user: user,
-      group: group,
-      id: undefined,
-      status: GroupMemberStatus.Pending
-    };
+      toAddOrUpdate = {
+        user: user,
+        group: group,
+        id: undefined,
+        status: GroupMemberStatus.Pending
+      };
+    }
 
-    if(!newOrUpdated.createdOn) {
-      newOrUpdated.createdOn = <any>moment().format(AppConstant.DEFAULT_DATETIME_FORMAT);
+    if(!toAddOrUpdate.createdOn) {
+      toAddOrUpdate.createdOn = <any>moment().format(AppConstant.DEFAULT_DATETIME_FORMAT);
     }
 
     //now save
-    const member = await this.memberRepo.save<GroupMember>(newOrUpdated);
+    const member = await this.memberRepo.save<GroupMember>(toAddOrUpdate);
+    console.log(toAddOrUpdate)
     result.data = this._prepareMember(member);
 
     return result;

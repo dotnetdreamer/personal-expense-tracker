@@ -4,7 +4,7 @@ import { ModalController } from '@ionic/angular';
 import * as moment from 'moment';
 
 import { BaseService } from '../shared/base.service';
-import { IGroup, IGroupMemberAddOrUpdateResponse, IGroupMember } from './group.model';
+import { IGroup, IGroupMemberAddOrUpdateResponse, IGroupMember, GroupMemberStatus } from './group.model';
 import { AppConstant } from '../shared/app-constant';
 import { GroupMemberModal } from './group-member/group-member.modal';
 
@@ -242,12 +242,13 @@ export class GroupService extends BaseService {
         }
     }
 
-    addOrUpdateMember(email, groupId): Promise<IGroupMemberAddOrUpdateResponse> {
+    addOrUpdateMember(email, groupId, status?: GroupMemberStatus): Promise<IGroupMemberAddOrUpdateResponse> {
         return this.postData({ 
             url: `${this.BASE_URL}/addOrUpdateMember`,
             body: {
                 email: email,
-                groupId: groupId
+                groupId: groupId,
+                status: status || ''
             }
         });
     }

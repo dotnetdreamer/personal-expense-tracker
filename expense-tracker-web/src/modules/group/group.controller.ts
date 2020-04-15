@@ -75,8 +75,7 @@ export class GroupController {
   @UseInterceptors(ClassSerializerInterceptor)
   @Post('addOrUpdateMember')
   async addOrUpdateMember(@Req() req: Request, @Body() model: IGroupMemberParams) {
-    const member = await this.groupSvc.addMember(model);
-
+    const member = await this.groupSvc.addOrUpdateMember(model);
     return member;
   }
 

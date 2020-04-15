@@ -61,14 +61,39 @@ export class AppComponent {
   }
 
   async onGroupItemClicked(group: IGroup) {
-    //is it in alert!
+    //is it in alert! i.e in pending
     if(group['alert']) {
-      const msg = await this.localizationSvc.getResource('group.accept_request');
+      let msg = await this.localizationSvc.getResource('group.accept_request');
+      msg = msg.format(group.name);
+
       const res = await this.helperSvc.presentConfirmDialog(this.workingLanguage, msg);
-      //TODO: need to update group member request
-      if(!res) {
-        return;
+      const status = res ? GroupMemberStatus.Aproved : GroupMemberStatus.Rejected;
+
+      const result = await this.groupSvc.addOrUpdateMember(this.currentUser.email
+        , group.id, status);
+      if(result && result.data) {
+        group['alert'] = null;
+
+        if(status == GroupMemberStatus.Rejected) {
+          await this.groupSvc.remove(group.id);
+          await this.helperSvc.presentToastGenericSuccess();
+          //reload
+          await this._getGroups();
+        } else {
+          //update group member statuses locally also 
+          group.members = group.members.map(m => {
+            m.status = status;
+            return m;
+          });
+          await this.groupSvc.putLocal(group);
+
+          await this.helperSvc.presentToastGenericSuccess();
+          await this._navigateTo('/expense/expense-listing', {
+            groupId: group.id
+          });        
+        }
       }
+      return;
     }
 
     switch(group.entityName) {

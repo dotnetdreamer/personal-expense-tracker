@@ -49,7 +49,7 @@
         "name": "Name",
         "add_member": "Add member",
         "members": "Members",
-        "accept_request": "Do you accept to join current group?",
+        "accept_request": "Do you accept to join \"{0}\" group?",
         "status": {
             "aproved": "Aproved",
             "pending": "Pending",

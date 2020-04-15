@@ -29,7 +29,7 @@ export interface IGroupMemberAddOrUpdateResponse {
     groupNotFound: boolean;
     memberNotFound: boolean;
     notAnOwner: boolean;
-    data: IGroup;
+    data: IGroupMember;
 }
 
 export enum GroupMemberStatus {
