@@ -352,7 +352,8 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit, OnDes
 
     const { data } = await modal.onDidDismiss();
     if(data) {
-      this.selectedTransactionType = data;
+      this.selectedTransactionType = data.type;
+      const membersWithAmount = data.membersWithAmount;
     }
   }
 

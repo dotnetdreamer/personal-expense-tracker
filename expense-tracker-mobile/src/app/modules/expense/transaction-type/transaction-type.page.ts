@@ -25,11 +25,19 @@ export class TransactionTypeModal implements OnInit {
   }
 
   async onTypeClicked(type: TransactionType) {
+    if(type === TransactionType.PaidByOtherPersonAndSplitEqually
+      || type == TransactionType.Mutiple) {
+      return;
+    }
+
     await this.dismiss(type);
   }
 
 
-  async dismiss(data?) {
-    await this.modalCtrl.dismiss(data);
+  async dismiss(type?) {
+    await this.modalCtrl.dismiss({
+      type: type,
+      membersWithAmount: null
+    });
   }
 }

@@ -35,6 +35,7 @@
         "notes": "Notes",
         "today": "Today",
         "total": "Total",
+        "split": "How was this expense split?",
         "transaction_type": {
             "10": "Paid by you and split equally",
             "20": "You owe full amount",
