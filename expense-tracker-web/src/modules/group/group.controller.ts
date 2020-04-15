@@ -3,7 +3,7 @@ import { Controller, UseInterceptors, Get, ClassSerializerInterceptor, Post, Bod
 import { Request } from "express";
 
 import { GroupService } from "./group.service";
-import { IGroupParams, IGroupMemberParams } from "./group.model";
+import { IGroupParams, IGroupMemberParams, GroupMemberStatus } from "./group.model";
 import { Group } from "./group.entity";
 import { JwtAuthGuard } from "../user/auth/jwt-auth.guard";
 import { ICurrentUser } from "../shared/shared.model";
@@ -41,7 +41,20 @@ export class GroupController {
         delete toAdd.id;
 
         const item = await this.groupSvc.save(toAdd);
-        returnedGroup = item;        
+
+        //add current user as a member as well
+        await this.groupSvc.addOrUpdateMember({
+          email: user.username,
+          groupId: (<any>item).id,
+          status: GroupMemberStatus.Aproved
+        });
+
+        //get the group with related data i.e members
+        let newGrp = await this.groupSvc.findOne((<any>item).id);
+        console.log('', newGrp)
+        newGrp = this.groupSvc.prepareGroup(newGrp);
+
+        returnedGroup = newGrp;        
       } else if(model.markedForUpdate) {
         const toUpdate = await this.groupSvc.findOne(model.id);
         if(!toUpdate) {

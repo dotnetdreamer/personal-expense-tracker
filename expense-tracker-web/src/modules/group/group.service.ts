@@ -73,15 +73,15 @@ export class GroupService {
     const data = await qb.getMany();
 
     //map 
-    let result = data.map(g => this._prepareGroup(g));
+    let result = data.map(g => this.prepareGroup(g));
     return result;
   }
 
   findOne(id): Promise<Group> {
-    return this.groupRepo.findOne(id);
+    return this.groupRepo.findOne({ where: { id: id }, relations: ['members', 'members.user']});
   }
 
-  save(group: IGroupParams) {
+  async save(group: IGroupParams) {
     let newOrUpdated: any = Object.assign({}, group);
     if(typeof newOrUpdated.isDeleted === 'undefined') {
       newOrUpdated.isDeleted = false;
@@ -94,7 +94,6 @@ export class GroupService {
   remove(id) {
     return this.groupRepo.delete(id);
   }
-
 
   /* 
     Member
@@ -159,7 +158,7 @@ export class GroupService {
         user: user,
         group: group,
         id: undefined,
-        status: GroupMemberStatus.Pending
+        status: gm.status || GroupMemberStatus.Pending
       };
     }
 
@@ -169,31 +168,12 @@ export class GroupService {
 
     //now save
     const member = await this.memberRepo.save<GroupMember>(toAddOrUpdate);
-    console.log(toAddOrUpdate)
     result.data = this._prepareMember(member);
 
     return result;
   }
-  
-  private _prepareMember(member: GroupMember) {
-    return {
-      id: member.id,
-      status: member.status,
-      user: {
-        name: member.user.name,
-        email: member.user.email,
-        photo: member.user.photo
-      },
-      group: {
-        id: member.group.id,
-        name: member.group.name,
-        guid: member.group.guid,
-        entityName: member.group.entityName
-      }
-    };
-  }
 
-  private _prepareGroup(group: Group) {
+  prepareGroup(group: Group): any {
     return {
       createdBy: group.createdBy,
       createdOn: group.createdOn,
@@ -211,6 +191,24 @@ export class GroupService {
           }
         };
       })
+    };
+  }
+  
+  private _prepareMember(member: GroupMember) {
+    return {
+      id: member.id,
+      status: member.status,
+      user: {
+        name: member.user.name,
+        email: member.user.email,
+        photo: member.user.photo
+      },
+      group: {
+        id: member.group.id,
+        name: member.group.name,
+        guid: member.group.guid,
+        entityName: member.group.entityName
+      }
     };
   }
 }

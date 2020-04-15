@@ -77,8 +77,6 @@ export class AppComponent {
         if(status == GroupMemberStatus.Rejected) {
           await this.groupSvc.remove(group.id);
           await this.helperSvc.presentToastGenericSuccess();
-          //reload
-          await this._getGroups();
         } else {
           //update group member statuses locally also 
           group.members = group.members.map(m => {

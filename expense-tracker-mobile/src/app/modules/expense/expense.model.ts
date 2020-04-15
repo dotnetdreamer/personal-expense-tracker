@@ -19,10 +19,10 @@ export interface IExpense {
 
 export interface IExpenseTransaction {
     expenseId: number
-    paidByUserEmail: string
     transactionType: TransactionType
     debit?: number
     credit?: number
+    email: string
 }
 
 export interface IExpenseDashboardReport {

@@ -19,7 +19,7 @@ import { IAttachment } from '../../attachment/attachment.model';
 import { MlService } from '../../shared/ml/ml.service';
 import { AttachmentService } from '../../attachment/attachment.service';
 import { Subscription } from 'rxjs';
-import { IGroup } from '../../group/group.model';
+import { IGroup, GroupMemberStatus } from '../../group/group.model';
 import { GroupService } from '../../group/group.service';
 import { TransactionTypeModal } from '../transaction-type/transaction-type.page';
 import { IUser, IUserProfile } from '../../authentication/authentication.model';
@@ -40,7 +40,7 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit, OnDes
   todayDate;
   attachment: IAttachment;
   group: IGroup;
-  selectedTransactionType: TransactionType.PaidByYouAndSplitEqually;
+  selectedTransactionType = TransactionType.PaidByYouAndSplitEqually;
   currentUser: IUserProfile;
 
   private _expense: IExpense;
@@ -159,9 +159,9 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit, OnDes
       exp.group = this.group;
     }
     // //TODO: move this to group condition
-    // const result = await this._distributeTransaction(exp, this.selectedTransactionType);
-    // console.log(result);
-    // return;
+    const result = await this._distributeTransaction(exp, this.selectedTransactionType);
+    console.log(result);
+    return;
     
     await this.expenseSvc.putLocal(exp);
     await this.helperSvc.presentToastGenericSuccess();
@@ -368,20 +368,63 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit, OnDes
 
   private async _distributeTransaction(expense: IExpense, tranType: TransactionType) {
     const total = +expense.amount;
+    let members = this.group.members
+      .filter(m => m.status == GroupMemberStatus.Aproved);
+
     let transactions: IExpenseTransaction[] = [];
+    let amountPerMbr = 0;
 
     switch(tranType) {
       case TransactionType.PaidByYouAndSplitEqually:
+        amountPerMbr = total / (members.length);
+        for(let member of members) {
+          const isCurrentMember = member.user.email == this.currentUser.email;
 
+          transactions.push({
+            expenseId: expense.id,
+            transactionType: TransactionType.PaidByYouAndSplitEqually,
+            credit: isCurrentMember ? amountPerMbr : 0,
+            debit: !isCurrentMember ? amountPerMbr : 0,
+            email: member.user.email
+          });
+        }
+      break;
+      case TransactionType.TheyOweFullAmount:
+        //remove the current member from amount division
+        const membersWithoutCurrentUser = members.filter(m => m.user.email != this.currentUser.email);
+        amountPerMbr = total / membersWithoutCurrentUser.length;
+
+        for(let member of membersWithoutCurrentUser) {
+          transactions.push({
+            expenseId: expense.id,
+            transactionType: TransactionType.TheyOweFullAmount,
+            credit: 0,
+            debit: amountPerMbr,
+            email: member.user.email
+          });
+        }
+      break;
+      case TransactionType.YouOweFullAmount:
         transactions.push({
           expenseId: expense.id,
-          transactionType: TransactionType.PaidByYouAndSplitEqually,
-          paidByUserEmail: this.currentUser.email,
+          transactionType: TransactionType.YouOweFullAmount,
           credit: 0,
-          debit: 0
+          debit: total,
+          email: this.currentUser.email
         });
       break;
+      case TransactionType.PaidByOtherPersonAndSplitEqually:
+        // transactions.push({
+        //   expenseId: expense.id,
+        //   transactionType: TransactionType.YouOweFullAmount,
+        //   credit: 0,
+        //   debit: total,
+        //   email: this.currentUser.email
+        // });
+      break;
     }
+
+    return transactions;
   }
 
   private _preFill() {
