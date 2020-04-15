@@ -1,10 +1,25 @@
 .modal-transaction-type {
     .modal-wrapper {
         --width: 320px;
-        --height: 400px;
+        --height: 310px;
 
         modal-expense-transaction-type {
+            ion-header {
+                ion-toolbar {
+                    ion-title {
+                        font-size: 16px;
+                        padding: 0;
+                    }
+                }
+            }
 
+            ion-content {
+                ion-list {
+                    ion-item {
+                        font-size: 14px;
+                    }
+                }
+            }
         }
     }
 }

@@ -10,7 +10,7 @@
 </ion-header>
 
 <ion-content>
-  <ion-list>
+  <ion-list lines="none">
     <ion-radio-group [(ngModel)]="selectedType">
       <ion-item (click)="onTypeClicked(TransactionType.PaidByYouAndSplitEqually)">
         <ion-label>{{ 'expense.transaction_type.' + TransactionType.PaidByYouAndSplitEqually | localizedresource | async }}</ion-label>
