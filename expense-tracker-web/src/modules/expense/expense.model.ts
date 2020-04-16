@@ -3,12 +3,13 @@ import { IAttachmentParams } from "../attachment/attachment.model";
 import { IGroupParams } from "../group/group.model";
 
 export interface IExpenseParams {
-    id?: number
-    category: number | ICategoryParams
-    group: number | IGroupParams
-    description: string
-    amount: string
-    notes?: string
+    id?: number;
+    category: number | ICategoryParams;
+    group: number | IGroupParams;
+    transactions?: IExpenseTransaction[];
+    description: string;
+    amount: string;
+    notes?: string;
     attachment?: number | IAttachmentParams
     createdOn: string
     updatedOn?: string
@@ -16,4 +17,20 @@ export interface IExpenseParams {
     markedForAdd: boolean
     markedForUpdate: boolean
     markedForDelete: boolean
+}
+
+export interface IExpenseTransaction {
+    expenseId: number;
+    transactionType: TransactionType;
+    debit: number;
+    credit: number;
+    email: string;
+}
+
+export enum TransactionType {
+    PaidByYouAndSplitEqually = 10,
+    YouOweFullAmount = 20,
+    TheyOweFullAmount = 30,
+    PaidByOtherPersonAndSplitEqually = 40,
+    Mutiple = 50
 }

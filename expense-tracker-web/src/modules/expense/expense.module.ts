@@ -7,10 +7,11 @@ import { ExpenseController } from './expense.controller';
 import { AttachmentModule } from '../attachment/attachment.module';
 import { CategoryModule } from '../category/category.module';
 import { GroupModule } from '../group/group.module';
+import { ExpenseTransaction } from './expense.transaction.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Expense]),
+    TypeOrmModule.forFeature([Expense, ExpenseTransaction]),
     AttachmentModule,
     CategoryModule,
     GroupModule

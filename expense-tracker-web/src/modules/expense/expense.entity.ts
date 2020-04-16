@@ -1,6 +1,7 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 
 import { BaseUserEntity } from '../shared/entity/base-user.entity';
+import { ExpenseTransaction } from './expense.transaction.entity';
 
 @Entity()
 export class Expense extends BaseUserEntity {
@@ -21,4 +22,7 @@ export class Expense extends BaseUserEntity {
 
   @Column({ nullable: true })
   attachmentId: number;
+
+  @OneToMany(type => ExpenseTransaction, exp => exp.expense, { nullable: true })
+  transactions?: ExpenseTransaction[];
 }

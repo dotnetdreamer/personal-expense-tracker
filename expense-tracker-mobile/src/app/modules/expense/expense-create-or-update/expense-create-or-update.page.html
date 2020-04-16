@@ -41,6 +41,12 @@
         *ngIf="selectedTransactionType" [disabled]="!formGroup.controls.amount.value">
         {{ 'expense.transaction_type.' + selectedTransactionType.type | localizedresource | async }}
       </ion-button>
+      <!-- <ion-list *ngIf="selectedTransactionType.membersWithAmount && selectedTransactionType.membersWithAmount.length">
+        <ion-item *ngFor="let ma of selectedTransactionType.membersWithAmount">
+          <ion-label>{{ ma.email }}</ion-label>
+          <ion-label slot="end">{{ ma.amount }}</ion-label>
+        </ion-item>
+      </ion-list> -->
     </div>
   </form>
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">

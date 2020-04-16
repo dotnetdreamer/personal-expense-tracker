@@ -159,12 +159,9 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit, OnDes
     //group
     if(this.group) {
       exp.group = this.group;
+      exp.transactions = await this._distributeTransaction(exp, this.selectedTransactionType);;
     }
-    // //TODO: move this to group condition
-    const result = await this._distributeTransaction(exp, this.selectedTransactionType);
-    console.log(result);
-    return;
-    
+
     await this.expenseSvc.putLocal(exp);
     await this.helperSvc.presentToastGenericSuccess();
 
@@ -422,15 +419,43 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit, OnDes
         });
       break;
       case TransactionType.PaidByOtherPersonAndSplitEqually:
-        const membersWithAmount = this.selectedTransactionType.membersWithAmount;
+        const ma = this.selectedTransactionType.membersWithAmount[0];
+        amountPerMbr = total / members.length;
 
         transactions.push({
           expenseId: expense.id,
-          transactionType: TransactionType.YouOweFullAmount,
-          credit: 0,
-          debit: total,
-          email: this.currentUser.email
+          transactionType: TransactionType.PaidByOtherPersonAndSplitEqually,
+          credit: ma.amount,
+          debit: 0,
+          email: ma.email
         });
+
+        for(let member of membersWithoutCurrentUser) {
+          if(member.user.email == ma.email) {
+            //skip
+            continue;
+          }
+
+          //add entries for others
+          transactions.push({
+            expenseId: expense.id,
+            transactionType: TransactionType.PaidByOtherPersonAndSplitEqually,
+            credit: 0,
+            debit: amountPerMbr,
+            email: member.user.email
+          });
+        }
+      break;
+      case TransactionType.Mutiple:
+        for(let member of this.selectedTransactionType.membersWithAmount) {
+          transactions.push({
+            expenseId: expense.id,
+            transactionType: TransactionType.Mutiple,
+            credit: 0,
+            debit: amountPerMbr,
+            email: member.email
+          });
+        }
       break;
     }
 

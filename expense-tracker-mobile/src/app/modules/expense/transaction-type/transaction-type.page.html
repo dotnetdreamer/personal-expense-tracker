@@ -9,7 +9,7 @@
   </ion-toolbar>
 </ion-header>
 <ion-content #tpContent>
-  <ion-list lines="none">
+  <ion-list>
     <ion-radio-group [(ngModel)]="selectedType">
       <ion-item (click)="onTypeClicked(TransactionType.PaidByYouAndSplitEqually)">
         <ion-label>{{ 'expense.transaction_type.' + TransactionType.PaidByYouAndSplitEqually | localizedresource | async }}</ion-label>

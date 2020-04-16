@@ -6,6 +6,7 @@ export interface IExpense {
     id?: number
     category?: ICategory
     group?: IGroup
+    transactions?: IExpenseTransaction[]
     description: string
     amount: string
     notes?: string
@@ -20,8 +21,8 @@ export interface IExpense {
 export interface IExpenseTransaction {
     expenseId: number
     transactionType: TransactionType
-    debit?: number
-    credit?: number
+    debit: number
+    credit: number
     email: string
 }
 

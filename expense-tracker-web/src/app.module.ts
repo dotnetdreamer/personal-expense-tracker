@@ -22,6 +22,7 @@ import { ExternalAuthModule } from './modules/user/external-auth/external-auth.m
 import { Group } from './modules/group/group.entity';
 import { GroupModule } from './modules/group/group.module';
 import { GroupMember } from './modules/group/group-member.entity';
+import { ExpenseTransaction } from './modules/expense/expense.transaction.entity';
 
 @Module({
   imports: [
@@ -29,7 +30,8 @@ import { GroupMember } from './modules/group/group-member.entity';
       type: 'sqlite',
       database: './_db/expense-tracker.db',
       entities: [
-        Category, Expense, Attachment, User
+        Category, Expense, ExpenseTransaction
+        , Attachment, User
         , AccessToken, ExternalAuth
         , Group, GroupMember
       ],

@@ -15,7 +15,7 @@ import { LocalizationService } from '../../shared/localization.service';
 })
 export class TransactionTypeModal implements OnInit {
   @ViewChild('tpContent') tpContent: IonContent;
-  @Input() transactionType: { type: TransactionType, membersWithAmount?: Array<any> };
+  @Input() transactionType: { type: TransactionType, membersWithAmount?: Array<{email,amount}> };
   @Input() allMembers: IGroupMember[];
   @Input() currentExpenseAmount: number;
   
@@ -29,42 +29,35 @@ export class TransactionTypeModal implements OnInit {
     , private formBuilder: FormBuilder
     , private helperSvc: HelperService, private localizationSvc: LocalizationService) { 
       this.memberFormGroup = this.formBuilder.group({
-        members: this.formBuilder.array(
-          [
-            this.formBuilder.group(
-              { 
-                email: [{ value: '', disabled: false }, Validators.compose([Validators.required, Validators.email])],
-                amount: [{ value: '', disabled: false }, Validators.compose([Validators.required])]
-              }
-            )
-          ])
+        members: this.formBuilder.array([])
       });
   }
 
   ngOnInit() { 
+    if(this.transactionType) {
+      this.selectedType = +this.transactionType.type;
+    }
+
     if(!this.allMembers) {
       this.allMembers = [];
     }
 
     this.remainingMembers = this.allMembers;
-    // if(this.website) {
-    //   //remove the default textbox
-    //   // this.removeEmail(0);
-    //   const emails = this.website.emails.split(';');
-    //   for(let i=0; i < emails.length; i++) {
-    //     const e = emails[i];
-    //     this.emails.push(this.formBuilder.group({ 
-    //       email: [{ value: e, disabled: i == 0}
-    //         , Validators.compose([Validators.required, Validators.email])]}));  
-    //   }
-    // } else {
-    //   this.customerService.getCustomerLocal()
-    //   .then((cu) => {
-    //     this.currentCustomer = cu;
-    //     const emailGrp = this.emails.controls[0] as FormGroup;  
-    //     emailGrp.controls.email.setValue(cu.email);
-    //   });
-    // }
+    
+    if(this.transactionType.membersWithAmount) {
+      for(let member of this.transactionType.membersWithAmount) {
+        this.members.push(this.formBuilder.group({ 
+          email: [{ value: member.email, disabled: false }, Validators.compose([Validators.required, Validators.email])],
+          amount: [{ value: member.amount, disabled: false }, Validators.compose([Validators.required])]
+        })); 
+      }
+    } else {
+      //add empty
+      this.members.push(this.formBuilder.group({ 
+        email: [{ value: '', disabled: false }, Validators.compose([Validators.required, Validators.email])],
+        amount: [{ value: '', disabled: false }, Validators.compose([Validators.required])]
+      })); 
+    }
   }
 
   get members() : FormArray {
