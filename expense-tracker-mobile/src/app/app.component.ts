@@ -318,7 +318,10 @@ export class AppComponent {
     const cUser = res[0];
     if(cUser) {
       this.pubsubSvc.publishEvent(UserConstant.EVENT_USER_LOGGEDIN, { user: cUser });
-      await this._navigateTo('/home');
+      // await this._navigateTo('/home');
+      await this._navigateTo('/expense/expense-create-or-update', {
+        groupId: 16
+      });  
 
       if(AppConstant.DEBUG) {
         console.log('AppComponent: _setDefaults: publishing EVENT_SYNC_DATA_PULL');

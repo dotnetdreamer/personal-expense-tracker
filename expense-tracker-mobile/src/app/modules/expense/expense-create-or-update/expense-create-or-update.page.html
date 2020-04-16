@@ -36,8 +36,10 @@
       </ion-list>
     </div>
     <div class="transaction-type-container">
-      <ion-button fill="clear" (click)="onTransactionTypeClicked()" *ngIf="selectedTransactionType">
-        {{ 'expense.transaction_type.' + selectedTransactionType | localizedresource | async }}
+      <!-- amount must be entered so we can validate amount in transaction-type.page.ts -->
+      <ion-button fill="clear" (click)="onTransactionTypeClicked()" 
+        *ngIf="selectedTransactionType" [disabled]="!formGroup.controls.amount.value">
+        {{ 'expense.transaction_type.' + selectedTransactionType.type | localizedresource | async }}
       </ion-button>
     </div>
   </form>

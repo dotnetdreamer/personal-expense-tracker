@@ -19,6 +19,26 @@
                         font-size: 14px;
                     }
                 }
+
+                .members-form {
+                    ion-list {
+                        ion-item {
+                            .member-with-amount {
+                                width: 100%;
+                                display: flex;
+                                align-items: center;
+
+                                ion-select {
+
+                                }
+
+                                ion-input {
+                                    text-align: center;
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
     }

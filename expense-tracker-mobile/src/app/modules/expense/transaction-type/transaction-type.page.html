@@ -8,8 +8,7 @@
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
-
-<ion-content>
+<ion-content #tpContent>
   <ion-list lines="none">
     <ion-radio-group [(ngModel)]="selectedType">
       <ion-item (click)="onTypeClicked(TransactionType.PaidByYouAndSplitEqually)">
@@ -34,4 +33,35 @@
       </ion-item>
     </ion-radio-group>
   </ion-list>
+  <form class="members-form" [formGroup]="memberFormGroup" (ngSubmit)="onMembersSubmit()" 
+    *ngIf="selectedType === TransactionType.PaidByOtherPersonAndSplitEqually || selectedType == TransactionType.Mutiple">
+    <ion-list formArrayName="members">
+      <ion-list-header>
+        <ion-label>{{'group.members' | localizedresource | async}}</ion-label>
+        <ion-buttons>
+          <!-- allow only 1 person to be added if type is PaidByOtherPersonAndSplitEqually -->
+          <ion-button (click)="addMember()" [disabled]="!memberFormGroup.valid" 
+            *ngIf="selectedType != TransactionType.PaidByOtherPersonAndSplitEqually">
+            <ion-icon slot="icon-only" name="add"></ion-icon>
+          </ion-button>
+          <ion-button type="submit" [disabled]="!memberFormGroup.valid">
+            <ion-icon slot="icon-only" name="checkmark"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+      </ion-list-header>
+      <ion-item [formGroupName]="i" *ngFor="let skill of members.controls; let i=index">
+        <div class="member-with-amount">
+          <ion-select [interface]="'popover'" formControlName="email">
+            <ion-select-option [value]="ambr.user.email" *ngFor="let ambr of remainingMembers">{{ambr.user.name}}</ion-select-option>
+          </ion-select>
+          <ion-input type="number" formControlName="amount" placeholder="e.g 100"></ion-input>
+        </div>
+        <ion-buttons slot="end">
+          <ion-button color="danger" (click)="removeMember(i)">
+            <ion-icon name="trash" slot="icon-only"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+      </ion-item>
+    </ion-list>
+  </form>
 </ion-content>

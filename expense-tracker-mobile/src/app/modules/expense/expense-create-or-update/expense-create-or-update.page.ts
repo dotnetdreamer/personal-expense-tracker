@@ -40,7 +40,9 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit, OnDes
   todayDate;
   attachment: IAttachment;
   group: IGroup;
-  selectedTransactionType = TransactionType.PaidByYouAndSplitEqually;
+  selectedTransactionType: {type:TransactionType,membersWithAmount?:Array<{email,amount }>} = {
+    type: TransactionType.PaidByYouAndSplitEqually,
+  };
   currentUser: IUserProfile;
 
   private _expense: IExpense;
@@ -345,15 +347,19 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit, OnDes
       mode: 'md',
       cssClass: 'modal-transaction-type',
       componentProps: {
-        transactionType: this.selectedTransactionType
+        transactionType: this.selectedTransactionType,
+        allMembers: this.group.members,
+        currentExpenseAmount: this.f.amount.value
       }
     });
     await modal.present();
 
     const { data } = await modal.onDidDismiss();
+    if(AppConstant.DEBUG) {
+      console.log('ExpenseCreateOrUpdatePage: onTransactionTypeClicked: data:', data);
+    }
     if(data) {
-      this.selectedTransactionType = data.type;
-      const membersWithAmount = data.membersWithAmount;
+      this.selectedTransactionType = data;
     }
   }
 
@@ -367,7 +373,8 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit, OnDes
     this.categories = await this.categorySvc.getCategoryListLocal();
   }
 
-  private async _distributeTransaction(expense: IExpense, tranType: TransactionType) {
+  private async _distributeTransaction(expense: IExpense
+    , tranType: { type: TransactionType, membersWithAmount?: Array<any> }) {
     const total = +expense.amount;
     let members = this.group.members
       .filter(m => m.status == GroupMemberStatus.Aproved);
@@ -375,7 +382,7 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit, OnDes
     let transactions: IExpenseTransaction[] = [];
     let amountPerMbr = 0;
 
-    switch(tranType) {
+    switch(tranType.type) {
       case TransactionType.PaidByYouAndSplitEqually:
         amountPerMbr = total / (members.length);
         for(let member of members) {
@@ -415,13 +422,15 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit, OnDes
         });
       break;
       case TransactionType.PaidByOtherPersonAndSplitEqually:
-        // transactions.push({
-        //   expenseId: expense.id,
-        //   transactionType: TransactionType.YouOweFullAmount,
-        //   credit: 0,
-        //   debit: total,
-        //   email: this.currentUser.email
-        // });
+        const membersWithAmount = this.selectedTransactionType.membersWithAmount;
+
+        transactions.push({
+          expenseId: expense.id,
+          transactionType: TransactionType.YouOweFullAmount,
+          credit: 0,
+          debit: total,
+          email: this.currentUser.email
+        });
       break;
     }
 
