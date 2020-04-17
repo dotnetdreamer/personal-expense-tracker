@@ -11,13 +11,17 @@ import { AppConstant } from '../shared/app-constant';
 import { IAttachmentParams } from '../attachment/attachment.model';
 import { ICategoryParams } from '../category/category.model';
 import { Category } from '../category/category.entity';
-import { IGroupParams } from '../group/group.model';
+import { ExpenseTransaction } from './expense.transaction.entity';
+import { User } from '../user/user.entity';
+import { Group } from '../group/group.entity';
 
 @Injectable()
 export class ExpenseService {
   constructor(
-    @InjectRepository(Expense)
-    private expenseRepo: Repository<Expense>
+    @InjectRepository(Expense) private expenseRepo: Repository<Expense>
+    , @InjectRepository(User) private userRepo: Repository<User>
+    , @InjectRepository(Group) private groupRepo: Repository<Group>
+    , @InjectRepository(Category) private categoryRepo: Repository<Category>
     , private helperSvc: HelperService
   ) {}
 
@@ -26,22 +30,23 @@ export class ExpenseService {
     , fromDate?: string, toDate?: string, showHidden?: boolean 
   }): Promise<Expense[]> {
     let qb = await getRepository(Expense)
-      .createQueryBuilder('exp'); 
+      .createQueryBuilder('exp')
+      .leftJoinAndSelect("exp.category", "cat")
+      .leftJoinAndSelect("exp.group", "grp"); 
       
     if(args && (args.term || args.groupId || args.userIds || args.fromDate || args.toDate)) {
       if(args.term) {
         const term = args.term.trim().toLowerCase();
-        qb = qb.innerJoinAndSelect(Category, "cat", "cat.id = exp.categoryId");
         qb = qb.andWhere('(exp.description like :term', { term: `%${term}%` })
-          .orWhere('cat.name like :categoryTerm)', { categoryTerm: `%${term}`});
+          .orWhere('cat.name like :categoryTerm)', { categoryTerm: `%${term}%`});
       }
 
       args.groupId = +args.groupId;
       if(args.groupId > 0) {
         //show non-grouped only if no grouped is passed
-        qb = qb.andWhere("exp.groupId = :groupId", { groupId: args.groupId });
+        qb = qb.andWhere("(grp.id = :groupId and grp.entityName = 'expense')", { groupId: args.groupId });
       } else {
-        qb = qb.andWhere("(exp.groupId is null OR exp.groupId = 0)");
+        qb = qb.andWhere("exp.group is null");
       }
       
       if(args.userIds && args.userIds.length) {
@@ -81,9 +86,10 @@ export class ExpenseService {
     }
 
     let qb = await getRepository(Expense)
-      .createQueryBuilder("exp");
+      .createQueryBuilder("exp")
+      .leftJoinAndSelect("exp.category", "cat")
+      .leftJoinAndSelect("exp.group", "grp");
 
-    qb = qb.innerJoinAndSelect(Category, "cat", "cat.id == categoryId");
     qb = qb.andWhere('date(exp.createdOn) >= :createdOnFrom', { createdOnFrom: args.fromDate });
     qb = qb.andWhere('date(exp.createdOn) <= :createdOnToDate', { createdOnToDate: args.toDate });
     qb = qb.andWhere('exp.isDeleted <= :isDeleted', { isDeleted: args.showHidden });
@@ -105,7 +111,7 @@ export class ExpenseService {
 
     let catQb = qb;
     catQb = catQb.addSelect("cat.name", "label");
-    catQb = catQb.groupBy("exp.categoryId");
+    catQb = catQb.groupBy("cat.id");
     catQb = catQb.orderBy("total", 'ASC');
     const categories: any = await catQb.limit(args.totalItems).getRawMany();
 
@@ -126,7 +132,7 @@ export class ExpenseService {
     return this.expenseRepo.findOne(id);
   }
 
-  save(expense: IExpenseParams) {
+  async save(expense: IExpenseParams) {
     let newOrUpdated: any = Object.assign({}, expense);
     if(typeof newOrUpdated.isDeleted === 'undefined') {
       newOrUpdated.isDeleted = false;
@@ -151,30 +157,54 @@ export class ExpenseService {
       }
     }
 
-    let categoryId;
+    let category;
     if(typeof expense.category !== 'number') {
-      const cat = <ICategoryParams>expense.category;
-      categoryId = cat.id;
+      category = expense.category;
     } else {
-      categoryId = expense.category;
+      category = this.categoryRepo.findOne({ id: expense.category });
     }
 
-    let groupId = undefined;
+    let group;
     if (expense.group) {
-        if (typeof expense.group !== 'number') {
-            const grp = expense.group;
-            groupId = grp.id;
-        } else {
-            groupId = expense.group;
+      let gId;
+      if (typeof expense.group !== 'number') {
+        const grp = expense.group;
+        gId = grp.id;
+      } else {
+        gId = expense.group;
+      }
+      group = await this.groupRepo.findOne({ id: gId });
+    }
+
+    const transactions = [];
+    if(expense.transactions) {
+      for(let expTran of expense.transactions) {
+        const user = await this.userRepo.findOne({ email: expTran.email });
+
+        //add
+        const tran: ExpenseTransaction = {
+          id: undefined,
+          credit: expTran.credit,
+          debit: expTran.debit,
+          transactionType: expTran.transactionType,
+          user: user,
+          expense: null
+        };
+        if(!tran.createdOn) {
+          tran.createdOn = <any>moment().format(AppConstant.DEFAULT_DATETIME_FORMAT);
         }
+
+        transactions.push(tran);
+      }
     }
 
     //now save
     return this.expenseRepo.save<Expense>({
       ...newOrUpdated,
-      groupId: groupId,
+      group: group,
       attachmentId: attachmentId,
-      categoryId: categoryId
+      category: category,
+      transactions: transactions.length ? transactions : undefined
     });
   }
 

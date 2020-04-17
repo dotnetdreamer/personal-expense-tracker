@@ -1,7 +1,9 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany, ManyToOne } from 'typeorm';
 
 import { BaseUserEntity } from '../shared/entity/base-user.entity';
 import { ExpenseTransaction } from './expense.transaction.entity';
+import { Group } from '../group/group.entity';
+import { Category } from '../category/category.entity';
 
 @Entity()
 export class Expense extends BaseUserEntity {
@@ -11,17 +13,17 @@ export class Expense extends BaseUserEntity {
   @Column()
   amount: number
 
-  @Column()
-  categoryId: number
-
-  @Column({ nullable: true })
-  groupId?: number;
+  @ManyToOne(type => Category, cat => cat.id)
+  category: Category;
 
   @Column({ nullable: true })
   notes: string;
 
   @Column({ nullable: true })
   attachmentId: number;
+
+  @ManyToOne(type => Group, { nullable: true })
+  group?: Group;
 
   @OneToMany(type => ExpenseTransaction, exp => exp.expense, { nullable: true })
   transactions?: ExpenseTransaction[];

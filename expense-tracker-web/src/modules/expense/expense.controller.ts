@@ -6,26 +6,20 @@ import { ExpenseService } from "./expense.service";
 import { IExpenseParams } from "./expense.model";
 import { Expense } from "./expense.entity";
 import { AttachmentService } from "../attachment/attachment.service";
-import { CategoryService } from "../category/category.service";
 import { AppConstant } from "../shared/app-constant";
 import { JwtAuthGuard } from "../user/auth/jwt-auth.guard";
 import { ICurrentUser } from "../shared/shared.model";
-import { GroupService } from "../group/group.service";
 
 @Controller('expense')
 export class ExpenseController {
   constructor(private readonly expenseSvc: ExpenseService
-    , private groupSvc: GroupService
-    , private attachmentSvc: AttachmentService, private categorySvc: CategoryService) {}
+    , private attachmentSvc: AttachmentService) {}
 
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(ClassSerializerInterceptor)
   @Get('getAll')
   async getAll(@Req() req: Request,
    @Query() filters?: { groupId?: number, term?: string, fromDate?: string, toDate?: string }) {
-    //TODO: add group access validation
-    // const u = <ICurrentUser>req.user;
-
     const expenses = await this.expenseSvc.findAll({
       ...filters
     });
@@ -111,18 +105,6 @@ export class ExpenseController {
   private async _prepare(exp: Expense) {
     let mExp = Object.assign({}, exp);
     
-    //group
-    if(mExp.groupId) {
-      const group = await this.groupSvc.findOne(mExp.groupId);
-      if(group) {
-        mExp["group"] = group;
-      }
-    }
-
-    //category
-    const category = await this.categorySvc.findOne(mExp.categoryId);
-    mExp["category"] = category;
- 
     //attachment
     if(mExp.attachmentId) {
       const attachment = await this.attachmentSvc.findOne(mExp.attachmentId);
@@ -136,8 +118,6 @@ export class ExpenseController {
 
     //remove 
     delete mExp.attachmentId;
-    delete mExp.categoryId;
-    delete mExp.groupId;
     delete mExp['markedForAdd'];
     delete mExp['markedForUpdate'];
     delete mExp['markedForDelete'];

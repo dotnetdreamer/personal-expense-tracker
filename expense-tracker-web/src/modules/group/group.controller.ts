@@ -51,7 +51,6 @@ export class GroupController {
 
         //get the group with related data i.e members
         let newGrp = await this.groupSvc.findOne((<any>item).id);
-        console.log('', newGrp)
         newGrp = this.groupSvc.prepareGroup(newGrp);
 
         returnedGroup = newGrp;        

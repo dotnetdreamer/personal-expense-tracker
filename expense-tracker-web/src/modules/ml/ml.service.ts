@@ -77,11 +77,6 @@ export class MlService {
 
     private async _prepare(exp: Expense) {
         let mExp = Object.assign({}, exp);
-        
-        //category
-        const category = await this.categorySvc.findOne(mExp.categoryId);
-        mExp["category"] = category;
-
         return mExp;
     }   
 }
