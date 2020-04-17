@@ -5,7 +5,7 @@ import { Repository, getRepository, SelectQueryBuilder } from 'typeorm';
 import * as moment from 'moment';
 
 import { Expense } from './expense.entity';
-import { IExpenseParams } from './expense.model';
+import { IExpense, IExpenseTransaction } from './expense.model';
 import { HelperService } from '../shared/helper.service';
 import { AppConstant } from '../shared/app-constant';
 import { IAttachmentParams } from '../attachment/attachment.model';
@@ -14,6 +14,7 @@ import { Category } from '../category/category.entity';
 import { ExpenseTransaction } from './expense.transaction.entity';
 import { User } from '../user/user.entity';
 import { Group } from '../group/group.entity';
+import { AttachmentService } from '../attachment/attachment.service';
 
 @Injectable()
 export class ExpenseService {
@@ -22,16 +23,18 @@ export class ExpenseService {
     , @InjectRepository(User) private userRepo: Repository<User>
     , @InjectRepository(Group) private groupRepo: Repository<Group>
     , @InjectRepository(Category) private categoryRepo: Repository<Category>
-    , private helperSvc: HelperService
+    , private helperSvc: HelperService, private attachmentSvc: AttachmentService
   ) {}
 
   async findAll(args?: { 
       term?: string, groupId?: number, userIds?: number[]
     , fromDate?: string, toDate?: string, showHidden?: boolean 
-  }): Promise<Expense[]> {
+  }): Promise<any[]> {
     let qb = await getRepository(Expense)
       .createQueryBuilder('exp')
       .leftJoinAndSelect("exp.category", "cat")
+      .leftJoinAndSelect("exp.transactions", "tran")      
+      .leftJoinAndSelect("tran.user", "tranUsr")      
       .leftJoinAndSelect("exp.group", "grp"); 
       
     if(args && (args.term || args.groupId || args.userIds || args.fromDate || args.toDate)) {
@@ -70,7 +73,13 @@ export class ExpenseService {
     qb = qb.orderBy("exp.createdOn", 'DESC')
       .addOrderBy('exp.id', 'DESC');
 
-    return qb.getMany();
+    const expenses = await qb.getMany();
+
+    const data = expenses.map(async (e) => {
+      const map = await this._map(e);
+      return map;
+    });
+    return Promise.all(data);
   }
 
   async getReport(args: {
@@ -132,7 +141,7 @@ export class ExpenseService {
     return this.expenseRepo.findOne(id);
   }
 
-  async save(expense: IExpenseParams) {
+  async save(expense: IExpense) {
     let newOrUpdated: any = Object.assign({}, expense);
     if(typeof newOrUpdated.isDeleted === 'undefined') {
       newOrUpdated.isDeleted = false;
@@ -164,8 +173,8 @@ export class ExpenseService {
       category = this.categoryRepo.findOne({ id: expense.category });
     }
 
-    let group;
-    if (expense.group) {
+    let group = undefined;
+    if(expense.group) {
       let gId;
       if (typeof expense.group !== 'number') {
         const grp = expense.group;
@@ -176,8 +185,16 @@ export class ExpenseService {
       group = await this.groupRepo.findOne({ id: gId });
     }
 
-    const transactions = [];
+    //now save
+    let newExp = new Expense();
+    newExp = Object.assign({}, newOrUpdated);
+    newExp.group = group;
+    newExp.attachmentId = attachmentId;
+    newExp.category = category;
+
     if(expense.transactions) {
+      newExp.transactions = [];
+
       for(let expTran of expense.transactions) {
         const user = await this.userRepo.findOne({ email: expTran.email });
 
@@ -188,27 +205,50 @@ export class ExpenseService {
           debit: expTran.debit,
           transactionType: expTran.transactionType,
           user: user,
-          expense: null
+          expense: undefined
         };
         if(!tran.createdOn) {
           tran.createdOn = <any>moment().format(AppConstant.DEFAULT_DATETIME_FORMAT);
         }
 
-        transactions.push(tran);
+        newExp.transactions.push(tran);
       }
     }
 
-    //now save
-    return this.expenseRepo.save<Expense>({
-      ...newOrUpdated,
-      group: group,
-      attachmentId: attachmentId,
-      category: category,
-      transactions: transactions.length ? transactions : undefined
-    });
+    const saved = await this.expenseRepo.save(newExp);
+    return saved;
   }
 
   remove(id) {
     return this.expenseRepo.delete(id);
+  }
+
+  private async _map(exp: Expense) {
+    let mExp: IExpense;
+    mExp = <any>Object.assign({}, exp);
+
+    //transactions
+    mExp.transactions = exp.transactions.map(t => {
+      const it: IExpenseTransaction = {
+        email: t.user.email,
+        credit: t.credit,
+        debit: t.debit,
+        transactionType: t.transactionType
+      };
+      return it;
+    });
+    
+    //attachment
+    if(exp.attachmentId) {
+      const attachment:any = await this.attachmentSvc.findOne(exp.attachmentId);
+      if(!attachment.isDeleted) {
+        mExp.attachment = {
+          ...attachment,
+          attachment: `${AppConstant.UPLOADED_PATH_FILES}/${attachment.guid}.${attachment.extension}`
+        };
+      }
+    }
+
+    return mExp;
   }
 }

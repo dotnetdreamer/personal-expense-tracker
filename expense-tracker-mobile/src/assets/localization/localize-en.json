@@ -16,7 +16,8 @@
         "areyousure": "Are you sure ?",
         "version": "Version",
         "nodata": "No data found",
-        "viewall": "View all"
+        "viewall": "View all",
+        "you": "You"
     },
     "category": {
         "title": "Category",

@@ -25,6 +25,7 @@ export class Expense extends BaseUserEntity {
   @ManyToOne(type => Group, { nullable: true })
   group?: Group;
 
-  @OneToMany(type => ExpenseTransaction, exp => exp.expense, { nullable: true })
+  //important to cascade as we wanna save transactions togather with expense on save call
+  @OneToMany(type => ExpenseTransaction, exp => exp.expense, { nullable: true, cascade: ['insert', 'update'] })
   transactions?: ExpenseTransaction[];
 }

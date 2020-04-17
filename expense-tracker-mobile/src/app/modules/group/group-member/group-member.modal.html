@@ -27,12 +27,19 @@
         <ion-icon name="add"></ion-icon>
       </ion-button>
     </ion-list-header>
-    <ion-item *ngFor="let member of members">
-      <ion-label>
-        <h2>{{ member.user.name }}</h2>
-        <h3>{{ member.user.email }}</h3>
-        <p>{{('group.status.' + member.status) | localizedresource | async }}</p>
-      </ion-label>
-    </ion-item>
+    <ng-container *ngIf="currentUser">
+      <ion-item *ngFor="let member of members">
+        <ion-label>
+          <h2 *ngIf="member.user.email != currentUser.email">
+            {{ member.user.name }}
+          </h2>
+          <h2 *ngIf="member.user.email == currentUser.email">
+            {{'common.you' | localizedresource | async }}
+          </h2>
+          <h3>{{ member.user.email }}</h3>
+          <p>{{('group.status.' + member.status) | localizedresource | async }}</p>
+        </ion-label>
+      </ion-item>
+    </ng-container>
   </ion-list>
 </ion-content>

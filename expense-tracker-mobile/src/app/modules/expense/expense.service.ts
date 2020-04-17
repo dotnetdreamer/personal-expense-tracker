@@ -59,6 +59,7 @@ export class ExpenseService extends BaseService {
                 category: false,
                 attachment: false
             };
+
             //make sure category and attachments are synced...if dependant are found
             unSycedLocal.forEach(async (ul) => {
                 //make sure its synched first...
@@ -220,7 +221,6 @@ export class ExpenseService extends BaseService {
     getExpenseListLocal(args?: { term?, groupId?, fromDate?, toDate?, pageIndex?, pageSize? }): Promise<IExpense[]> {
         return new Promise(async (resolve, reject) => {
             let results = [];
-
             const db = this.dbService.Db;
             // new ydn.db.IndexValueIterator(store, opt.key, key_range, (pageSize == 0 ? undefined : pageSize), (skip > 0 ? skip: undefined), false);
             //https://github.com/yathit/ydn-db/blob/8d217ba5ff58a1df694b5282e20ebc2c52104197/test/qunit/ver_1_iteration.js#L117
@@ -304,7 +304,7 @@ export class ExpenseService extends BaseService {
                 // console.log(idx);
             }, iter);
             req.always(async () => {
-                results = this._mapAll(results);
+                results = await this._mapAll(results);
                 results = this._sort(results);                    
                 
                 //check for pagesize
@@ -484,20 +484,35 @@ export class ExpenseService extends BaseService {
     }
 
     private _mapAll(expenses: Array<IExpense>) {
-        expenses = expenses.map(e => {
-            const exp = this._map(e);
+        const result = expenses.map(async (e) => {
+            const exp = await this._map(e);
             return exp;
         });
-        return expenses;
+        return Promise.all(result);
     }
 
-    private _map(e: IExpense) {
+    private async _map(e: IExpense) {
         //only convert dates for data that came from server
         // if(!e.markedForAdd && !e.markedForUpdate && !e.markedForDelete) {
             e.createdOn = moment(e.createdOn).local().format(AppConstant.DEFAULT_DATETIME_FORMAT);
             if(e.updatedOn) {
                 e.updatedOn = moment(e.updatedOn).local().format(AppConstant.DEFAULT_DATETIME_FORMAT);
             }
+        // }
+
+        //if expense is in a group and have transactions, 
+        //then consider grabing current user transaction as an expense
+        // if(e.group) {
+        //     const cu = await this.userSettingSvc.getUserProfileLocal();
+        //     const cuTran = e.transactions.filter(t => t.email == cu.email)[0];
+        //     if(cuTran) {
+        //         if(cuTran.debit) {
+        //             e.amount = cuTran.debit.toString();
+        //         } else {
+        //             //remove this transaction from showing as this isn't expense, its a credit
+        //             return;
+        //         }
+        //     }
         // }
         return e;
     }

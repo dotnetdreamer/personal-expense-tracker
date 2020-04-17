@@ -19,7 +19,6 @@ export interface IExpense {
 }
 
 export interface IExpenseTransaction {
-    expenseId: number
     transactionType: TransactionType
     debit: number
     credit: number

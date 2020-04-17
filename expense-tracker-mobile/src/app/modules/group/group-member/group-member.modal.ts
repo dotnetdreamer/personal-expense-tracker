@@ -5,6 +5,7 @@ import { BasePage } from '../../shared/base.page';
 import { ModalController } from '@ionic/angular';
 import { AppConstant } from '../../shared/app-constant';
 import { IGroupMember } from '../group.model';
+import { IUserProfile } from '../../authentication/authentication.model';
 
 @Component({
   selector: 'group-member-modal',
@@ -17,6 +18,7 @@ export class GroupMemberModal extends BasePage implements OnInit {
 
   email: string;
   members: IGroupMember[] = [];
+  currentUser: IUserProfile;
 
   constructor(private modalCtrl: ModalController
     , private groupSvc: GroupService) { 
@@ -25,6 +27,7 @@ export class GroupMemberModal extends BasePage implements OnInit {
 
   async ngOnInit() {
     await this._getAllMemberByGroupId();
+    this.currentUser = await this.userSettingSvc.getUserProfileLocal();
   }
 
 

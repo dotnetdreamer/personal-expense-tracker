@@ -3,7 +3,7 @@ import { Controller, UseInterceptors, Get, ClassSerializerInterceptor, Post, Bod
 import { Request } from "express";
 
 import { ExpenseService } from "./expense.service";
-import { IExpenseParams } from "./expense.model";
+import { IExpense } from "./expense.model";
 import { Expense } from "./expense.entity";
 import { AttachmentService } from "../attachment/attachment.service";
 import { AppConstant } from "../shared/app-constant";
@@ -24,12 +24,13 @@ export class ExpenseController {
       ...filters
     });
 
+    return expenses;
     //map it
-    const model = expenses.map(async (e) => {
-      const mapped = await this._prepare(e);
-      return mapped;
-    });
-    return Promise.all(model);
+    // const model = expenses.map(async (e) => {
+    //   const mapped = await this._prepare(e);
+    //   return mapped;
+    // });
+    // return Promise.all(model);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -47,13 +48,13 @@ export class ExpenseController {
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(ClassSerializerInterceptor)
   @Post('sync')
-  async sync(@Body() models: IExpenseParams[]) {
+  async sync(@Body() models: IExpense[]) {
     //local id and mapping server record
     let items: Array<Map<number, any>> = [];
 
     for (let model of models)
     {
-      const itemMap: Map<number, IExpenseParams> = new Map();
+      const itemMap: Map<number, IExpense> = new Map();
       let returnedExpense: any;
 
       if (model.markedForAdd) {

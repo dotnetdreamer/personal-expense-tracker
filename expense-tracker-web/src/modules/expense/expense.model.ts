@@ -2,7 +2,7 @@ import { ICategoryParams } from "../category/category.model";
 import { IAttachmentParams } from "../attachment/attachment.model";
 import { IGroupParams } from "../group/group.model";
 
-export interface IExpenseParams {
+export interface IExpense {
     id?: number;
     category: number | ICategoryParams;
     group: number | IGroupParams;
@@ -20,7 +20,6 @@ export interface IExpenseParams {
 }
 
 export interface IExpenseTransaction {
-    expenseId: number;
     transactionType: TransactionType;
     debit: number;
     credit: number;

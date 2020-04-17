@@ -386,7 +386,6 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit, OnDes
           const isCurrentMember = member.user.email == this.currentUser.email;
 
           transactions.push({
-            expenseId: expense.id,
             transactionType: TransactionType.PaidByYouAndSplitEqually,
             credit: isCurrentMember ? amountPerMbr : 0,
             debit: !isCurrentMember ? amountPerMbr : 0,
@@ -401,7 +400,6 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit, OnDes
 
         for(let member of membersWithoutCurrentUser) {
           transactions.push({
-            expenseId: expense.id,
             transactionType: TransactionType.TheyOweFullAmount,
             credit: 0,
             debit: amountPerMbr,
@@ -411,7 +409,6 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit, OnDes
       break;
       case TransactionType.YouOweFullAmount:
         transactions.push({
-          expenseId: expense.id,
           transactionType: TransactionType.YouOweFullAmount,
           credit: 0,
           debit: total,
@@ -423,7 +420,6 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit, OnDes
         amountPerMbr = total / members.length;
 
         transactions.push({
-          expenseId: expense.id,
           transactionType: TransactionType.PaidByOtherPersonAndSplitEqually,
           credit: ma.amount,
           debit: 0,
@@ -438,7 +434,6 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit, OnDes
 
           //add entries for others
           transactions.push({
-            expenseId: expense.id,
             transactionType: TransactionType.PaidByOtherPersonAndSplitEqually,
             credit: 0,
             debit: amountPerMbr,
@@ -449,7 +444,6 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit, OnDes
       case TransactionType.Mutiple:
         for(let member of this.selectedTransactionType.membersWithAmount) {
           transactions.push({
-            expenseId: expense.id,
             transactionType: TransactionType.Mutiple,
             credit: 0,
             debit: amountPerMbr,
