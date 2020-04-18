@@ -205,7 +205,8 @@ export class ExpenseService {
           debit: expTran.debit,
           transactionType: expTran.transactionType,
           user: user,
-          expense: undefined
+          expense: undefined,
+          actualPaidAmount: expTran.actualPaidAmount
         };
         if(!tran.createdOn) {
           tran.createdOn = <any>moment().format(AppConstant.DEFAULT_DATETIME_FORMAT);
@@ -216,7 +217,9 @@ export class ExpenseService {
     }
 
     const saved = await this.expenseRepo.save(newExp);
-    return saved;
+
+    const maped = await this._map(saved);
+    return maped;
   }
 
   remove(id) {
@@ -233,7 +236,8 @@ export class ExpenseService {
         email: t.user.email,
         credit: t.credit,
         debit: t.debit,
-        transactionType: t.transactionType
+        transactionType: t.transactionType,
+        actualPaidAmount: t.actualPaidAmount
       };
       return it;
     });
@@ -249,6 +253,12 @@ export class ExpenseService {
       }
     }
 
+    //remove 
+    delete mExp['attachmentId'];
+    delete mExp['markedForAdd'];
+    delete mExp['markedForUpdate'];
+    delete mExp['markedForDelete'];
+    
     return mExp;
   }
 }

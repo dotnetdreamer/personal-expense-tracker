@@ -25,12 +25,6 @@ export class ExpenseController {
     });
 
     return expenses;
-    //map it
-    // const model = expenses.map(async (e) => {
-    //   const mapped = await this._prepare(e);
-    //   return mapped;
-    // });
-    // return Promise.all(model);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -81,8 +75,6 @@ export class ExpenseController {
         let deleted = await this._updateOrDelete(toDelete, model, true);
         returnedExpense = deleted;
       }
-
-      returnedExpense = await this._prepare(returnedExpense);
 
       itemMap.set(model.id, returnedExpense);
       items.push(itemMap);
