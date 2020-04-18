@@ -231,16 +231,18 @@ export class ExpenseService {
     mExp = <any>Object.assign({}, exp);
 
     //transactions
-    mExp.transactions = exp.transactions.map(t => {
-      const it: IExpenseTransaction = {
-        email: t.user.email,
-        credit: t.credit,
-        debit: t.debit,
-        transactionType: t.transactionType,
-        actualPaidAmount: t.actualPaidAmount
-      };
-      return it;
-    });
+    if(exp.transactions && exp.transactions.length) {
+      mExp.transactions = exp.transactions.map(t => {
+        const it: IExpenseTransaction = {
+          email: t.user.email,
+          credit: t.credit,
+          debit: t.debit,
+          transactionType: t.transactionType,
+          actualPaidAmount: t.actualPaidAmount
+        };
+        return it;
+      });
+    }
     
     //attachment
     if(exp.attachmentId) {

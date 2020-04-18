@@ -23,7 +23,8 @@ export class ExpenseAmountPipe {
             const email = await this.userSettingSvc.getCurrentUser();
             const cuTran = expense.transactions.filter(t => t.email == email)[0];
             if(cuTran) {
-                finalAmount = cuTran.debit ? `-${cuTran.debit.toString()}` : `+${cuTran.credit.toString()}`;
+                const total = cuTran.credit - cuTran.debit;
+                finalAmount = `${total > 0 ? '+' : ''}${total}`;
             }
         } else {
             finalAmount = `${expense.amount}`;
