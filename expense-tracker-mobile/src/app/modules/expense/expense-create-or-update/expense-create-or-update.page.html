@@ -35,7 +35,7 @@
         </ion-item>
       </ion-list>
     </div>
-    <div class="transaction-type-container">
+    <div class="transaction-type-container" *ngIf="group">
       <!-- amount must be entered so we can validate amount in transaction-type.page.ts -->
       <ion-button fill="clear" (click)="onTransactionTypeClicked()" 
         *ngIf="selectedTransactionType" [disabled]="!formGroup.controls.amount.value">
