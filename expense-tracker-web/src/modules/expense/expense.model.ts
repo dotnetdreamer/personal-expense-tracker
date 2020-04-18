@@ -24,6 +24,7 @@ export interface IExpenseTransaction {
     debit: number;
     credit: number;
     email: string;
+    actualPaidAmount: number;
 }
 
 export enum TransactionType {

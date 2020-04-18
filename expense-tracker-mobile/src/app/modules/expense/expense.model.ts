@@ -22,6 +22,7 @@ export interface IExpenseTransaction {
     transactionType: TransactionType
     debit: number
     credit: number
+    actualPaidAmount: number
     email: string
 }
 

@@ -394,7 +394,8 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit, OnDes
             transactionType: TransactionType.PaidByYouAndSplitEqually,
             credit: isCurrentMember ? total - amountPerMbr : 0,
             debit: isCurrentMember ? total : amountPerMbr,
-            email: member.user.email
+            email: member.user.email,
+            actualPaidAmount: isCurrentMember ? total : 0
           });
         }
       break;
@@ -411,7 +412,8 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit, OnDes
           transactionType: TransactionType.YouOweFullAmount,
           credit: 0,
           debit: total,
-          email: this.currentUser.email
+          email: this.currentUser.email,
+          actualPaidAmount: 0
         });
         //others
         for(let member of membersWithoutCurrentUser) {
@@ -419,7 +421,8 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit, OnDes
             transactionType: TransactionType.YouOweFullAmount,
             credit: amountPerMbr,
             debit: 0,
-            email: member.user.email
+            email: member.user.email,
+            actualPaidAmount: amountPerMbr
           });
         }
       break;
@@ -436,7 +439,8 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit, OnDes
           transactionType: TransactionType.TheyOweFullAmount,
           credit: total,
           debit: 0,
-          email: this.currentUser.email
+          email: this.currentUser.email,
+          actualPaidAmount: total
         });
         //others
         for(let member of membersWithoutCurrentUser) {
@@ -444,7 +448,8 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit, OnDes
             transactionType: TransactionType.TheyOweFullAmount,
             credit: 0,
             debit: amountPerMbr,
-            email: member.user.email
+            email: member.user.email,
+            actualPaidAmount: 0
           });
         }
       break;
@@ -461,7 +466,8 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit, OnDes
             transactionType: TransactionType.PaidByYouAndSplitEqually,
             credit: isOtherMember ? total - amountPerMbr : 0,
             debit: isOtherMember ? total : amountPerMbr,
-            email: member.user.email
+            email: member.user.email,
+            actualPaidAmount: isOtherMember ? ma.amount : 0
           });
         }
       break;
@@ -477,7 +483,8 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit, OnDes
             transactionType: TransactionType.Mutiple,
             email: member.user.email,
             debit: amountPerMbr,
-            credit: 0
+            credit: 0,
+            actualPaidAmount: 0
           };
 
           //get paid amount of the paid members
@@ -485,10 +492,12 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit, OnDes
           if(memberWhoPaid) {
             //member paid amount is 'greater or less than' the amount he is supposed to pay
             tran.credit = memberWhoPaid.amount - amountPerMbr;
+            tran.actualPaidAmount = memberWhoPaid.amount;
           }
           transactions.push(tran);
         }
       break;
+      //#endregion
     }
 
     return transactions;

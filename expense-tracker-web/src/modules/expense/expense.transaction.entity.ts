@@ -21,4 +21,7 @@ export class ExpenseTransaction extends BaseEntity {
 
     @Column()
     credit: number;
+
+    @Column()
+    actualPaidAmount: number;
 }
