@@ -63,6 +63,10 @@
             .amount {
                 font-size: 1em;
                 margin-bottom: 5px;
+
+                > span {
+                    font-size: 0.6em;
+                }
             }
         }
     }

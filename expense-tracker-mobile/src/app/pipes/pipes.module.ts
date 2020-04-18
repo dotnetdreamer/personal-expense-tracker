@@ -4,13 +4,15 @@ import { LocalizedResourcePipe } from './localizedRresource.pipe';
 import { FormateDatePipe } from './formateDate.pipe';
 import { HighlightSearchPipe } from './highlightsearch.pipe';
 import { SafePipe } from './safe.pipe';
+import { ExpenseAmountPipe } from './expenseAmount.pipe';
 
 @NgModule({
     declarations: [
         LocalizedResourcePipe,
         FormateDatePipe,
         HighlightSearchPipe,
-        SafePipe
+        SafePipe,
+        ExpenseAmountPipe,
     ],
     imports: [
 
@@ -19,7 +21,8 @@ import { SafePipe } from './safe.pipe';
         LocalizedResourcePipe,
         FormateDatePipe,
         HighlightSearchPipe,
-        SafePipe
+        SafePipe,
+        ExpenseAmountPipe
     ]
 })
 export class PipesModule { }

@@ -79,7 +79,7 @@
                 <div class="description">{{item.description | slice:0:40 }}{{item.description.length > 40 ? '...' : ''}}</div>
               </div>
               <div class="amount-date">
-                <div class="amount">{{item.amount}}&nbsp;{{workingCurrency}}</div>
+                <div class="amount" [innerHTML]="item | expenseamount | async"></div>
               </div>
             </div>
           </div>
