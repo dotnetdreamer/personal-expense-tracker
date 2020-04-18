@@ -375,29 +375,67 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit, OnDes
     const total = +expense.amount;
     let members = this.group.members
       .filter(m => m.status == GroupMemberStatus.Aproved);
+    let membersWithoutCurrentUser = members.filter(m => m.user.email != this.currentUser.email);
 
     let transactions: IExpenseTransaction[] = [];
     let amountPerMbr = 0;
 
     switch(tranType.type) {
+      //#region PaidByYouAndSplitEqually
       case TransactionType.PaidByYouAndSplitEqually:
         amountPerMbr = total / (members.length);
+
         for(let member of members) {
           const isCurrentMember = member.user.email == this.currentUser.email;
-
           transactions.push({
             transactionType: TransactionType.PaidByYouAndSplitEqually,
-            credit: isCurrentMember ? amountPerMbr : 0,
-            debit: !isCurrentMember ? amountPerMbr : 0,
+            credit: isCurrentMember ? total - amountPerMbr : 0,
+            debit: isCurrentMember ? total : amountPerMbr,
             email: member.user.email
           });
         }
       break;
+      //#endregion
+
+      //#region YouOweFullAmount
+      case TransactionType.YouOweFullAmount:
+        //add total amount to debits for current member 
+        //and divide rest amount on other members to credit
+        amountPerMbr = total / (membersWithoutCurrentUser.length);
+
+        //current member
+        transactions.push({
+          transactionType: TransactionType.YouOweFullAmount,
+          credit: 0,
+          debit: total,
+          email: this.currentUser.email
+        });
+        //others
+        for(let member of membersWithoutCurrentUser) {
+          transactions.push({
+            transactionType: TransactionType.YouOweFullAmount,
+            credit: amountPerMbr,
+            debit: 0,
+            email: member.user.email
+          });
+        }
+      break;
+      //#endregion
+      
+      //#region TheyOweFullAmount
       case TransactionType.TheyOweFullAmount:
-        //remove the current member from amount division
-        const membersWithoutCurrentUser = members.filter(m => m.user.email != this.currentUser.email);
+        //divide total amount on group members and add their debits, 
+        //and add total to current member credit 
         amountPerMbr = total / membersWithoutCurrentUser.length;
 
+        //current member
+        transactions.push({
+          transactionType: TransactionType.TheyOweFullAmount,
+          credit: total,
+          debit: 0,
+          email: this.currentUser.email
+        });
+        //others
         for(let member of membersWithoutCurrentUser) {
           transactions.push({
             transactionType: TransactionType.TheyOweFullAmount,
@@ -407,41 +445,26 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit, OnDes
           });
         }
       break;
-      case TransactionType.YouOweFullAmount:
-        transactions.push({
-          transactionType: TransactionType.YouOweFullAmount,
-          credit: 0,
-          debit: total,
-          email: this.currentUser.email
-        });
-      break;
-      //TODO: need to test this logic
+      //#endregion
+      
+      //#region PaidByOtherPersonAndSplitEqually
       case TransactionType.PaidByOtherPersonAndSplitEqually:
         const ma = this.selectedTransactionType.membersWithAmount[0];
         amountPerMbr = total / members.length;
 
-        transactions.push({
-          transactionType: TransactionType.PaidByOtherPersonAndSplitEqually,
-          credit: ma.amount,
-          debit: 0,
-          email: ma.email
-        });
-
         for(let member of members) {
-          if(member.user.email == ma.email) {
-            //skip
-            continue;
-          }
-
-          //add entries for others
+          const isOtherMember = member.user.email == ma.email;
           transactions.push({
-            transactionType: TransactionType.PaidByOtherPersonAndSplitEqually,
-            credit: 0,
-            debit: amountPerMbr,
+            transactionType: TransactionType.PaidByYouAndSplitEqually,
+            credit: isOtherMember ? total - amountPerMbr : 0,
+            debit: isOtherMember ? total : amountPerMbr,
             email: member.user.email
           });
         }
       break;
+      //#endregion
+
+      //#region Mutiple
       case TransactionType.Mutiple:
         for(let member of this.selectedTransactionType.membersWithAmount) {
           transactions.push({
