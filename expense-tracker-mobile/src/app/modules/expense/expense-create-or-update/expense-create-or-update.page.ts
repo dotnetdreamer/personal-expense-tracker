@@ -415,6 +415,7 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit, OnDes
           email: this.currentUser.email
         });
       break;
+      //TODO: need to test this logic
       case TransactionType.PaidByOtherPersonAndSplitEqually:
         const ma = this.selectedTransactionType.membersWithAmount[0];
         amountPerMbr = total / members.length;
@@ -426,7 +427,7 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit, OnDes
           email: ma.email
         });
 
-        for(let member of membersWithoutCurrentUser) {
+        for(let member of members) {
           if(member.user.email == ma.email) {
             //skip
             continue;
