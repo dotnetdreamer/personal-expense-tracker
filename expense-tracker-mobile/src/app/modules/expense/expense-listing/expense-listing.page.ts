@@ -37,6 +37,7 @@ export class ExpenseListingPage extends BasePage implements OnInit, OnDestroy {
   workingCurrency = ''; //fix for undefined showing in title
   group: IGroup;
 
+  private _viewNonGrouped;
   private _syncInitSub: Subscription;
   private _expenseCreatedOrUpdatedSub: Subscription;
   private _syncDataPushCompleteSub: Subscription;
@@ -53,7 +54,11 @@ export class ExpenseListingPage extends BasePage implements OnInit, OnDestroy {
 
   async ngOnInit() {    
     this._routeParamsSub = this.activatedRoute.params.subscribe(async (params) => {
-      let { groupId } = params;
+      let { groupId, viewNonGrouped } = params;
+
+      if(viewNonGrouped) {
+        this._viewNonGrouped = Boolean(viewNonGrouped);
+      }
 
       if(groupId) {
         groupId = +groupId;
@@ -206,10 +211,15 @@ export class ExpenseListingPage extends BasePage implements OnInit, OnDestroy {
     let filters:any = {
       fromDate: this.dates.selectedDate.from,
       toDate: this.dates.selectedDate.to,
-      groupId: null
+      groupId: undefined  //by default show grouped and non-grouped
     };
-    if(this.group) {
-      filters.groupId = this.group.id;
+
+    if(this.group || this._viewNonGrouped) {
+      if(this.group) {
+        filters.groupId = this.group.id;
+      } else if(typeof this._viewNonGrouped != undefined) {
+        filters.groupId = null;
+      }
     }
  
     if(args && args.term) {

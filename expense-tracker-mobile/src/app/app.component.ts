@@ -105,7 +105,7 @@ export class AppComponent {
     }
   }
 
-  async onItemClicked(url, timeout?) {
+  async onItemClicked(url, args, timeout?) {
     setTimeout(async () => {
       switch(url) {
         case '/home':
@@ -116,7 +116,7 @@ export class AppComponent {
           await this._logout();
         break;
         default:
-          this.router.navigate([url]);
+          await this.router.navigate([url, {...args}]);
         break;
       }
     }, typeof timeout !== 'undefined' ? timeout : 300);
