@@ -339,13 +339,16 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit, OnDes
   }
 
   async onTransactionTypeClicked() {
+    //we sent copy to modal as we don't wanna modify orignal array
+    const allMembers = [...this.group.members];
+    
     const modal = await this.modalCtrl.create({
       component: TransactionTypeModal,
       mode: 'md',
       cssClass: 'modal-transaction-type',
       componentProps: {
         transactionType: this.selectedTransactionType,
-        allMembers: this.group.members,
+        allMembers: allMembers,
         currentExpenseAmount: this.f.amount.value
       }
     });
@@ -466,13 +469,24 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit, OnDes
 
       //#region Mutiple
       case TransactionType.Mutiple:
-        for(let member of this.selectedTransactionType.membersWithAmount) {
-          transactions.push({
+        amountPerMbr = total / members.length;
+        const membersWhoPaid = this.selectedTransactionType.membersWithAmount;
+
+        for(let member of members) {
+          const tran: IExpenseTransaction = {
             transactionType: TransactionType.Mutiple,
-            credit: 0,
+            email: member.user.email,
             debit: amountPerMbr,
-            email: member.email
-          });
+            credit: 0
+          };
+
+          //get paid amount of the paid members
+          const memberWhoPaid = membersWhoPaid.filter(mp => mp.email == member.user.email)[0];
+          if(memberWhoPaid) {
+            //member paid amount is 'greater or less than' the amount he is supposed to pay
+            tran.credit = memberWhoPaid.amount - amountPerMbr;
+          }
+          transactions.push(tran);
         }
       break;
     }
