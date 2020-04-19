@@ -50,9 +50,11 @@
         </ion-buttons>
       </ion-list-header>
       <ion-item [formGroupName]="i" *ngFor="let skill of members.controls; let i=index">
-        <div class="member-with-amount">
+        <div class="member-with-amount" *ngIf="currentUser">
           <ion-select [interface]="'popover'" formControlName="email">
-            <ion-select-option [value]="ambr.user.email" *ngFor="let ambr of remainingMembers">{{ambr.user.name}}</ion-select-option>
+            <ion-select-option [value]="ambr.user.email" *ngFor="let ambr of remainingMembers">
+              {{ambr.user.email == currentUser.email ? ('common.you' | localizedresource | async) : ambr.user.name}}
+            </ion-select-option>
           </ion-select>
           <ion-input type="number" formControlName="amount" placeholder="e.g 100"></ion-input>
         </div>

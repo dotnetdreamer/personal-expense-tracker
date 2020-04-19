@@ -6,6 +6,8 @@ import { TransactionType } from '../expense.model';
 import { IGroupMember } from '../../group/group.model';
 import { HelperService } from '../../shared/helper.service';
 import { LocalizationService } from '../../shared/localization.service';
+import { IUserProfile } from '../../authentication/authentication.model';
+import { UserSettingService } from '../../authentication/user-setting.service';
 
 @Component({
   selector: 'modal-expense-transaction-type',
@@ -19,6 +21,7 @@ export class TransactionTypeModal implements OnInit {
   @Input() allMembers: IGroupMember[];
   @Input() currentExpenseAmount: number;
   
+  currentUser: IUserProfile;
   TransactionType = TransactionType;
   selectedType;
   memberFormGroup;
@@ -27,13 +30,16 @@ export class TransactionTypeModal implements OnInit {
   
   constructor(private modalCtrl: ModalController
     , private formBuilder: FormBuilder
-    , private helperSvc: HelperService, private localizationSvc: LocalizationService) { 
+    , private helperSvc: HelperService, private localizationSvc: LocalizationService
+    , private userSettingSvc: UserSettingService) { 
       this.memberFormGroup = this.formBuilder.group({
         members: this.formBuilder.array([])
       });
   }
 
-  ngOnInit() { 
+  async ngOnInit() { 
+    this.currentUser = await this.userSettingSvc.getUserProfileLocal();
+
     if(this.transactionType) {
       this.selectedType = +this.transactionType.type;
     }
@@ -87,6 +93,11 @@ export class TransactionTypeModal implements OnInit {
   }
 
   addMember() {
+    if(!this.remainingMembers) {
+      //no members have left to add
+      return;
+    }
+
     const last = this.members.controls[this.members.controls.length - 1] as FormGroup;
     if(last.value.email && last.value.amount) {
       this.members.push(this.formBuilder.group({ 
