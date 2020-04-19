@@ -93,11 +93,6 @@ export class TransactionTypeModal implements OnInit {
   }
 
   addMember() {
-    if(!this.remainingMembers) {
-      //no members have left to add
-      return;
-    }
-
     const last = this.members.controls[this.members.controls.length - 1] as FormGroup;
     if(last.value.email && last.value.amount) {
       this.members.push(this.formBuilder.group({ 

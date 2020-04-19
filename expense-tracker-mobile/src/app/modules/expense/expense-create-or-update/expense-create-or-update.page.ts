@@ -346,6 +346,7 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit, OnDes
       component: TransactionTypeModal,
       mode: 'md',
       cssClass: 'modal-transaction-type',
+      backdropDismiss: false,
       componentProps: {
         transactionType: this.selectedTransactionType,
         allMembers: allMembers,
