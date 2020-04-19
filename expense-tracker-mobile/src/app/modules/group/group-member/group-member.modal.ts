@@ -19,6 +19,7 @@ export class GroupMemberModal extends BasePage implements OnInit {
   email: string;
   members: IGroupMember[] = [];
   currentUser: IUserProfile;
+  displayAddToolbar = false;
 
   constructor(private modalCtrl: ModalController
     , private groupSvc: GroupService) { 
@@ -51,6 +52,11 @@ export class GroupMemberModal extends BasePage implements OnInit {
 
   async dismiss(data?) {
     await this.modalCtrl.dismiss(data);
+  }
+
+  toggleAddMemberClicked() {
+    this.displayAddToolbar = !this.displayAddToolbar;
+    this.email = null;
   }
 
   private async _getAllMemberByGroupId() {

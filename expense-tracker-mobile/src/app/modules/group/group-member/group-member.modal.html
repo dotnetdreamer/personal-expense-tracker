@@ -1,19 +1,19 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>group-member</ion-title>
+    <ion-label>{{'group.members' | localizedresource | async}}</ion-label>
     <ion-buttons slot="start">
       <ion-button (click)="dismiss()">
         <ion-icon name="close"></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
-  <ion-toolbar>
+  <ion-toolbar *ngIf="displayAddToolbar">
     <ion-searchbar slot="start" [(ngModel)]="email"></ion-searchbar>
     <ion-buttons slot="end">
       <ion-button (click)="onMemberSaveClicked()">
         <ion-icon name="checkmark"></ion-icon>
       </ion-button>
-      <ion-button>
+      <ion-button (click)="toggleAddMemberClicked()">
         <ion-icon name="close"></ion-icon>
       </ion-button>
     </ion-buttons>
@@ -23,9 +23,6 @@
   <ion-list>
     <ion-list-header lines="inset">
       <ion-label>{{'group.members' | localizedresource | async}}</ion-label>
-      <ion-button>
-        <ion-icon name="add"></ion-icon>
-      </ion-button>
     </ion-list-header>
     <ng-container *ngIf="currentUser">
       <ion-item *ngFor="let member of members">
@@ -42,4 +39,9 @@
       </ion-item>
     </ng-container>
   </ion-list>
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button (click)="toggleAddMemberClicked()" [disabled]="displayAddToolbar">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
 </ion-content>
