@@ -12,7 +12,7 @@
         <ion-icon slot="icon-only" name="ellipsis-vertical"></ion-icon>
       </ion-button>
     </ion-buttons>
-    <ion-title>{{ sum | currency: (workingCurrency + '&nbsp;')}}</ion-title>
+    <ion-title [innerHTML]="sum | formateCurrency | async" *ngIf="sum"></ion-title>
   </ion-toolbar>
   <ion-toolbar class="toolbar-calendar" [class.hidden]="!displayHeaderbar">
     <ion-label>{{ dates?.selectedDate?.from }}&nbsp;-&nbsp;{{ dates?.selectedDate?.to }}</ion-label>
@@ -66,6 +66,7 @@
           <div class="category-description">
             <div class="description" [innerHTML]="(item.description | slice:0:40) | highlightsearch: searchTerm"></div>
             <div class="category-notes-attachment">
+              <ion-icon slot="icon-only" ios="group" md="group" *ngIf="item.group"></ion-icon>        
               <div class="category" [innerHTML]=" item.category?.name | highlightsearch: searchTerm"></div>
               <ion-icon slot="icon-only" name="reader-outline" *ngIf="item.notes"></ion-icon>        
               <ion-icon slot="icon-only" name="receipt-outline" *ngIf="item.attachment"></ion-icon>        

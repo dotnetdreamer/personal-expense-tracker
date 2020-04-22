@@ -35,7 +35,7 @@
     <div class="total-with-chart">
       <div class="total-container">
         <div class="total-label">{{'expense.total' | localizedresource | async }}</div>
-        <ion-label *ngIf="totalAmount">{{ (totalAmount || 0) | currency: (workingCurrency + '&nbsp;')}}</ion-label>
+        <ion-label *ngIf="totalAmount" [innerHTML]="totalAmount | formateCurrency | async"></ion-label>
       </div>
       <div class="total-chart-container" [class.skeleton-loading]="!totalChartOptions">
         <apx-chart *ngIf="totalChartOptions" 
@@ -62,7 +62,7 @@
             <div class="month-year">{{ todayDate | formateDate: 'MM' | async }}&nbsp;{{ todayDate | formateDate: 'YYYY' | async }}</div>
           </div>
         </div>
-        <div class="today-total">{{ (totalAmountToday || 0) | currency: (workingCurrency + '&nbsp;') }}</div>
+        <div class="today-total" [innerHTML]="totalAmountToday | formateCurrency | async"></div>
       </div>
       <no-data *ngIf="todayExpenses && !todayExpenses.length"></no-data>
       <ion-list *ngIf="todayExpenses && todayExpenses.length">

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation, OnDestroy, NgZone, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation, OnDestroy, NgZone, ViewChild, AfterViewInit } from '@angular/core';
 
 import { Subscription, Observable } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
@@ -24,7 +24,7 @@ import { ExpenseListingOption } from './expense-listing-options.popover';
   styleUrls: ['./expense-listing.page.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class ExpenseListingPage extends BasePage implements OnInit, OnDestroy {
+export class ExpenseListingPage extends BasePage implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('epListingContent') epListingContent: IonContent;
 
   displayHeaderbar = true;
@@ -84,7 +84,9 @@ export class ExpenseListingPage extends BasePage implements OnInit, OnDestroy {
       from: fromDate,
       to: toDate
     };
+  }
 
+  ngAfterViewInit() {
     //fix: navigation lag
     setTimeout(async () => {
       await this._getExpenses();

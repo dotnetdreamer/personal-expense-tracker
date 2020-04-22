@@ -48,6 +48,11 @@
                 ion-icon {
                     font-size: 14px;
                     margin-left: 5px;
+                    margin-right: 5px;
+
+                    &:first-child {
+                        margin-left: 0;
+                    }
                 }
             }
         }
