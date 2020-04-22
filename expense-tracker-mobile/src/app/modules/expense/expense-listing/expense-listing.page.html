@@ -26,10 +26,23 @@
   </ion-toolbar>
   <ion-toolbar class="toolbar-group" *ngIf="group" [class.hidden]="!displayHeaderbar">
     <div class="group-container">
-      <div class="group-icon">
-        <ion-icon ios="group" md="group"></ion-icon>
+      <div class="group-amount-title group-debits">
+        <div class="title">{{'expense.debit' | localizedresource | async }}</div>
+        <div class="amount">-{{groupTotals.debits}}</div>
       </div>
-      <div class="group-title">{{ group.name }}</div>
+      <div class="group-icon-title">
+        <div class="group-owe">
+          {{ (groupTotals.owe < 0 ? 'expense.total_owe': 'expense.total_theyowe') | localizedresource | async}}
+          <!-- Display as a positive value -->
+          <span>{{ groupTotals.owe < 0 ? groupTotals.owe * -1: groupTotals.owe }}</span>
+        </div>
+        <div class="group-icon"><ion-icon ios="group" md="group"></ion-icon></div>
+        <div class="group-title">{{ group.name }}</div>
+      </div>
+      <div class="group-amount-title group-credits">
+        <div class="title">{{'expense.credit' | localizedresource | async }}</div>
+        <div class="amount">+{{groupTotals.credits}}</div>
+      </div>
     </div>
   </ion-toolbar>
 </ion-header>

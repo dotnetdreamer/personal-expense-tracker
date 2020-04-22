@@ -17,6 +17,7 @@ import { ExpenseAmountPipe } from './expenseAmount.pipe';
     imports: [
 
     ],
+    providers: [ExpenseAmountPipe],
     exports: [
         LocalizedResourcePipe,
         FormateDatePipe,

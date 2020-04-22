@@ -16,7 +16,7 @@ export class ExpenseAmountPipe {
     async transform(expense: IExpense, shouldFormat = true) {
         const wc = await this.currencySettingSvc.getWorkingCurrency();
 
-         //if expense is in a group and have transactions, 
+        //if expense is in a group and have transactions, 
         //then consider grabing current user transaction as an expense
         let finalAmount;
         if(expense.group) {

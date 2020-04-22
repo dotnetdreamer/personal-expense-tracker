@@ -36,6 +36,11 @@ export class ExpenseListingPage extends BasePage implements OnInit, OnDestroy {
   dataLoaded = false;
   workingCurrency = ''; //fix for undefined showing in title
   group: IGroup;
+  groupTotals = {
+    debits: 0,
+    credits: 0,
+    owe: 0
+  };
 
   private _viewNonGrouped;
   private _syncInitSub: Subscription;
@@ -218,6 +223,7 @@ export class ExpenseListingPage extends BasePage implements OnInit, OnDestroy {
       if(this.group) {
         filters.groupId = this.group.id;
       } else if(typeof this._viewNonGrouped != undefined) {
+        //passing null means non-grouped only
         filters.groupId = null;
       }
     }
@@ -237,6 +243,18 @@ export class ExpenseListingPage extends BasePage implements OnInit, OnDestroy {
           this.expenses = await this.expenseSvc.getExpenses(filters);
         } else {
           this.expenses = await this.expenseSvc.getExpenseListLocal(filters);
+        }
+
+        //calculate debits and credits
+        if(this.group) {
+          const email = await this.userSettingSvc.getCurrentUser();
+
+          const cuTransactions = this.expenses.map(e => e.transactions.filter(t => t.email == email)[0]);
+          if(cuTransactions.length) {
+            this.groupTotals.debits = cuTransactions.reduce((a, b) => a + b.debit, 0);
+            this.groupTotals.credits = cuTransactions.reduce((a, b) => a + b.credit, 0);
+            this.groupTotals.owe = this.groupTotals.credits - this.groupTotals.debits;
+          }
         }
       } catch(e) {
         this.expenses = [];
