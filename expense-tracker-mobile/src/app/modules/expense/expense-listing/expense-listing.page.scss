@@ -23,11 +23,16 @@ page-expense-listing {
                         text-align: center;
                         
                         .title {
-                            font-size: 1.1em;
+                            font-size: 0.8em;
                         }
 
                         .amount {
                             font-weight: bold;
+
+                            span {
+                                display: block;
+                                font-size: 0.6em;
+                            }
                         }
                     }
 
