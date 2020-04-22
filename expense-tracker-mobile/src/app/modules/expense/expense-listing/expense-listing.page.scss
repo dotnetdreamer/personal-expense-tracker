@@ -40,8 +40,12 @@ page-expense-listing {
                         .group-owe {
                             margin-bottom: 5px;
 
-                            span {
+                            > span {
                                 font-weight: bold;
+
+                                > span {
+                                    font-size: 0.6em;
+                                }
                             }
                         }
 
