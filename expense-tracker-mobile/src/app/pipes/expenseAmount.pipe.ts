@@ -3,19 +3,18 @@ import { Pipe } from "@angular/core";
 import { IExpense } from '../modules/expense/expense.model';
 import { UserSettingService } from '../modules/authentication/user-setting.service';
 import { CurrencySettingService } from '../modules/currency/currency-setting.service';
+import { FormateCurrencyPipe } from './formateCurrency.pipe';
 
 @Pipe({
     name: 'expenseamount'
 })
 export class ExpenseAmountPipe {
     constructor(private userSettingSvc: UserSettingService
-        , private currencySettingSvc: CurrencySettingService) {
+        , private formatCurrencyPipe: FormateCurrencyPipe) {
 
     }
     
     async transform(expense: IExpense, shouldFormat = true) {
-        const wc = await this.currencySettingSvc.getWorkingCurrency();
-
         //if expense is in a group and have transactions, 
         //then consider grabing current user transaction as an expense
         let finalAmount;
@@ -31,7 +30,7 @@ export class ExpenseAmountPipe {
         }
 
         if(shouldFormat) {
-            finalAmount = `${finalAmount}&nbsp;<span>${wc}</span>`;
+            finalAmount = await this.formatCurrencyPipe.transform(finalAmount);
         }
 
         return finalAmount;

@@ -5,6 +5,8 @@ import { FormateDatePipe } from './formateDate.pipe';
 import { HighlightSearchPipe } from './highlightsearch.pipe';
 import { SafePipe } from './safe.pipe';
 import { ExpenseAmountPipe } from './expenseAmount.pipe';
+import { FormateCurrencyPipe } from './formateCurrency.pipe';
+import { CommonModule } from '@angular/common';
 
 @NgModule({
     declarations: [
@@ -13,17 +15,19 @@ import { ExpenseAmountPipe } from './expenseAmount.pipe';
         HighlightSearchPipe,
         SafePipe,
         ExpenseAmountPipe,
+        FormateCurrencyPipe
     ],
     imports: [
-
+        CommonModule
     ],
-    providers: [ExpenseAmountPipe],
+    providers: [ExpenseAmountPipe, FormateCurrencyPipe],
     exports: [
         LocalizedResourcePipe,
         FormateDatePipe,
         HighlightSearchPipe,
         SafePipe,
-        ExpenseAmountPipe
+        ExpenseAmountPipe,
+        FormateCurrencyPipe
     ]
 })
 export class PipesModule { }
