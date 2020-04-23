@@ -168,8 +168,27 @@ export class ExpenseListingPage extends BasePage implements OnInit, AfterViewIni
     await popCtrl.present();
 
     const { data } = await popCtrl.onDidDismiss();
-    if(data == 'add_member') {
-      await this.onMemberAddClicked();
+    switch(data) {
+      case 'add_member':
+        await this.onMemberAddClicked();
+      break;
+      case 'settle_up':
+        const confirm = await this.helperSvc.presentConfirmDialog();
+        if(!confirm) {
+          return;
+        }
+        
+        const updatedGroup = await this.groupSvc.settleUpGroup(this.group);
+        if(updatedGroup) {
+          //refresh
+          this.group = updatedGroup;
+          this.expenses = [];
+
+          setTimeout(async () => {
+            await this._getExpenses();
+          });
+        }
+      break;
     }
   }
 

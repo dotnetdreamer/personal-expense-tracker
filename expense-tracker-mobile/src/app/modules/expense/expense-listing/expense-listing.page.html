@@ -31,7 +31,7 @@
         <div class="amount" [innerHTML]="'-' + (groupTotals.debits | formateCurrency | async)"></div>
       </div>
       <div class="group-icon-title">
-        <div class="group-owe">
+        <div class="group-owe" *ngIf="groupTotals.owe != 0">
           {{ (groupTotals.owe < 0 ? 'expense.total_owe': 'expense.total_theyowe') | localizedresource | async}}
           <!-- Display as a positive value always -->
           <span [innerHTML]="(groupTotals.owe < 0 ? groupTotals.owe * -1 : groupTotals.owe) | formateCurrency | async"></span>

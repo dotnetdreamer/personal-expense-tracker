@@ -20,6 +20,8 @@ export class GroupService extends BaseService {
         super();
     }
   
+    //#region Group 
+
     pull() {
         return new Promise(async (resolve, reject) => {
             try {
@@ -140,7 +142,6 @@ export class GroupService extends BaseService {
         });
     }
 
-    
     getGroupList() {
         return this.getData<IGroup[]>({ url: `${this.BASE_URL}/getAll` });
     }
@@ -217,6 +218,32 @@ export class GroupService extends BaseService {
         });
     }
 
+    settleUpGroup(group: IGroup): Promise<IGroup> {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const updatedGroup = await this.postData<IGroup>({ 
+                    url: `${this.BASE_URL}/settleUp`, 
+                    body: { 
+                        groupId: group.id 
+                    }});
+                let msg;
+                if(!updatedGroup) {
+                    msg = await this.localizationSvc.getResource('common.failed');
+                } else {
+                    msg = await this.localizationSvc.getResource('group.settled');
+                    //update locally
+                    await this.putLocal(updatedGroup, true , true);
+                }
+
+                //notify
+                await this.helperSvc.presentToast(msg);
+                resolve(updatedGroup);
+            } catch(e) {
+                reject(e);
+            }
+        });
+    }
+
     remove(id) {
         return this.dbService.remove(this.schemaSvc.tables.group, id);
     }
@@ -225,8 +252,10 @@ export class GroupService extends BaseService {
         return this.dbService.removeAll(this.schemaSvc.tables.group);
     }
 
+    //#endregion
 
-    //member
+    //#region Member 
+
     async presentMemberModal(groupId, onDidDismiss?: (data?) => void) {
         const modal = await this.modalCtrl.create({
             component: GroupMemberModal,
@@ -261,4 +290,6 @@ export class GroupService extends BaseService {
             }
         })
     }
+
+    //#endregion
 }

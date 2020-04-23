@@ -10,6 +10,10 @@ import { PopoverController } from '@ionic/angular';
                 <ion-icon slot="start" name="people"></ion-icon>
                 <ion-label>{{'group.members' | localizedresource | async }}</ion-label>
             </ion-item>
+            <ion-item (click)="dismiss('settle_up')">
+                <ion-icon slot="start" name="people"></ion-icon>
+                <ion-label>{{'group.settle_up' | localizedresource | async }}</ion-label>
+            </ion-item>
         </ion-list>
     `,
 })
@@ -21,7 +25,7 @@ export class ExpenseListingOption implements OnInit {
     ngOnInit() {
     }
 
-    async dismiss(opt: 'add_member') {
+    async dismiss(opt: 'add_member' | 'settle_up') {
         await this.popoverCtrl.dismiss(opt);
     }
 }

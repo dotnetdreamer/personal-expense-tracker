@@ -23,6 +23,7 @@ import { Group } from './modules/group/group.entity';
 import { GroupModule } from './modules/group/group.module';
 import { GroupMember } from './modules/group/group-member.entity';
 import { ExpenseTransaction } from './modules/expense/expense.transaction.entity';
+import { GroupPeriod } from './modules/group/group-period.entity';
 
 @Module({
   imports: [
@@ -33,7 +34,7 @@ import { ExpenseTransaction } from './modules/expense/expense.transaction.entity
         Category, Expense, ExpenseTransaction
         , Attachment, User
         , AccessToken, ExternalAuth
-        , Group, GroupMember
+        , Group, GroupMember, GroupPeriod
       ],
       synchronize: true,
     }),

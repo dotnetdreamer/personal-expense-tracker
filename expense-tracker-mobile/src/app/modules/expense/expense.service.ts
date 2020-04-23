@@ -230,9 +230,7 @@ export class ExpenseService extends BaseService {
             // let idx = 0;
             let req = db.open(x => {
                 let v: IExpense = x.getValue();
-                // const objToFind = v.company.locales.find(l => l.languageId == wkLanguage.id);
-
-                // const cLocaledName: string = objToFind.name.toLowerCase();
+                
                 let item: IExpense;
                 if(args) {
                     if(args.fromDate || args.toDate) {

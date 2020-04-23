@@ -6,13 +6,14 @@ import * as moment from 'moment';
 import { Request } from 'express';
 
 import { Group } from './group.entity';
-import { IGroupParams, IGroupMemberParams, GroupMemberStatus } from './group.model';
+import { IGroupParams, IGroupMemberParams, GroupMemberStatus, GroupPeriodStatus } from './group.model';
 import { GroupMember } from './group-member.entity';
 import { UserService } from '../user/user.service';
 import { REQUEST } from '@nestjs/core';
 import { ICurrentUser } from '../shared/shared.model';
 import { AppConstant } from '../shared/app-constant';
 import { User } from '../user/user.entity';
+import { GroupPeriod } from './group-period.entity';
 
 @Injectable()
 export class GroupService {
@@ -31,6 +32,7 @@ export class GroupService {
     }): Promise<any[]> {
     let qb = await getRepository(Group)
       .createQueryBuilder('grp')
+      .leftJoinAndSelect("grp.periods", "pr")
       .leftJoinAndSelect("grp.members", "grpMbr")
       .leftJoinAndSelect("grpMbr.user", "usr");
       
@@ -78,17 +80,63 @@ export class GroupService {
   }
 
   findOne(id): Promise<Group> {
-    return this.groupRepo.findOne({ where: { id: id }, relations: ['members', 'members.user']});
+    return this.groupRepo.findOne({ 
+      where: { id: id }, 
+      relations: ['members', 'members.user', 'periods']
+    });
   }
 
   async save(group: IGroupParams) {
+    // const group = new Group();
     let newOrUpdated: any = Object.assign({}, group);
     if(typeof newOrUpdated.isDeleted === 'undefined') {
       newOrUpdated.isDeleted = false;
     }
 
+    if(typeof newOrUpdated.periods === 'undefined') {
+      //created default
+      newOrUpdated.periods = [];
+      const newPeriod: GroupPeriod = {
+        id: undefined,
+        startDate: <any>moment().format(AppConstant.DEFAULT_DATETIME_FORMAT),
+        endDate: undefined,
+        status: GroupPeriodStatus.Open,
+        group: undefined,
+        createdOn: <any>moment().format(AppConstant.DEFAULT_DATETIME_FORMAT)
+      };
+      newOrUpdated.periods.push(newPeriod);
+    }
+
     //now save
     return this.groupRepo.save<Group>(newOrUpdated);
+  }
+
+  async settleUp(groupId) {
+    let toUpdate = await this.findOne(groupId);
+    if(!toUpdate) {
+      return null;
+    }
+
+    const lastPeriod = toUpdate.periods[toUpdate.periods.length - 1];
+    lastPeriod.endDate = <any>moment().format(AppConstant.DEFAULT_DATETIME_FORMAT);
+    lastPeriod.status = GroupPeriodStatus.Closed;
+
+    //create new 
+    const newPeriod: GroupPeriod = {
+      id: undefined,
+      startDate: <any>moment().format(AppConstant.DEFAULT_DATETIME_FORMAT),
+      endDate: undefined,
+      status: GroupPeriodStatus.Open,
+      group: undefined,
+      createdOn: <any>moment().format(AppConstant.DEFAULT_DATETIME_FORMAT)
+    };
+    toUpdate.periods.push(newPeriod);
+
+    //save
+    await this.groupRepo.save(toUpdate);
+
+    //prepare
+    return this.prepareGroup(toUpdate);
   }
 
   remove(id) {
@@ -98,10 +146,6 @@ export class GroupService {
   /* 
     Member
   */
-
-  findMemberByEmail(email) {
-    // return this.memberRepo.find({ userId: })
-  }
 
   async findAllMemberByGroupId(args: { groupId }) {
     let qb = await getRepository(GroupMember)
@@ -136,8 +180,6 @@ export class GroupService {
       result.memberNotFound = true;
       return result;
     }
-
-    //TODO: owner can't add himself..
 
     //already exist?. fetch relation also to be used in _prepare method
     let toAddOrUpdate: GroupMember = await this.memberRepo.findOne(
@@ -190,6 +232,11 @@ export class GroupService {
             photo: m.user.photo
           }
         };
+      }),
+      periods: group.periods.map(p => {
+        return p;
+      }).sort((a, b) => {
+        return moment(b.startDate).diff(a.startDate);
       })
     };
   }

@@ -12,6 +12,8 @@ import { ICurrentUser } from "../shared/shared.model";
 export class GroupController {
   constructor(private readonly groupSvc: GroupService) {}
 
+  //#region Group
+
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(ClassSerializerInterceptor)
   @Get('getAll')
@@ -83,6 +85,19 @@ export class GroupController {
     return items;
   }
 
+  
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(ClassSerializerInterceptor)
+  @Post('settleUp')
+  async settleUp(@Req() req: Request, @Body() args: { groupId }) {
+    return this.groupSvc.settleUp(args.groupId);
+  }
+
+  //#endregion
+  
+
+  //#region Member 
+
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(ClassSerializerInterceptor)
   @Post('addOrUpdateMember')
@@ -99,6 +114,9 @@ export class GroupController {
     return members;
   }
 
+  //#endregion
+
+  //#region Utilities
 
   private async _updateOrDelete(toUpdateOrDelete: Group, model, shouldDelete?: boolean) {
     //no need to update
@@ -122,4 +140,6 @@ export class GroupController {
 
     return mExp;
   }
+
+  //#endregion
 }

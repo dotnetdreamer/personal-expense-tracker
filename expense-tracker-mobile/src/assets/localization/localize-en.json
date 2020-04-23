@@ -1,6 +1,7 @@
 {
     "common": {
         "success": "Success",
+        "failed": "Failed",
         "dismiss": "Dismiss",
         "ok": "OK",
         "edit": "Edit",
@@ -55,6 +56,8 @@
         "add": "Add group",
         "name": "Name",
         "add_member": "Add member",
+        "settle_up": "Settle up",
+        "settled": "You are settled up",
         "members": "Members",
         "accept_request": "Do you accept to join \"{0}\" group?",
         "status": {

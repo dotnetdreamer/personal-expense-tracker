@@ -3,6 +3,8 @@ export interface IGroupParams {
     name: string
     guid: string
     entityName: string
+    periods?: any[]
+
     createdOn: string
     updatedOn?: string
     isDeleted: boolean
@@ -26,4 +28,9 @@ export enum GroupMemberStatus {
     Pending = 'pending',
     Aproved = 'aproved',
     Rejected = 'rejected'
+}
+
+export enum GroupPeriodStatus {
+    Open = 'open',
+    Closed = 'closed'
 }

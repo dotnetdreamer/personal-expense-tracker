@@ -6,6 +6,7 @@ export interface IGroup {
     name: string
     entityName: string;
     members?: IGroupMember[];
+    periods?: IGroupPeriod[]
 
     createdOn?: string
     updatedOn?: string
@@ -20,9 +21,16 @@ export interface IGroup {
 
 export interface IGroupMember {
     id: number;
-    status: GroupMemberStatus
+    status: GroupMemberStatus;
     user: IUser;
     group: IGroup;
+}
+
+export interface IGroupPeriod {
+    id: number;
+    startDate: string;
+    endDate: string;
+    status: GroupPeriodStatus;
 }
 
 export interface IGroupMemberAddOrUpdateResponse {
@@ -36,4 +44,9 @@ export enum GroupMemberStatus {
     Pending = 'pending',
     Aproved = 'aproved',
     Rejected = 'rejected'
+}
+
+export enum GroupPeriodStatus {
+    Open = 'open',
+    Closed = 'closed'
 }
