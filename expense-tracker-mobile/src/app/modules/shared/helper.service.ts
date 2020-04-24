@@ -69,7 +69,7 @@ export class HelperService {
         return alert.present();
     }
 
-    async presentConfirmDialog(workingLanguage?, message?) {
+    async presentConfirmDialog(workingLanguage?, message?): Promise<boolean> {
         let yesPromise = this.localizationService.getResource('common.yes', workingLanguage);
         let noPromise = this.localizationService.getResource('common.no', workingLanguage);
         let genericMsg = message || this.localizationService.getResource('common.areyousure', workingLanguage);
@@ -81,6 +81,7 @@ export class HelperService {
             const alert = await this.alertCtrl.create({
                 message: buttonTexts[2],
                 cssClass: workingLanguage ? (workingLanguage == 'en' ? 'ltr' : 'rtl') : '',
+                backdropDismiss: false,
                 buttons: [
                     {
                         text: buttonTexts[1],

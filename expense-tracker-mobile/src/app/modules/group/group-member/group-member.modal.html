@@ -10,7 +10,7 @@
   <ion-toolbar *ngIf="displayAddToolbar">
     <ion-searchbar slot="start" [(ngModel)]="email"></ion-searchbar>
     <ion-buttons slot="end">
-      <ion-button (click)="onMemberSaveClicked()">
+      <ion-button (click)="onMemberSaveClicked()" [disabled]="!email">
         <ion-icon name="checkmark"></ion-icon>
       </ion-button>
       <ion-button (click)="toggleAddMemberClicked()">
@@ -28,7 +28,7 @@
       <ion-item *ngFor="let member of members">
         <ion-label>
           <h2 *ngIf="member.user.email != currentUser.email">
-            {{ member.user.name }}
+            {{ member.user.name }}&nbsp;<strong *ngIf="member.user['owner']">{{'group.owner' | localizedresource | async}}</strong>
           </h2>
           <h2 *ngIf="member.user.email == currentUser.email">
             {{'common.you' | localizedresource | async }}
@@ -36,6 +36,14 @@
           <h3>{{ member.user.email }}</h3>
           <p>{{('group.status.' + member.status) | localizedresource | async }}</p>
         </ion-label>
+        <ion-buttons slot="end">
+          <ion-button (click)="onMemberUpdateClicked(member, 'resend')" *ngIf="member.status == GroupMemberStatus.Rejected">
+            <ion-icon name="refresh" slot="icon-only"></ion-icon>
+          </ion-button>
+          <ion-button (click)="onMemberUpdateClicked(member, 'delete')">
+            <ion-icon name="trash" slot="icon-only"></ion-icon>
+          </ion-button>
+        </ion-buttons>
       </ion-item>
     </ng-container>
   </ion-list>

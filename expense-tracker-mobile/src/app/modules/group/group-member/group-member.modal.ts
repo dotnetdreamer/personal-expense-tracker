@@ -4,7 +4,7 @@ import { GroupService } from '../group.service';
 import { BasePage } from '../../shared/base.page';
 import { ModalController } from '@ionic/angular';
 import { AppConstant } from '../../shared/app-constant';
-import { IGroupMember } from '../group.model';
+import { IGroupMember, GroupMemberStatus } from '../group.model';
 import { IUserProfile } from '../../authentication/authentication.model';
 
 @Component({
@@ -20,6 +20,7 @@ export class GroupMemberModal extends BasePage implements OnInit {
   members: IGroupMember[] = [];
   currentUser: IUserProfile;
   displayAddToolbar = false;
+  GroupMemberStatus = GroupMemberStatus;
 
   constructor(private modalCtrl: ModalController
     , private groupSvc: GroupService) { 
@@ -40,13 +41,42 @@ export class GroupMemberModal extends BasePage implements OnInit {
     const em = this.email.trim();
     const gId = +this.groupId;
 
-    const result = await this.groupSvc.addOrUpdateMember(this.email, gId);
+    const result = await this.groupSvc.addOrUpdateMember({
+      email: this.email,
+      groupId: gId
+    });
     if(AppConstant.DEBUG) {
       console.log('GroupMemberModal: onMemberSaveClicked', result);
     }
+
     if(result.data) {
-      this.email = null;
-      await this._getAllMemberByGroupId();
+      await this._refresh();
+    }
+  }
+
+  async onMemberUpdateClicked(member: IGroupMember, opt: 'delete' | 'resend') {
+    //TODO: need to review this logic
+    if(opt == 'delete') {
+      // const confirm = await this.helperSvc.presentConfirmDialog();
+      // if(!confirm) {
+      //   return;
+      // }
+
+
+    } else if(opt == 'resend') {
+      const result = await this.groupSvc.addOrUpdateMember({
+        id: member.id,
+        email: member.user.email,
+        groupId: member.group.id,
+        status: GroupMemberStatus.Pending
+      });
+      if(AppConstant.DEBUG) {
+        console.log('GroupMemberModal: onMemberUpdateClicked', result);
+      }
+  
+      if(result.data) {
+        await this._refresh();
+      }
     }
   }
 
@@ -57,6 +87,11 @@ export class GroupMemberModal extends BasePage implements OnInit {
   toggleAddMemberClicked() {
     this.displayAddToolbar = !this.displayAddToolbar;
     this.email = null;
+  }
+
+  private async _refresh() {
+    this.email = null;
+    await this._getAllMemberByGroupId();
   }
 
   private async _getAllMemberByGroupId() {

@@ -69,8 +69,13 @@ export class AppComponent {
       const res = await this.helperSvc.presentConfirmDialog(this.workingLanguage, msg);
       const status = res ? GroupMemberStatus.Aproved : GroupMemberStatus.Rejected;
 
-      const result = await this.groupSvc.addOrUpdateMember(this.currentUser.email
-        , group.id, status);
+      const existingMbr = group.members.filter(m => this.currentUser.email)[0];
+      const result = await this.groupSvc.addOrUpdateMember({
+        id: existingMbr.id,
+        email: this.currentUser.email,
+        groupId: group.id,
+        status: status
+      });
       if(result && result.data) {
         group['alert'] = null;
 
@@ -86,9 +91,12 @@ export class AppComponent {
           await this.groupSvc.putLocal(group);
 
           await this.helperSvc.presentToastGenericSuccess();
-          await this._navigateTo('/expense/expense-listing', {
-            groupId: group.id
-          });        
+          
+          setTimeout(async () => {
+            await this._navigateTo('/expense/expense-listing', {
+              groupId: group.id
+            });  
+          })
         }
       }
       return;

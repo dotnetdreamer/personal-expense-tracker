@@ -271,13 +271,41 @@ export class GroupService extends BaseService {
         }
     }
 
-    addOrUpdateMember(email, groupId, status?: GroupMemberStatus): Promise<IGroupMemberAddOrUpdateResponse> {
-        return this.postData({ 
-            url: `${this.BASE_URL}/addOrUpdateMember`,
-            body: {
-                email: email,
-                groupId: groupId,
-                status: status || ''
+    addOrUpdateMember(args: { id?, email, groupId, status?: GroupMemberStatus })
+    : Promise<IGroupMemberAddOrUpdateResponse> {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const result = await this.postData<IGroupMemberAddOrUpdateResponse>({ 
+                    url: `${this.BASE_URL}/addOrUpdateMember`,
+                    body: {
+                        id: args.id || '',
+                        email: args.email,
+                        groupId: args.groupId,
+                        status: args.status || ''
+                    }
+                });
+
+                if(!result.data) {
+                    let msg;
+                    if(result.memberNotFound) {
+                        msg = await this.localizationSvc.getResource('group.member_not_found');
+                    }
+                    if(result.notAnOwner) {
+                        msg = await this.localizationSvc.getResource('group.not_an_owner');
+                    }
+                    if(result.groupNotFound) {
+                        msg = await this.localizationSvc.getResource('group.not_found');
+                    }
+                    if(result.alreadyMember) {
+                        msg = await this.localizationSvc.getResource('group.already_member');
+                        const g = await this.getByIdLocal(args.groupId);
+                        msg = msg.format(args.email, g.name);
+                    }
+                    await this.helperSvc.presentToast(msg, false);
+                }
+                resolve(result);
+            } catch(e) {
+                reject(e);
             }
         });
     }

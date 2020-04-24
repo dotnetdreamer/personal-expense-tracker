@@ -60,6 +60,11 @@
         "settled": "You are settled up",
         "members": "Members",
         "accept_request": "Do you accept to join \"{0}\" group?",
+        "owner": "Owner",
+        "member_not_found": "Member not found",
+        "not_an_owner": "Only owner of this group can add members",
+        "not_found": "Group not found",
+        "already_member": "\"{0}\" is already a member of \"{1}\" group",
         "status": {
             "aproved": "Aproved",
             "pending": "Pending",

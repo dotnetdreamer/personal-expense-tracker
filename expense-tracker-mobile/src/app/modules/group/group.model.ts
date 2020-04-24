@@ -37,6 +37,7 @@ export interface IGroupMemberAddOrUpdateResponse {
     groupNotFound: boolean;
     memberNotFound: boolean;
     notAnOwner: boolean;
+    alreadyMember: boolean;
     data: IGroupMember;
 }
 

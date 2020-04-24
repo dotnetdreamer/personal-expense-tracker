@@ -185,9 +185,17 @@ export class GroupService {
     let toAddOrUpdate: GroupMember = await this.memberRepo.findOne(
       { user: user, group: group }, { relations: ["user", "group"] }
     );
+
     if(toAddOrUpdate) {
-      toAddOrUpdate.status = gm.status || toAddOrUpdate.status;
-      toAddOrUpdate.updatedOn = <any>moment().format(AppConstant.DEFAULT_DATETIME_FORMAT);
+      if(gm.id) {
+        //update
+        toAddOrUpdate.status = gm.status || toAddOrUpdate.status;
+        toAddOrUpdate.updatedOn = <any>moment().format(AppConstant.DEFAULT_DATETIME_FORMAT);
+      } else {
+        //make sure member is added only once
+        result.alreadyMember = true;
+        return result;
+      }
     } else {
       //only owner can add members
       const currentUser = <ICurrentUser>this.request.user;
@@ -225,6 +233,7 @@ export class GroupService {
       name: group.name,
       members: group.members.map(m => {
         return { 
+          id: m.id,
           status: m.status,
           user: {
             name: m.user.name,
@@ -248,7 +257,8 @@ export class GroupService {
       user: {
         name: member.user.name,
         email: member.user.email,
-        photo: member.user.photo
+        photo: member.user.photo,
+        owner: member.user.id == member.group.createdBy
       },
       group: {
         id: member.group.id,
