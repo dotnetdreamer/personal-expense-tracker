@@ -193,7 +193,10 @@ export class ExpenseListingPage extends BasePage implements OnInit, AfterViewIni
   }
 
   async onMemberAddClicked() {
-    await this.groupSvc.presentMemberModal(this.group.id);
+    await this.groupSvc.presentMemberModal(this.group.id, (data) => {
+      //always grab the latest info on close i.e to get any updated status on member aproval
+      //TODO: need to grab the gorup from web and keep it local...
+    });
   }
 
   async doRefresh(ev) {
