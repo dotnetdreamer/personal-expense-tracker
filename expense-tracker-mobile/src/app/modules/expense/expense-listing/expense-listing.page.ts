@@ -200,7 +200,9 @@ export class ExpenseListingPage extends BasePage implements OnInit, AfterViewIni
   }
 
   async doRefresh(ev) {
-    //reset
+    //pull latest
+    this.pubsubSvc.publishEvent(SyncConstant.EVENT_SYNC_DATA_PULL, SyncEntity.Expense);
+    //now push
     this.pubsubSvc.publishEvent(SyncConstant.EVENT_SYNC_DATA_PUSH, SyncEntity.Expense);
 
     setTimeout(() => {
