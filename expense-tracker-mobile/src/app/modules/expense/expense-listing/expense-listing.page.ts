@@ -275,7 +275,8 @@ export class ExpenseListingPage extends BasePage implements OnInit, AfterViewIni
         if(this.group) {
           const email = await this.userSettingSvc.getCurrentUser();
 
-          const cuTransactions = this.expenses.map(e => e.transactions.filter(t => t.email == email)[0]);
+          const cuTransactions = this.expenses.map(e => e.transactions.filter(t => t.email == email)[0])
+            .filter(e => e != null);
           if(cuTransactions.length) {
             this.groupTotals.debits = cuTransactions.reduce((a, b) => a + b.debit, 0);
             this.groupTotals.credits = cuTransactions.reduce((a, b) => a + b.credit, 0);
