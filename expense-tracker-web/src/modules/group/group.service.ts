@@ -119,6 +119,7 @@ export class GroupService {
 
     const lastPeriod = toUpdate.periods[toUpdate.periods.length - 1];
     lastPeriod.endDate = <any>moment().format(AppConstant.DEFAULT_DATETIME_FORMAT);
+    lastPeriod.updatedOn = <any>moment().format(AppConstant.DEFAULT_DATETIME_FORMAT);
     lastPeriod.status = GroupPeriodStatus.Closed;
 
     //create new 
