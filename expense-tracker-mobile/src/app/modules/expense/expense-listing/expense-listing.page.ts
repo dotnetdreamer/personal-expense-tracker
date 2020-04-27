@@ -163,6 +163,9 @@ export class ExpenseListingPage extends BasePage implements OnInit, AfterViewIni
   async onMoreOptionsClicked(eve) {
     const popCtrl = await this.popoverCtrl.create({
       component: ExpenseListingOption,
+      componentProps: {
+        totalExpenses: this.expenses.length
+      },
       event: eve
     });
     await popCtrl.present();

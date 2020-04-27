@@ -10,7 +10,7 @@ import { PopoverController } from '@ionic/angular';
                 <ion-icon slot="start" name="people"></ion-icon>
                 <ion-label>{{'group.members' | localizedresource | async }}</ion-label>
             </ion-item>
-            <ion-item (click)="dismiss('settle_up')">
+            <ion-item (click)="dismiss('settle_up')" [disabled]="totalExpenses == 0">
                 <ion-icon slot="start" name="people"></ion-icon>
                 <ion-label>{{'group.settle_up' | localizedresource | async }}</ion-label>
             </ion-item>
@@ -18,6 +18,8 @@ import { PopoverController } from '@ionic/angular';
     `,
 })
 export class ExpenseListingOption implements OnInit {
+    @Input() totalExpenses: number;
+
     constructor(private popoverCtrl: PopoverController) {
 
     }
