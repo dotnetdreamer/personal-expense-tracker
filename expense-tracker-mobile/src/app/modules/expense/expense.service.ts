@@ -218,7 +218,8 @@ export class ExpenseService extends BaseService {
         });
     }
 
-    getExpenseListLocal(args?: { term?, groupId?, fromDate?, toDate?, pageIndex?, pageSize? }): Promise<IExpense[]> {
+    getExpenseListLocal(args?: { term?, groupId?, fromDate?, toDate?, fromTime?, toTime?, pageIndex?, pageSize? })
+        : Promise<IExpense[]> {
         return new Promise(async (resolve, reject) => {
             let results = [];
             const db = this.dbService.Db;
@@ -235,7 +236,7 @@ export class ExpenseService extends BaseService {
                 if(args) {
                     if(args.fromDate || args.toDate) {
                         const createdOnUtc = moment(v.createdOn).format(AppConstant.DEFAULT_DATE_FORMAT);
-                        // console.log(createdOnUtc)
+                        const createdOnUtcTime = moment(v.createdOn).format(AppConstant.DEFAULT_TIME_FORMAT);
 
                         if(args.fromDate && args.toDate) {
                             //change date to utc first
@@ -244,7 +245,17 @@ export class ExpenseService extends BaseService {
 
                             if(createdOnUtc >= fromDateCreatedOnUtc 
                                 && createdOnUtc <= toDateCreatedOnUtc) {
-                                item = v;
+                                //compare time also. We compare time in case of gorup periods 
+                                //in order to properly fetch un-settled expenses
+                                if(args.fromTime && args.toTime) {
+                                    //time should be greater, not equal in fromTime
+                                    if(createdOnUtcTime > args.fromTime 
+                                        && createdOnUtcTime <= args.toTime) {
+                                        item = v;
+                                    }
+                                } else {
+                                    item = v;
+                                }
                             }
                         } else if (args.fromDate) {
                             //change date to utc first

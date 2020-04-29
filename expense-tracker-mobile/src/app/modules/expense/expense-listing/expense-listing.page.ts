@@ -14,7 +14,7 @@ import { CurrencySettingService } from '../../currency/currency-setting.service'
 import { SyncConstant } from '../../shared/sync/sync-constant';
 import { SyncEntity } from '../../shared/sync/sync.model';
 import { ActivatedRoute } from '@angular/router';
-import { IGroup } from '../../group/group.model';
+import { IGroup, GroupPeriodStatus } from '../../group/group.model';
 import { GroupService } from '../../group/group.service';
 import { ExpenseListingOption } from './expense-listing-options.popover';
 
@@ -32,7 +32,7 @@ export class ExpenseListingPage extends BasePage implements OnInit, AfterViewIni
   searchTerm: string;
   displaySearch = false;
   sum = 0;
-  dates: { selectedDate?: { from, to }, todayDate? } = {};
+  dates: { selectedDate?: { from, to, fromTime?, toTime? }, todayDate? } = {};
   dataLoaded = false;
   workingCurrency = ''; //fix for undefined showing in title
   group: IGroup;
@@ -65,25 +65,35 @@ export class ExpenseListingPage extends BasePage implements OnInit, AfterViewIni
         this._viewNonGrouped = Boolean(viewNonGrouped);
       }
 
+      this.dates.todayDate = moment().format(AppConstant.DEFAULT_DATE_FORMAT);
+      this.dates.selectedDate = <any>{};
+      
+      let fromDate, toDate;
       if(groupId) {
         groupId = +groupId;
         this.group = await this.groupSvc.getByIdLocal(groupId);
         if(AppConstant.DEBUG) {
           console.log('ExpenseListingPage: ngOnInit: group', this.group);
         }
+
+        //expenses must be filtered by periods
+        const openPeriod = this.group.periods.filter(p => p.status == GroupPeriodStatus.Open)[0];
+        fromDate = moment(openPeriod.startDate).local().format(AppConstant.DEFAULT_DATETIME_FORMAT);
+
+        this.dates.selectedDate.fromTime = moment(openPeriod.startDate).local().format(AppConstant.DEFAULT_TIME_FORMAT);;
+        this.dates.selectedDate.toTime = moment(openPeriod.startDate).local().endOf('D')
+          .format(AppConstant.DEFAULT_TIME_FORMAT);
+      } else {
+        //show all current month expenses
+        fromDate = moment().startOf('M').format(AppConstant.DEFAULT_DATE_FORMAT);
       }
+           
+      toDate = moment().endOf('M').format(AppConstant.DEFAULT_DATE_FORMAT);
+      this.dates.selectedDate.from = fromDate;
+      this.dates.selectedDate.to = toDate;
     });
 
     this.workingCurrency = await this.currencySettingSvc.getWorkingCurrency();
-
-    const fromDate = moment().startOf('M').format(AppConstant.DEFAULT_DATE_FORMAT);
-    const toDate = moment().endOf('M').format(AppConstant.DEFAULT_DATE_FORMAT);
-
-    this.dates.todayDate = moment().format(AppConstant.DEFAULT_DATE_FORMAT);
-    this.dates.selectedDate =  {
-      from: fromDate,
-      to: toDate
-    };
   }
 
   ngAfterViewInit() {
@@ -183,11 +193,18 @@ export class ExpenseListingPage extends BasePage implements OnInit, AfterViewIni
         
         const updatedGroup = await this.groupSvc.settleUpGroup(this.group);
         if(updatedGroup) {
-          //refresh
-          this.group = updatedGroup;
+          this.group = null;
           this.expenses = [];
 
+          //refresh
           setTimeout(async () => {
+            this.group = updatedGroup;
+            //get the new period
+            const openPeriod = this.group.periods.filter(p => p.status == GroupPeriodStatus.Open)[0];
+            this.dates.selectedDate.from = moment(openPeriod.startDate).local().format(AppConstant.DEFAULT_DATETIME_FORMAT);
+            this.dates.selectedDate.fromTime = moment(openPeriod.startDate).local().format(AppConstant.DEFAULT_TIME_FORMAT);;
+
+            //now get expenses
             await this._getExpenses();
           });
         }
@@ -245,6 +262,8 @@ export class ExpenseListingPage extends BasePage implements OnInit, AfterViewIni
     let filters:any = {
       fromDate: this.dates.selectedDate.from,
       toDate: this.dates.selectedDate.to,
+      fromTime: this.dates.selectedDate.fromTime,
+      toTime: this.dates.selectedDate.toTime,
       groupId: undefined  //by default show grouped and non-grouped
     };
 
