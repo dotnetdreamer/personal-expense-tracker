@@ -5,4 +5,4 @@ Pretty simple, i wanted to log my expenses under my control! so i created this. 
 
 # License
 
-The Notadd is open-sourced software licensed under the [Apache 2.0 license](LICENSE).
+Personal Tracker is open-sourced software licensed under the [Apache 2.0 license](LICENSE).
