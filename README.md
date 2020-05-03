@@ -12,7 +12,7 @@ Pretty simple, why not?. i wanted to log my expenses under my control! so i crea
 - [Licensing](#licensing)
 
 # <a name="quick-start"></a>Quick Start
-1. Git pull
+1. Clone this repository
 2. Switch to master branch
 3. Navigate to i.e **expense-tracker-mobile** directory and run `npm i`
 4. Now navigate to **expense-tracker-web** and run `npm i`
