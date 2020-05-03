@@ -7,7 +7,6 @@ Pretty simple, why not?. i wanted to log my expenses under my control! so i crea
 
 - [Features](#features)
 - [Quick Start](#quick-start)
-- [Plugins](https://github.com/)
 - [Contributing](#contributing)
 - [Licensing](#licensing)
 
