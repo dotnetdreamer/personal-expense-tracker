@@ -5,11 +5,20 @@ This is an open source personal expense tracker that lets you log your expenses.
 ### Why?
 Pretty simple, why not?. i wanted to log my expenses under my control! so i created this. It runs everywhere (as a PWA) but you can run it as Hybrid app📱 also as it is built on top of [Capacitor](https://capacitor.ionicframework.com/).
 
-- [Quick Start](#quick-start)
 - [Features](#features)
+- [Quick Start](#quick-start)
 - [Plugins](https://github.com/)
 - [Contributing](#contributing)
 - [Licensing](#licensing)
+
+## <a name="features"></a>Features
+
+- Personal expenses
+- Group Expenses
+- Share expenses with group members
+- Dashboard & Charts
+- All of the above + you own it
+
 
 # <a name="quick-start"></a>Quick Start
 1. Clone this repository
@@ -19,7 +28,6 @@ Pretty simple, why not?. i wanted to log my expenses under my control! so i crea
 5. Navigate to **expense-tracker-web** directory (if not already) and run `npm run start:dev`
 6. Open another command line and navigate to **expense-tracker-mobile** and run ionic serve
 7. Mobile and Web projects are good to go!
-
 
 # <a name="contributing"></a>Contributing
 Any type of contribution is welcome!
