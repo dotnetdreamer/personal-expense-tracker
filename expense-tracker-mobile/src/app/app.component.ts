@@ -302,6 +302,8 @@ export class AppComponent {
   }
 
   private async _setDefaults() {
+    await this._configureWeb();
+
     const res = await Promise.all([
       this.userSettingSvc.getUserProfileLocal()
       , this.appSettingSvc.getWorkingLanguage(), this.currencySettingSvc.getWorkingCurrency()
@@ -338,7 +340,6 @@ export class AppComponent {
     } else {
       await this._navigateTo('/authentication/login');
     }
-
     // await this._navigateTo('/expense/expense-create-or-update');
     // await this._navigateTo('/expense/expense-listing');
     // await this._navigateTo('/category');
@@ -351,5 +352,19 @@ export class AppComponent {
     } else {
       await this.router.navigate([path, args], { replaceUrl: replaceUrl });
     }
+  }
+
+  private async _configureWeb() {
+    //used for google signin login/logout on web
+    const webConfigured = document.getElementsByName('google-signin-client_id').length > 0;
+    if(!webConfigured) {
+      document.head.appendChild(Object.assign(
+        document.createElement('meta'), {
+        name: 'google-signin-client_id',
+        content: AppConstant.GOOGLE_SIGNIN_CLIENT_ID
+      }));
+    }
+    //dynamic import
+    await import (`@codetrix-studio/capacitor-google-auth`);
   }
 }

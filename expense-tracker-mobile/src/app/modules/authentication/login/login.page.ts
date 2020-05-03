@@ -4,10 +4,7 @@ import { LoginType, ILoginParams, IUser, IUserProfile } from '../authentication.
 import { UserSettingService } from '../user-setting.service';
 import { UserConstant } from '../user-constant';
 import { BasePage } from '../../shared/base.page';
-import { SyncConstant } from '../../shared/sync/sync-constant';
 import { AuthenticationService } from '../authentication.service';
-import { Subscription } from 'rxjs';
-import { AppConstant } from '../../shared/app-constant';
 import { FormGroup, Validators, FormBuilder } from '@angular/forms';
 
 @Component({
@@ -79,5 +76,4 @@ export class LoginPage extends BasePage implements OnInit, OnDestroy {
       this.canDeactivate = false;
     });
   }
-
 }

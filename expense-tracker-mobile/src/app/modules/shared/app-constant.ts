@@ -12,6 +12,8 @@ export class AppConstant {
     public static readonly DEFAULT_DATETIME_FORMAT = "YYYY-MM-DD HH:mm:ss";
     public static readonly DEFAULT_DATE_FORMAT = "YYYY-MM-DD";
     public static readonly DEFAULT_TIME_FORMAT = "HH:mm";
+
+    public static readonly GOOGLE_SIGNIN_CLIENT_ID = "481765426823-3c4gmsn2bbk3mrghqm0q6ng70d7mrqbl.apps.googleusercontent.com";
     
     public static readonly EVENT_DB_INITIALIZED = "event:dbInitialized"; 
     public static readonly EVENT_CATEGORY_CREATED_OR_UPDATED = "event:categoryCreatedOrUpdated"; 
