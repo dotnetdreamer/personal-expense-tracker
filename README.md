@@ -18,7 +18,7 @@ Pretty simple, why not?. i wanted to log my expenses under my control! so i crea
 4. Now navigate to **expense-tracker-web** and run `npm i`
 5. Navigate to **expense-tracker-web** directory (if not already) and run `npm run start:dev`
 6. Open another command line and navigate to **expense-tracker-mobile** and run ionic serve
-7. Mobile and Web project are good to go!
+7. Mobile and Web projects are good to go!
 
 
 # <a name="contributing"></a>Contributing
