@@ -7,7 +7,7 @@ Pretty simple, why not?. i wanted to log my expenses under my control! so i crea
 
 - [Quick Start](#quick-start)
 - [Features](#features)
-- [Plugins](https://github.com/serverless/plugins)
+- [Plugins](https://github.com/)
 - [Contributing](#contributing)
 - [Licensing](#licensing)
 
