@@ -24,10 +24,14 @@ import { GroupModule } from './modules/group/group.module';
 import { GroupMember } from './modules/group/group-member.entity';
 import { ExpenseTransaction } from './modules/expense/expense.transaction.entity';
 import { GroupPeriod } from './modules/group/group-period.entity';
+import { Connection, createConnection, getConnection } from 'typeorm';
+
+const CONNECTION_NAME = "default";
 
 @Module({
   imports: [
     TypeOrmModule.forRoot({
+      name: CONNECTION_NAME,
       type: 'sqlite',
       database: './_db/expense-tracker.db',
       entities: [
@@ -36,7 +40,7 @@ import { GroupPeriod } from './modules/group/group-period.entity';
         , AccessToken, ExternalAuth
         , Group, GroupMember, GroupPeriod
       ],
-      synchronize: true,
+      synchronize: false,
     }),
     SharedModule,
     CategoryModule,
@@ -52,4 +56,25 @@ import { GroupPeriod } from './modules/group/group-period.entity';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule {
+  constructor() {
+    setTimeout(async () => {
+      let connection: Connection;
+      try {
+        connection = getConnection(CONNECTION_NAME);
+      } catch (error) {
+        await createConnection(CONNECTION_NAME);
+      }
+      
+      //do migration manually. As synchronize: true is causing issues
+      await this.fixedSync(connection);
+    }, 0);
+  }
+
+  //https://github.com/typeorm/typeorm/issues/2576#issuecomment-499506647
+  async fixedSync(connection: Connection) {
+    await connection.query('PRAGMA foreign_keys=OFF');
+    await connection.synchronize();
+    await connection.query('PRAGMA foreign_keys=ON');
+  }
+}
