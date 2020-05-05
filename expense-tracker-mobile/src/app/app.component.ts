@@ -113,7 +113,7 @@ export class AppComponent {
     }
   }
 
-  async onItemClicked(url, args, timeout?) {
+  async onItemClicked(url, args?, timeout?) {
     setTimeout(async () => {
       switch(url) {
         case '/home':
