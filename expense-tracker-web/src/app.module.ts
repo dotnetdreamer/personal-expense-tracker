@@ -58,23 +58,27 @@ const CONNECTION_NAME = "default";
 })
 export class AppModule {
   constructor() {
-    setTimeout(async () => {
-      let connection: Connection;
-      try {
-        connection = getConnection(CONNECTION_NAME);
-      } catch (error) {
-        await createConnection(CONNECTION_NAME);
-      }
-      
-      //do migration manually. As synchronize: true is causing issues
-      await this.fixedSync(connection);
-    }, 0);
+    // setTimeout(async () => {
+    //   let connection: Connection;
+    //   try {
+    //     connection = getConnection(CONNECTION_NAME);
+    //   } catch (error) {
+    //     await createConnection(CONNECTION_NAME);
+    //   }
+
+    //   //do migration manually. As synchronize: true is causing issues
+    //   await this.fixedSync(connection);
+    // }, 0);
   }
 
   //https://github.com/typeorm/typeorm/issues/2576#issuecomment-499506647
   async fixedSync(connection: Connection) {
-    await connection.query('PRAGMA foreign_keys=OFF');
-    await connection.synchronize();
-    await connection.query('PRAGMA foreign_keys=ON');
+    try {
+      await connection.query('PRAGMA foreign_keys=OFF;');
+      await connection.synchronize();
+      await connection.query('PRAGMA foreign_keys=ON');
+    } catch(e) {
+      console.log(e);
+    }
   }
 }
