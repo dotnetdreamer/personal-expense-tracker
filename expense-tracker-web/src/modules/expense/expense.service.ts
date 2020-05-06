@@ -28,7 +28,8 @@ export class ExpenseService {
 
   async findAll(args?: { 
       term?: string, groupId?: number, userIds?: number[]
-    , fromDate?: string, toDate?: string, showHidden?: boolean 
+    , fromDate?: string, toDate?: string
+    , showHidden?: boolean, sync?: boolean
   }): Promise<any[]> {
     let qb = await getRepository(Expense)
       .createQueryBuilder('exp')
@@ -48,7 +49,7 @@ export class ExpenseService {
       if(args.groupId > 0) {
         //show non-grouped only if no grouped is passed
         qb = qb.andWhere("(grp.id = :groupId and grp.entityName = 'expense')", { groupId: args.groupId });
-      } else {
+      } else if(!args.sync) { //in case of sync, we show grouped and non-grouped i.e both
         qb = qb.andWhere("exp.group is null");
       }
       

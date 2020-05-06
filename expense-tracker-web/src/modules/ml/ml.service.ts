@@ -16,7 +16,7 @@ export class MlService {
     } 
 
     async buildExpensesTrainingSet() {
-        let expenses = await this.expenseSvc.findAll();
+        let expenses = await this.expenseSvc.findAll({ sync: true });
         //map it
         const model = expenses.map(async (e) => {
             const mapped = await this._prepare(e);

@@ -19,7 +19,7 @@ export class ExpenseController {
   @UseInterceptors(ClassSerializerInterceptor)
   @Get('getAll')
   async getAll(@Req() req: Request,
-   @Query() filters?: { groupId?: number, term?: string, fromDate?: string, toDate?: string }) {
+   @Query() filters?: { groupId?: number, term?: string, fromDate?: string, toDate?: string, sync?: boolean }) {
     const expenses = await this.expenseSvc.findAll({
       ...filters
     });
