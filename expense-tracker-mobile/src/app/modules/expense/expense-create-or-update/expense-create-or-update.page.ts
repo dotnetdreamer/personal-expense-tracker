@@ -464,7 +464,7 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit, OnDes
         for(let member of members) {
           const isOtherMember = member.user.email == ma.email;
           transactions.push({
-            transactionType: TransactionType.PaidByYouAndSplitEqually,
+            transactionType: TransactionType.PaidByOtherPersonAndSplitEqually,
             credit: isOtherMember ? total - amountPerMbr : 0,
             debit: isOtherMember ? total : amountPerMbr,
             email: member.user.email,
