@@ -222,8 +222,15 @@ export class ExpenseListingPage extends BasePage implements OnInit, AfterViewIni
   async doRefresh(ev) {
     //pull latest. Important as other members need to have lastest information
     this.pubsubSvc.publishEvent(SyncConstant.EVENT_SYNC_DATA_PULL, SyncEntity.Expense);
-    //now push
-    this.pubsubSvc.publishEvent(SyncConstant.EVENT_SYNC_DATA_PUSH, SyncEntity.Expense);
+
+    //TODO: need to figure out this
+    // //don't push again is something is in progress to avoid duplicate records insert
+    // const anyPending = this.expenses.map(item => item.markedForAdd 
+    //   || item.markedForUpdate || item.markedForDelete);
+    // if(!anyPending) {
+    //   //now push
+    //   this.pubsubSvc.publishEvent(SyncConstant.EVENT_SYNC_DATA_PUSH, SyncEntity.Expense);
+    // }
 
     setTimeout(() => {
       ev.target.complete();
