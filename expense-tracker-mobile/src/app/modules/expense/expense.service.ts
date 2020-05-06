@@ -23,7 +23,10 @@ export class ExpenseService extends BaseService {
     pull() {
         return new Promise(async (resolve, reject) => {
             try {
-                const items = await this.getExpenses();
+                //by default fetch 15 days records only
+                const fromDate = moment().add(-10, 'days').format(AppConstant.DEFAULT_DATE_FORMAT);
+                const items = await this.getExpenses({ fromDate: fromDate, sync: true });
+
                 if(items.length) {
                     //local item marked for local changes i.e (delete, update or add) should be ignored...
                     for(let i of items) {
@@ -195,13 +198,14 @@ export class ExpenseService extends BaseService {
         });
     }
 
-    getExpenses(args?: { term?, fromDate?, toDate? }) {
+    getExpenses(args?: { term?, fromDate?, toDate?, sync? }) {
         let body;
 
         if(args && (args.fromDate || args.toDate )) {
             //change date to utc first
             if(args.fromDate) {
-                const fromDate = moment(args.fromDate).endOf('D').utc().format(AppConstant.DEFAULT_DATETIME_FORMAT);
+                const fromDate = moment(args.fromDate).endOf('D').utc()
+                    .format(AppConstant.DEFAULT_DATETIME_FORMAT);
                 args.fromDate = fromDate;
             }
             if(args.toDate) {
@@ -235,38 +239,56 @@ export class ExpenseService extends BaseService {
                 let item: IExpense;
                 if(args) {
                     if(args.fromDate || args.toDate) {
-                        const createdOnUtc = moment(v.createdOn).format(AppConstant.DEFAULT_DATE_FORMAT);
-                        const createdOnUtcTime = moment(v.createdOn).format(AppConstant.DEFAULT_TIME_FORMAT);
+                        const createdOnUtcStr = moment.utc(v.createdOn).format(AppConstant.DEFAULT_DATE_FORMAT);
 
                         if(args.fromDate && args.toDate) {
                             //change date to utc first
-                            const fromDateCreatedOnUtc = moment.utc(args.fromDate).format(AppConstant.DEFAULT_DATE_FORMAT);
-                            const toDateCreatedOnUtc = moment.utc(args.toDate).format(AppConstant.DEFAULT_DATE_FORMAT);
+                            let fromDateCreatedOnUtc, toDateCreatedOnUtc, createdOnUtc;
+
+                            if(args.fromTime) {
+                                const fromTime = moment.utc(args.fromTime, AppConstant.DEFAULT_TIME_FORMAT)
+                                    .format(AppConstant.DEFAULT_TIME_FORMAT)
+                                    .split(':')
+                                    .map(t => +t);
+                                fromDateCreatedOnUtc = moment.utc(args.fromDate)
+                                    .set('hour', fromTime[0])
+                                    .set('minute', fromTime[1])
+                                    .format(AppConstant.DEFAULT_DATETIME_FORMAT);
+                                createdOnUtc = moment.utc(v.createdOn).format(AppConstant.DEFAULT_DATETIME_FORMAT);
+                            } else {
+                                fromDateCreatedOnUtc = moment.utc(args.fromDate).format(AppConstant.DEFAULT_DATE_FORMAT);
+                                createdOnUtc = moment.utc(v.createdOn).format(AppConstant.DEFAULT_DATE_FORMAT);
+                            }
+
+                            if(args.toTime) {
+                                const toTime = moment.utc(args.toTime, AppConstant.DEFAULT_TIME_FORMAT)
+                                    .format(AppConstant.DEFAULT_TIME_FORMAT)
+                                    .split(':')
+                                    .map(t => +t);
+                                toDateCreatedOnUtc = moment.utc(args.toDate)
+                                    .set('hour', toTime[0])
+                                    .set('minute', toTime[1])
+                                    .format(AppConstant.DEFAULT_DATETIME_FORMAT);
+                                createdOnUtc = moment.utc(v.createdOn).format(AppConstant.DEFAULT_DATETIME_FORMAT);
+                            } else {
+                                toDateCreatedOnUtc = moment.utc(args.toDate).format(AppConstant.DEFAULT_DATE_FORMAT);;
+                                createdOnUtc = moment.utc(v.createdOn).format(AppConstant.DEFAULT_DATE_FORMAT);
+                            }
 
                             if(createdOnUtc >= fromDateCreatedOnUtc 
                                 && createdOnUtc <= toDateCreatedOnUtc) {
-                                //compare time also. We compare time in case of gorup periods 
-                                //in order to properly fetch un-settled expenses
-                                if(args.fromTime && args.toTime) {
-                                    //time should be greater, not equal in fromTime
-                                    if(createdOnUtcTime > args.fromTime 
-                                        && createdOnUtcTime <= args.toTime) {
-                                        item = v;
-                                    }
-                                } else {
-                                    item = v;
-                                }
+                                item = v;
                             }
                         } else if (args.fromDate) {
                             //change date to utc first
                             const fromDateCreatedOnUtc = moment.utc(args.fromDate).format(AppConstant.DEFAULT_DATE_FORMAT);
-                            if(createdOnUtc >= fromDateCreatedOnUtc) {
+                            if(createdOnUtcStr >= fromDateCreatedOnUtc) {
                                 item = v;
                             }
                         } else if (args.toDate) {
                             //change date to utc first
                             const toDateCreatedOnUtc = moment.utc(args.toDate).format(AppConstant.DEFAULT_DATE_FORMAT);
-                            if(createdOnUtc <= toDateCreatedOnUtc) {
+                            if(createdOnUtcStr <= toDateCreatedOnUtc) {
                                 item = v;
                             } 
                         }
