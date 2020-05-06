@@ -11,3 +11,15 @@ export interface ILoginParams {
     email: string
     password: string
 }
+
+export enum UserRole {
+    Admin = "admin",
+    User = "user"
+}
+
+export enum UserStatus {
+    Approved = "approved",
+    Pending = "pending",
+    Rejected = "rejected",
+    Blocked = "blocked"
+}
