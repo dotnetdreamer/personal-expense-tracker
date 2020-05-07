@@ -37,8 +37,8 @@ export class ExpenseListingPage extends BasePage implements OnInit, AfterViewIni
   workingCurrency = ''; //fix for undefined showing in title
   group: IGroup;
   groupTotals = {
-    debits: 0,
-    credits: 0,
+    actualPaidAmount: 0,
+    totalPerMember: 0,
     owe: 0
   };
 
@@ -233,7 +233,8 @@ export class ExpenseListingPage extends BasePage implements OnInit, AfterViewIni
 
   onIonScrolling(ev: CustomEvent) {
     const { scrollTop } = ev.detail;
-    if(scrollTop > 100) {
+    const top = this.group ? 180 : 120;
+    if(scrollTop > top) {
       this.displayHeaderbar = false;
     } else if(scrollTop <= 0) {
       this.displayHeaderbar = true;
@@ -294,22 +295,27 @@ export class ExpenseListingPage extends BasePage implements OnInit, AfterViewIni
           this.expenses = await this.expenseSvc.getExpenseListLocal(filters);
         }
 
-        //calculate debits and credits
+        //calculate actualPaidAmount and totalPerMember
         if(this.group) {
           const email = await this.userSettingSvc.getCurrentUser();
 
           const cuTransactions = this.expenses.map(e => e.transactions.filter(t => t.email == email)[0])
             .filter(e => e != null);
           if(cuTransactions.length) {
-            this.groupTotals.debits = cuTransactions.reduce((a, b) => a + b.debit, 0);
-            this.groupTotals.credits = cuTransactions.reduce((a, b) => a + b.credit, 0);
-            this.groupTotals.owe = this.groupTotals.credits - this.groupTotals.debits;
+            this.groupTotals.actualPaidAmount = cuTransactions.reduce((a, b) => a + b.actualPaidAmount, 0);
           }
         }
       } catch(e) {
         this.expenses = [];
       } finally {
         this.sum = this.expenses.reduce((a, b) => a + (+b.amount), 0);
+        if(this.group) {
+          const perMember = this.sum / this.group.members.length;
+          this.groupTotals.owe = this.groupTotals.actualPaidAmount - perMember;
+          if(this.sum > 0) {
+            this.groupTotals.totalPerMember = this.sum / this.group.members.length;
+          }
+        }
         if(AppConstant.DEBUG) {
           console.log('ExpenseListingPage: _getExpenses: expenses', this.expenses);
         }

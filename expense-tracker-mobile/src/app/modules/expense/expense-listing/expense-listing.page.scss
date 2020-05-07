@@ -13,18 +13,21 @@ page-expense-listing {
             &.toolbar-group {
                 .group-container {
                     text-align: center;
-                    padding: 0 20px;
+                    padding: 0 10px;
                     margin-bottom: 10px;
                     display: flex;
                     justify-content: space-around;
                     align-items: center;
+                    position: relative;
+                    padding-top: 25px;
 
                     .group-amount-title {
                         text-align: center;
-                        min-width: 70px;
+                        min-width: 125px;
                         
                         .title {
-                            font-size: 0.8em;
+                            font-size: 0.7em;
+                            text-transform: uppercase;
                         }
 
                         .amount {
@@ -40,6 +43,11 @@ page-expense-listing {
                     .group-icon-title {
                         .group-owe {
                             margin-bottom: 5px;
+                            position: absolute;
+                            top: 0;
+                            left: 0;
+                            right: 0;
+                            margin: auto;
 
                             > span {
                                 font-weight: bold;

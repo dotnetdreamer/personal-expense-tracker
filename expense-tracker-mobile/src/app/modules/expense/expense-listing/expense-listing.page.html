@@ -27,12 +27,13 @@
   <ion-toolbar class="toolbar-group" *ngIf="group" [class.hidden]="!displayHeaderbar">
     <div class="group-container">
       <div class="group-amount-title group-debits">
-        <div class="title">{{'expense.debit' | localizedresource | async }}</div>
-        <div class="amount" [innerHTML]="'-' + (groupTotals.debits | formateCurrency | async)"></div>
+        <div class="title">{{'group.total_you_paid' | localizedresource | async }}</div>
+        <div class="amount" [innerHTML]="groupTotals.actualPaidAmount | formateCurrency | async"></div>
       </div>
       <div class="group-icon-title">
         <div class="group-owe" *ngIf="groupTotals.owe != 0">
           {{ (groupTotals.owe < 0 ? 'expense.total_owe': 'expense.total_theyowe') | localizedresource | async}}
+          <!-- {{'expense.total_owe' | localizedresource | async}} -->
           <!-- Display as a positive value always -->
           <span [innerHTML]="(groupTotals.owe < 0 ? groupTotals.owe * -1 : groupTotals.owe) | formateCurrency | async"></span>
         </div>
@@ -40,8 +41,8 @@
         <div class="group-title">{{ group.name }}</div>
       </div>
       <div class="group-amount-title group-credits">
-        <div class="title">{{'expense.credit' | localizedresource | async }}</div>
-        <div class="amount" [innerHTML]="'+' +(groupTotals.credits | formateCurrency | async)"></div>
+        <div class="title">{{'group.total_your_share' | localizedresource | async }}</div>
+        <div class="amount" [innerHTML]="(groupTotals.totalPerMember | formateCurrency | async)"></div>
       </div>
     </div>
   </ion-toolbar>

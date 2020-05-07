@@ -22,8 +22,12 @@ export class ExpenseAmountPipe {
             const email = await this.userSettingSvc.getCurrentUser();
             const cuTran = expense.transactions.filter(t => t.email == email)[0];
             if(cuTran) {
-                const total = cuTran.credit - cuTran.debit;
-                finalAmount = `${total > 0 ? '+' : ''}${total}`;
+                //if current user paid, then calculate
+                if(cuTran.actualPaidAmount) {
+                    finalAmount = this._calculateTotal(cuTran.actualPaidAmount, cuTran.debit);
+                } else {
+                    finalAmount = this._calculateTotal(cuTran.credit, cuTran.debit);
+                }
             }
         } else {
             finalAmount = `${expense.amount}`;
@@ -31,6 +35,20 @@ export class ExpenseAmountPipe {
 
         if(shouldFormat) {
             finalAmount = await this.formatCurrencyPipe.transform(finalAmount);
+        }
+
+        return finalAmount;
+    }
+
+    private _calculateTotal(credit, debit) {
+        let finalAmount;
+        const total = credit - debit;
+        if(total > 0) {
+            finalAmount = `+${total}`;
+        } else if(total == 0) {
+            finalAmount = `+${credit}`;
+        } else {
+            finalAmount = `${total}`;
         }
 
         return finalAmount;
