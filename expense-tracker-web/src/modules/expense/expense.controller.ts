@@ -80,6 +80,8 @@ export class ExpenseController {
       items.push(itemMap);
     }
 
+    //test delay...
+    // await this._timeout();
     return items;
   }
 
@@ -116,5 +118,9 @@ export class ExpenseController {
     delete mExp['markedForDelete'];
 
     return mExp;
+  }
+
+  private _timeout() {
+    return new Promise((resolve, reject) => setTimeout(resolve, 5000));
   }
 }
