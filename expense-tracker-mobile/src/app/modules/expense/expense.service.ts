@@ -48,10 +48,13 @@ export class ExpenseService extends BaseService {
 
     push() {
         return new Promise(async (resolve, reject) => {
-            const unSycedLocal = await this.getUnSyncedLocal();
+            let unSycedLocal = await this.getUnSyncedLocal();
             if(AppConstant.DEBUG) {
                 console.log('ExpenseService: sync: unSycedLocal items length', unSycedLocal.length);
             }
+
+            //do not push same records again...
+            unSycedLocal = unSycedLocal.filter(ul => this._findInQueue(ul) == -1);
 
             if(!unSycedLocal.length) {
                 resolve();
@@ -102,6 +105,9 @@ export class ExpenseService extends BaseService {
                 return; 
             }
 
+            //add to push queue
+            this._addQueuePattern(unSycedLocal);
+
             let items: Array<any>;
             //server returns array of dictionary objects, each key in dict is the localdb id
             //we map the localids and update its serverid locally
@@ -117,7 +123,7 @@ export class ExpenseService extends BaseService {
                     try {
                         const returnedItems = await this.postData<any[]>({
                             url: `${this.BASE_URL}/sync`,
-                            body: [usItem]  //server expect an array...
+                            body: [usItem]  //server expects an array...
                         });
                         if(!items) {
                             items = [];
@@ -132,10 +138,6 @@ export class ExpenseService extends BaseService {
                         continue;
                     }
                 }
-
-                //if any of them succeeded
-                // reject(e);
-                // return;
             }
 
             //something bad happend or in case of update, we don't need to update server ids
@@ -514,6 +516,17 @@ export class ExpenseService extends BaseService {
         return this.dbService.removeAll(this.schemaSvc.tables.expense);
     }
 
+    private _addQueuePattern(items: IExpense[]) {
+        items.map(item => {
+            item['queuePattern'] = `${this.schemaSvc.tables.expense}_${item.amount}_${item.createdOn}`;
+            return item;
+        });
+    }
+
+    private _findInQueue(item: IExpense) {
+        return this.findInQueue(`${this.schemaSvc.tables.expense}_${item.amount}_${item.createdOn}`);
+    }
+
     private _mapAll(expenses: Array<IExpense>) {
         const result = expenses.map(async (e) => {
             const exp = await this._map(e);
@@ -547,7 +560,6 @@ export class ExpenseService extends BaseService {
         // }
         return e;
     }
-    
 
     private _sort(expenses: Array<IExpense>) {
         // expenses.sort((aDate: IExpense, bDate: IExpense) => {

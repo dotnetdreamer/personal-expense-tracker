@@ -30,6 +30,9 @@ export class BaseService {
     protected localizationSvc: LocalizationService;
     protected pubsubSvc: NgxPubSubService;
 
+    //hold anytime that is currently in progress to avoid pushing same record more than once
+    protected static pushQueue = [];
+
     constructor() {
         const injector = AppInjector.getInjector();
 
@@ -99,23 +102,22 @@ export class BaseService {
             } else {
                 newUrl = args.url;
             }
-
-            // let data;
-            // for(let prop in args.body) {
-            //     if(args.body.hasOwnProperty(prop)) {
-            //         if(data) {
-            //             data += '&';
-            //         } else {
-            //             //initialize
-            //             data = '';
-            //         }
-            //         data += `${prop}=${args.body[prop]}`;
-            //     }
-            // }   
-            // args.body = data || {};   
+  
             args.url = newUrl;
 
-            this.http.post<T>(args.url, args.body, {
+            //add to queue
+            let body = args.body;
+            if(Array.isArray(body)) {
+                (<any[]>body).forEach(i => {
+                    if(i.queuePattern) {
+                        this._addToQueue(i.queuePattern);
+                    }
+                });
+            } else if(body.queuePattern) {
+                this._addToQueue(body.queuePattern);
+            }
+
+            this.http.post<T>(args.url, body, {
                 headers: headers
             })
             .subscribe(result => {
@@ -127,8 +129,38 @@ export class BaseService {
                 } else {
                     reject(error);
                 }
+            }).add(() => {
+                //Called when operation is complete (both success and error)
+                //remove from queue
+                if(Array.isArray(body)) {
+                    (<any[]>body).forEach(i => {
+                        if(i.queuePattern) {
+                            this._removeFromQueue(i.queuePattern);
+                        }
+                    });
+                } else if(body.queuePattern) {
+                    this._removeFromQueue(body.queuePattern);
+                }
             });
         });
+    }
+
+    protected findInQueue(pattern) {
+        return BaseService.pushQueue.findIndex(q => q == pattern);
+    }
+
+    private _addToQueue(pattern) {
+        if(this.findInQueue(pattern) == -1) {
+            BaseService.pushQueue.push(pattern);
+        }
+    }
+
+    private _removeFromQueue(pattern) {
+        const toRemove = this.findInQueue(pattern);
+        if(toRemove == -1) {
+            return;
+        }
+        BaseService.pushQueue.splice(toRemove);
     }
 
     protected async handleError(e: HttpErrorResponse, args: HttpParams) {
