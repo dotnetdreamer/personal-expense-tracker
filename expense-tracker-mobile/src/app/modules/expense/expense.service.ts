@@ -23,8 +23,8 @@ export class ExpenseService extends BaseService {
     pull() {
         return new Promise(async (resolve, reject) => {
             try {
-                //by default fetch 15 days records only
-                const fromDate = moment().add(-10, 'days').format(AppConstant.DEFAULT_DATE_FORMAT);
+                //by default fetch 31 days records only
+                const fromDate = moment().add(-31, 'days').format(AppConstant.DEFAULT_DATE_FORMAT);
                 const items = await this.getExpenses({ fromDate: fromDate, sync: true });
 
                 if(items.length) {
