@@ -11,7 +11,7 @@ export class FormateCurrencyPipe {
 
     }
 
-    transform(amount: string, workingCurrency?: string) {
+    transform(amount, workingCurrency?: string) {
         return new Promise(async (resolve, reject) => {
             if(!amount) {
                 amount = "0";
