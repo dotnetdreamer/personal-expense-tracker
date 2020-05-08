@@ -12,6 +12,8 @@ import { SyncEntity } from '../../shared/sync/sync.model';
 import { Subscription } from 'rxjs';
 import { AppConstant } from '../../shared/app-constant';
 import { SchemaService } from '../../shared/db/schema.service';
+import { CurrencyService } from '../../currency/currency.service';
+import { CurrencySettingService } from '../../currency/currency-setting.service';
 
 @Component({
   selector: 'page-general-setting',
@@ -29,8 +31,13 @@ export class SettingPage extends BasePage implements OnInit, OnDestroy {
   selectedTable;
   tables: string[] = [];
 
+  currencies = [];
+  workingCurrency;
+  selectedCurrency;
+
   private _syncDataPushCompleteSub: Subscription;
-  constructor(private platform: Platform, @Inject(DOCUMENT) private document: Document) { 
+  constructor(private platform: Platform, @Inject(DOCUMENT) private document: Document
+    , private currencySettingSvc: CurrencySettingService, private currencySvc: CurrencyService) { 
     super();
 
     this._subscribeToEvents();
@@ -43,11 +50,38 @@ export class SettingPage extends BasePage implements OnInit, OnDestroy {
     this.schemaSvc = injector.get(SchemaService);
   }
 
-  ngOnInit() {
+  async ngOnInit() {
     for(let tab in this.schemaSvc.tables) {
       this.tables.push(this.schemaSvc.tables[tab]);
     }
+    const all = await Promise.all([
+      this.currencySvc.getAllCurrenciesLocal(),
+      this.currencySettingSvc.getWorkingCurrency()
+    ]);
+    this.currencies = all[0];
+    this.workingCurrency = all[1];
   }
+
+  //#region Currency
+
+  async onSelectedCurrencyChanged(ev: CustomEvent) {
+    const { value } = ev.detail;
+    this.selectedCurrency = value;
+  }
+
+  async onCurrencyUpdateClicked() {
+    if(!this.selectedCurrency) {
+      return;
+    }
+
+    const res = await this.helperSvc.presentConfirmDialog();
+    if(res) {
+      await this.currencySettingSvc.putWorkingCurrency(this.selectedCurrency);
+      await this._reload();
+    }
+  }
+
+  //#endregion
 
   async onTableSelectionChanged() {
     const data = await this.dbSvc.getAll<any[]>(this.selectedTable);
@@ -99,9 +133,7 @@ export class SettingPage extends BasePage implements OnInit, OnDestroy {
     const res = await this.helperSvc.presentConfirmDialog();
     if(res) {
       await this.dbSvc.delete();
-
-      await this.navigateToHome();
-      this.document.location.reload(true);
+      await this._reload();
     }
   }
 
@@ -130,5 +162,10 @@ export class SettingPage extends BasePage implements OnInit, OnDestroy {
         this.isSyncInProgress = false;
       });
     });
+  }
+
+  private async _reload() {
+    await this.navigateToHome();
+    this.document.location.reload(true);
   }
 }

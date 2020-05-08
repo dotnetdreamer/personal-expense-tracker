@@ -8,5 +8,12 @@ export class CurrencyService {
 
     }
 
-    
+    getAllCurrenciesLocal() {
+        return Promise.resolve([
+            "AED",
+            "PKR",
+            "USD",
+            "EUR"
+        ]);
+    }
 }

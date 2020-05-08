@@ -107,5 +107,9 @@
         "register": {
             "title": "Register"
         }
+    },
+    "currency": {
+        "default": "Default currency",
+        "title": "Currency"
     }
 }
