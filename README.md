@@ -13,6 +13,7 @@ Pretty simple, why not?. i wanted to log my expenses under my control! so i crea
 ## <a name="features"></a>Features
 
 - Full Stack JS. One language to rule them all
+- Works on cheap hosting (Only requires Node.js and Disk storage (which is very cheap))
 - Personal expenses
 - Group Expenses
 - Share expenses with group members
