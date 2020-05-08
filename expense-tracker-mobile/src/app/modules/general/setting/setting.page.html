@@ -27,8 +27,7 @@
           {{curr}}
         </ion-select-option>
       </ion-select>
-      <ion-button color="primary" (click)="onCurrencyUpdateClicked('update')" 
-        [disabled]="!selectedCurrency">
+      <ion-button color="primary" (click)="onCurrencyUpdateClicked()" [disabled]="!selectedCurrency">
         {{'common.update' | localizedresource | async}}
       </ion-button>
     </ion-item>
