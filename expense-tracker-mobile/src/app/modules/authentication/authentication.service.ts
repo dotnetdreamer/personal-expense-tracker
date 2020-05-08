@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 
 
-import { IUser, IUserProfile, LoginType, ILoginParams, IGoogleAuthResponse, IExternalAuth } from './authentication.model';
+import { IUser, IUserProfile, LoginType, ILoginParams, IGoogleAuthResponse, IExternalAuth, IRegistrationResponse } from './authentication.model';
 import { UserSettingService } from './user-setting.service';
 import { BaseService } from '../shared/base.service';
 import { AuthenticationGoogleService } from './authentication-google.service';
@@ -73,7 +73,6 @@ export class AuthenticationService extends BaseService {
         if(regRes.data) {
           user = regRes.data;
         } else {
-          await this.helperSvc.presentToast(regRes.message, false);
           return null;
         }
       }
@@ -98,14 +97,26 @@ export class AuthenticationService extends BaseService {
   }
 
   register(args: { email, name, mobile?, password?, externalAuth?: IExternalAuth })
-    : Promise<{ data?, message? }> {
+    : Promise<IRegistrationResponse> {
     return new Promise(async (resolve, reject) => {
       try {
-        const res = await this.postData<{ data?, message? }> ({ 
+        const res = await this.postData<IRegistrationResponse> ({ 
           url: `app/register`,
           body: args
         });
 
+        if(res.status) {
+          let msg;
+          if(res.status.alreadyExist) {
+            msg = await this.localizationSvc.getResource('user.already_exist');
+          } else if(res.status.alreadyRegisteredWwithNormalAuth) {
+            msg = await this.localizationSvc.getResource('user.already_registered_normal_auth');
+          } else if(res.status.userStatus) {
+            msg = await this.localizationSvc.getResource('user.cannot_register');
+            msg = msg.format(res.status.userStatus);
+          }
+          await this.helperSvc.presentToast(msg, false);
+        }
         resolve(res);
       } catch(e) {
         reject(e);

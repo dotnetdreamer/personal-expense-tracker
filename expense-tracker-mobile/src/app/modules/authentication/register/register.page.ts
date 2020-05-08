@@ -54,7 +54,6 @@ export class RegisterPage extends BasePage implements OnInit {
       }
   
       if(!response.data) {
-        await this.helperSvc.presentToast(response.message, false);
         return;
       }
 

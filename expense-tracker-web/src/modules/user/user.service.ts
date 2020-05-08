@@ -1,11 +1,11 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { Repository, FindConditions } from "typeorm";
 
 import * as moment from 'moment';
 import * as bcrypt from 'bcrypt';
 
-import { IRegistrationParams } from "./user.model";
+import { IRegistrationParams, UserRole, UserStatus } from "./user.model";
 import { User } from "./user.entity";
 import { AppConstant } from "../shared/app-constant";
 import { ExternalAuthService } from "./external-auth/external-auth.service";
@@ -19,8 +19,8 @@ export class UserService {
         private externalAuthSvc: ExternalAuthService, private helperSvc: HelperService
     ) {}
 
-    async getUserByEmail(email) {
-        const user = await this._findByEmail(email);
+    async getUserByEmail(email, status = UserStatus.Approved, isDeleted = false) {
+        const user = await this._findByEmail(email, status, isDeleted);
         if(!user) {
             return null;
         }
@@ -42,17 +42,33 @@ export class UserService {
         return null;
     }
 
-    async register(user: IRegistrationParams): Promise<{ data?, message? }> {
-        //validate
-        let existingUser = await this._findByEmail(user.email);
-        if(existingUser && !user.externalAuth) {
-            return { message: 'User already exist' };
-        } 
+    async register(user: IRegistrationParams): Promise<{ data?, status? }> {
+        let result = {
+            userStatus: null,
+            alreadyExist: false,
+            alreadyRegisteredWwithNormalAuth: false
+        };
+        //validate, fetch all by status
+        let existingUser = await this._findByEmail(user.email, null);
+        if(!user.externalAuth) {
+            if(existingUser) {
+                result.alreadyExist = true;
+            }
+
+            if(existingUser.status != UserStatus.Approved) {
+                result.userStatus = existingUser.status;
+            }
+        }
+
+        if(result.userStatus || result.alreadyExist) {
+            return { status: result };
+        }
 
         let eAuth = await this.externalAuthSvc.findByEmail(user.email);
         //user is registered normally, can't be registered again using external auth
         if(existingUser && user.externalAuth && !eAuth) {
-            return { message: 'User already registered using normal authentication' };
+            result.alreadyRegisteredWwithNormalAuth = true;
+            return { status: result };
         }
         
         if(!existingUser) {
@@ -76,6 +92,17 @@ export class UserService {
             //password
             const hasPassword = await bcrypt.hash(password, AppConstant.DEFAULT_PASSWORD_SALT_ROUNDS);
             newOrUpdated.password = hasPassword;
+
+            //default 
+            newOrUpdated.role = UserRole.User;
+            newOrUpdated.status = UserStatus.Pending;
+
+            //first user is Admin
+            const hasUsers = await this.userRepo.count();
+            if(!hasUsers) {
+                newOrUpdated.role = UserRole.Admin;
+                newOrUpdated.status = UserStatus.Approved;
+            }
 
             //now save
             existingUser = <any>await this.userRepo.save<User>(newOrUpdated);
@@ -103,8 +130,18 @@ export class UserService {
         return { data: pareparedUser };
     }
 
-    private _findByEmail(email) {
-        return this.userRepo.findOne({ email: email });
+    private _findByEmail(email, status: UserStatus | null = UserStatus.Approved
+        , isDeleted: boolean | null = false) {
+        const conditions: FindConditions<User> = { email: email };
+        if(status != null) {
+            conditions.status = <any>status;
+        }
+
+        if(isDeleted != null) {
+            conditions.isDeleted = isDeleted;
+        }
+
+        return this.userRepo.findOne(conditions);
     }
 
     private _prepareUser(user: User) {

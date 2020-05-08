@@ -43,3 +43,8 @@ export interface IExternalAuth {
     oAuthAccessToken?: string
     providerSystemName: LoginType
 }
+
+export interface IRegistrationResponse {
+    data: any;
+    status: {  userStatus: '', alreadyExist: false, alreadyRegisteredWwithNormalAuth: false };
+}

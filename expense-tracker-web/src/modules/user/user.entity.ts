@@ -1,6 +1,7 @@
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
 import { BaseComplexEntity } from '../shared/entity/base-complex.entity';
+import { UserRole, UserStatus } from './user.model';
 
 @Entity()
 export class User extends BaseComplexEntity {
@@ -18,4 +19,10 @@ export class User extends BaseComplexEntity {
   
   @Column({ nullable: true })
   mobile?: string;
+
+  @Column()
+  role: UserRole; 
+
+  @Column()
+  status: UserStatus; 
 }
