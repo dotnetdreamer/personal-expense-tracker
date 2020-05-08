@@ -47,6 +47,7 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit, OnDes
 
   private _expense: IExpense;
   private _routeParamsSub: Subscription;
+  private _transactionTypeModal = null;
 
   constructor(private activatedRoute: ActivatedRoute
     , private formBuilder: FormBuilder, private location: Location
@@ -339,10 +340,15 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit, OnDes
   }
 
   async onTransactionTypeClicked() {
+    //avoid openning twice
+    if(this._transactionTypeModal) {
+      return;
+    }
+    
     //we sent copy to modal as we don't wanna modify orignal array
     const allMembers = [...this.group.members];
     
-    const modal = await this.modalCtrl.create({
+    this._transactionTypeModal = await this.modalCtrl.create({
       component: TransactionTypeModal,
       mode: 'md',
       cssClass: 'modal-transaction-type',
@@ -353,15 +359,16 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit, OnDes
         currentExpenseAmount: this.f.amount.value
       }
     });
-    await modal.present();
+    await this._transactionTypeModal.present();
 
-    const { data } = await modal.onDidDismiss();
+    const { data } = await this._transactionTypeModal.onDidDismiss();
     if(AppConstant.DEBUG) {
       console.log('ExpenseCreateOrUpdatePage: onTransactionTypeClicked: data:', data);
     }
     if(data) {
       this.selectedTransactionType = data;
     }
+    this._transactionTypeModal = null;
   }
 
   ngOnDestroy() {
