@@ -190,6 +190,14 @@ export class ExpenseListingPage extends BasePage implements OnInit, AfterViewIni
         if(!confirm) {
           return;
         }
+
+        //all expenses must be synced before settling up
+        const es = this.expenses.filter(e => e.markedForAdd || e.markedForUpdate || e.markedForDelete);
+        if(es.length) {
+          const msg = await this.localizationSvc.getResource('group.expenses_must_sync');
+          await this.helperSvc.presentToast(msg, false);
+          return;
+        }
         
         const updatedGroup = await this.groupSvc.settleUpGroup(this.group);
         if(updatedGroup) {

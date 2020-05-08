@@ -67,6 +67,7 @@
         "already_member": "\"{0}\" is already a member of \"{1}\" group",
         "total_you_paid": "Total you paid",
         "total_your_share": "Your total share",
+        "expenses_must_sync": "All expenses must be synced before settling up",
         "status": {
             "aproved": "Aproved",
             "pending": "Pending",
