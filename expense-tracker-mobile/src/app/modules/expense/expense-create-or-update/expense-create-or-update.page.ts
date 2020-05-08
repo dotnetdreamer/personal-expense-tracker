@@ -466,7 +466,7 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit, OnDes
           transactions.push({
             transactionType: TransactionType.PaidByOtherPersonAndSplitEqually,
             credit: isOtherMember ? total - amountPerMbr : 0,
-            debit: isOtherMember ? total : amountPerMbr,
+            debit: amountPerMbr,
             email: member.user.email,
             actualPaidAmount: isOtherMember ? ma.amount : 0
           });
