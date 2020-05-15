@@ -1,0 +1,82 @@
+page-group-expense-listing {
+    ion-header {
+        ion-toolbar {
+            &.toolbar-group {
+                .group-container {
+                    text-align: center;
+                    padding: 0 10px;
+                    margin-bottom: 10px;
+                    display: flex;
+                    justify-content: space-around;
+                    align-items: center;
+                    position: relative;
+                    padding-top: 25px;
+
+                    .group-amount-title {
+                        text-align: center;
+                        min-width: 125px;
+                        
+                        .title {
+                            font-size: 0.7em;
+                            text-transform: uppercase;
+                            margin-bottom: 5px;
+                        }
+
+                        .amount {
+                            font-weight: bold;
+
+                            span {
+                                display: block;
+                                font-size: 0.6em;
+                            }
+                        }
+                    }
+
+                    .group-icon-title {
+                        .group-owe {
+                            margin-bottom: 5px;
+                            position: absolute;
+                            top: 0;
+                            left: 0;
+                            right: 0;
+                            margin: auto;
+
+                            > span {
+                                font-weight: bold;
+
+                                > span {
+                                    font-size: 0.6em;
+                                }
+                            }
+                        }
+
+                        .group-icon {
+                            width: 70px;
+                            height: 70px;
+                            border-radius: 50%;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            margin: auto;
+                            border: 1px solid #cdcdcd;
+                            margin-bottom: 10px;
+            
+                            > ion-icon {
+                                font-size: 35px;
+                            }
+                        }
+            
+                        .group-title {
+                            font-size: 1.1em;
+                            font-weight: bold;
+                        } 
+                    }
+                }
+            }
+        }
+    }
+
+    ion-content {
+        --padding-bottom: 70px;
+    }
+}

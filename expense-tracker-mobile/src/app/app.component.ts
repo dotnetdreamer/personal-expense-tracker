@@ -93,7 +93,7 @@ export class AppComponent {
           await this.helperSvc.presentToastGenericSuccess();
           
           setTimeout(async () => {
-            await this._navigateTo('/expense/expense-listing', {
+            await this._navigateTo('/expense/group-expense-listing', {
               groupId: group.id
             });  
           })
@@ -104,7 +104,7 @@ export class AppComponent {
 
     switch(group.entityName) {
       case SyncEntity.Expense:
-        await this._navigateTo('/expense/expense-listing', {
+        await this._navigateTo('/expense/group-expense-listing', {
           groupId: group.id
         });
       break;

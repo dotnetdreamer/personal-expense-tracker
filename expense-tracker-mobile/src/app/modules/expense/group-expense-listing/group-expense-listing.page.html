@@ -8,18 +8,39 @@
         <ion-icon name="search" *ngIf="!displaySearch"></ion-icon>
         <ion-icon name="close" *ngIf="displaySearch"></ion-icon>
       </ion-button>
+      <ion-button (click)="onMoreOptionsClicked($event)" *ngIf="group">
+        <ion-icon slot="icon-only" name="ellipsis-vertical"></ion-icon>
+      </ion-button>
     </ion-buttons>
     <ion-title [innerHTML]="sum | formateCurrency | async" *ngIf="sum"></ion-title>
-  </ion-toolbar>
-  <ion-toolbar class="toolbar-calendar" [class.hidden]="!displayHeaderbar">
-    <ion-label>{{ dates?.selectedDate?.from }}&nbsp;-&nbsp;{{ dates?.selectedDate?.to }}</ion-label>
-    <calendar-swiper (monthChanged)="onMonthChanged($event)"></calendar-swiper>
   </ion-toolbar>
   <ion-toolbar *ngIf="displaySearch" [class.hidden]="!displayHeaderbar">
     <ion-searchbar slot="start" animated inputmode="search" debounce="500"
       [(ngModel)]="searchTerm" 
       (ionChange)="onSearchInputChanged($event)" (ionClear)="onSearchInputCleared()"
       [placeholder]="'search.title' | localizedresource | async"></ion-searchbar>
+  </ion-toolbar>
+  <ion-toolbar class="toolbar-group" *ngIf="group" [class.hidden]="!displayHeaderbar">
+    <div class="group-container">
+      <div class="group-amount-title group-debits">
+        <div class="title">{{'group.total_you_paid' | localizedresource | async }}</div>
+        <div class="amount" [innerHTML]="groupTotals.actualPaidAmount | formateCurrency | async"></div>
+      </div>
+      <div class="group-icon-title">
+        <div class="group-owe" *ngIf="groupTotals.owe != 0">
+          {{ (groupTotals.owe < 0 ? 'expense.total_owe': 'expense.total_theyowe') | localizedresource | async}}
+          <!-- {{'expense.total_owe' | localizedresource | async}} -->
+          <!-- Display as a positive value always -->
+          <span [innerHTML]="(groupTotals.owe < 0 ? groupTotals.owe * -1 : groupTotals.owe) | formateCurrency | async"></span>
+        </div>
+        <div class="group-icon"><ion-icon ios="group" md="group"></ion-icon></div>
+        <div class="group-title">{{ group.name }}</div>
+      </div>
+      <div class="group-amount-title group-credits">
+        <div class="title">{{'group.total_your_share' | localizedresource | async }}</div>
+        <div class="amount" [innerHTML]="(groupTotals.totalPerMember | formateCurrency | async)"></div>
+      </div>
+    </div>
   </ion-toolbar>
 </ion-header>
 
@@ -28,7 +49,11 @@
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
   <no-data *ngIf="!expenses.length && dataLoaded"></no-data>
-  <ion-virtual-scroll [items]="expenses" approxItemHeight="85px" class="expenses">
+  <ion-virtual-scroll [items]="expenses" approxItemHeight="85px" 
+    class="expenses" [headerFn]="groupHeaderFn">
+    <ion-item-divider *virtualHeader="let header">
+      {{ header }}
+    </ion-item-divider>
     <ion-item lines="none" *virtualItem="let item;let index=index;" 
       (click)="onExpenseItemClicked($event, item, 'detail')">
       <div class="expense-item" [class.expense-item-even]="index % 2">
@@ -65,7 +90,9 @@
   </ion-virtual-scroll>
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
     <ion-fab-button (click)="onAddClicked()">
-      <ion-icon name="add"></ion-icon>
+      <ion-icon name="add" *ngIf="!group || !(group && (group.markedForAdd || group.markedForUpdate || group.markedForDelete))"></ion-icon>
+      <ion-icon name="refresh" class="animated infinite spin" 
+        *ngIf="group && (group.markedForAdd || group.markedForUpdate || group.markedForDelete)"></ion-icon>
     </ion-fab-button>
   </ion-fab>
 </ion-content>

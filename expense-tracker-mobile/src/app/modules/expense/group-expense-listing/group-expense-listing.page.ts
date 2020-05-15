@@ -16,15 +16,17 @@ import { SyncEntity } from '../../shared/sync/sync.model';
 import { ActivatedRoute } from '@angular/router';
 import { IGroup, GroupPeriodStatus } from '../../group/group.model';
 import { GroupService } from '../../group/group.service';
-import { ExpenseListingOption } from './expense-listing-options.popover';
+import { ExpenseListingOption } from '../expense-listing/expense-listing-options.popover';
+
+declare const window: any;
 
 @Component({
-  selector: 'page-expense-listing',
-  templateUrl: './expense-listing.page.html',
-  styleUrls: ['./expense-listing.page.scss'],
+  selector: 'page-group-expense-listing',
+  templateUrl: './group-expense-listing.page.html',
+  styleUrls: ['./group-expense-listing.page.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class ExpenseListingPage extends BasePage implements OnInit, AfterViewInit, OnDestroy {
+export class GroupExpenseListingPage extends BasePage implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('epListingContent') epListingContent: IonContent;
 
   displayHeaderbar = true;
@@ -35,8 +37,13 @@ export class ExpenseListingPage extends BasePage implements OnInit, AfterViewIni
   dates: { selectedDate?: { from, to, fromTime?, toTime? }, todayDate? } = {};
   dataLoaded = false;
   workingCurrency = ''; //fix for undefined showing in title
+  group: IGroup;
+  groupTotals = {
+    actualPaidAmount: 0,
+    totalPerMember: 0,
+    owe: 0
+  };
 
-  private _viewNonGrouped;
   private _syncInitSub: Subscription;
   private _expenseCreatedOrUpdatedSub: Subscription;
   private _syncDataPushCompleteSub: Subscription;
@@ -53,20 +60,29 @@ export class ExpenseListingPage extends BasePage implements OnInit, AfterViewIni
 
   async ngOnInit() {    
     this._routeParamsSub = this.activatedRoute.params.subscribe(async (params) => {
-      let { viewNonGrouped } = params;
-
-      if(viewNonGrouped) {
-        this._viewNonGrouped = Boolean(viewNonGrouped);
-      }
+      let { groupId } = params;
 
       this.dates.todayDate = moment().format(AppConstant.DEFAULT_DATE_FORMAT);
       this.dates.selectedDate = <any>{};
       
-      //show all current month expenses
-      const fromDate = moment().startOf('M').format(AppConstant.DEFAULT_DATE_FORMAT);
+      groupId = +groupId;
+      this.group = await this.groupSvc.getByIdLocal(groupId);
+      if(AppConstant.DEBUG) {
+        console.log('ExpenseListingPage: ngOnInit: group', this.group);
+      }
+
+      //expenses must be filtered by periods
+      const openPeriod = this.group.periods.filter(p => p.status == GroupPeriodStatus.Open)[0];
+
+      const fromDate = moment(openPeriod.startDate).local().format(AppConstant.DEFAULT_DATETIME_FORMAT);
       const toDate = moment().endOf('M').format(AppConstant.DEFAULT_DATE_FORMAT);
       this.dates.selectedDate.from = fromDate;
       this.dates.selectedDate.to = toDate;
+
+      this.dates.selectedDate.fromTime = moment(openPeriod.startDate).local()
+        .format(AppConstant.DEFAULT_TIME_FORMAT);;
+      this.dates.selectedDate.toTime = moment(openPeriod.startDate).local().endOf('D')
+        .format(AppConstant.DEFAULT_TIME_FORMAT);
     });
 
     this.workingCurrency = await this.currencySettingSvc.getWorkingCurrency();
@@ -79,27 +95,18 @@ export class ExpenseListingPage extends BasePage implements OnInit, AfterViewIni
     }, 300);
   }
 
-  async onMonthChanged(args: { start, end, month }) {
-    if(!args) {
-      return;
+  groupHeaderFn(record: IExpense, recordIndex, records) {
+    window.et = window.et || {};
+    window.et.headers = window.et.headers || [];
+    const createdOn =  moment(records[recordIndex].createdOn).format('YYYY-MM');
+
+    let date = null;
+    if(!(<string[]>window.et.headers).includes(createdOn)) {
+      date = `${createdOn}`;
+      (<string[]>window.et.headers).push(createdOn);
     }
 
-    const loader = await this.helperSvc.loader;
-    await loader.present();
-
-    try {
-      this.dates.selectedDate =  {
-        from: args.start,
-        to: args.end
-      };
-      await this._getExpenses({ term: this.searchTerm });
-    } catch (e) {
-      await this.helperSvc.presentToast(e, false);
-    } finally {
-      setTimeout(async () => {
-        await loader.dismiss();
-      }, 300);
-    }
+    return date;
   }
 
   async onSearchInputChanged(args: CustomEvent) {
@@ -117,8 +124,16 @@ export class ExpenseListingPage extends BasePage implements OnInit, AfterViewIni
   }
 
   async onAddClicked() {
+    //unsynced group, you can't add item into it
+    if(this.group && (this.group.markedForAdd || this.group.markedForUpdate || this.group.markedForDelete)) {
+      return;
+    }
+
     await this.navigate({ 
-      path: '/expense/expense-create-or-update'
+      path: '/expense/expense-create-or-update',
+      params: {
+        groupId: this.group?.id || ''
+      } 
     });
   }
 
@@ -138,6 +153,63 @@ export class ExpenseListingPage extends BasePage implements OnInit, AfterViewIni
     }
   }
 
+  async onMoreOptionsClicked(eve) {
+    const popCtrl = await this.popoverCtrl.create({
+      component: ExpenseListingOption,
+      componentProps: {
+        totalExpenses: this.expenses.length
+      },
+      event: eve
+    });
+    await popCtrl.present();
+
+    const { data } = await popCtrl.onDidDismiss();
+    switch(data) {
+      case 'add_member':
+        await this.onMemberAddClicked();
+      break;
+      case 'settle_up':
+        const confirm = await this.helperSvc.presentConfirmDialog();
+        if(!confirm) {
+          return;
+        }
+
+        //all expenses must be synced before settling up
+        const es = this.expenses.filter(e => e.markedForAdd || e.markedForUpdate || e.markedForDelete);
+        if(es.length) {
+          const msg = await this.localizationSvc.getResource('group.expenses_must_sync');
+          await this.helperSvc.presentToast(msg, false);
+          return;
+        }
+        
+        const updatedGroup = await this.groupSvc.settleUpGroup(this.group);
+        if(updatedGroup) {
+          this.group = null;
+          this.expenses = [];
+
+          //refresh
+          setTimeout(async () => {
+            this.group = updatedGroup;
+            //get the new period
+            const openPeriod = this.group.periods.filter(p => p.status == GroupPeriodStatus.Open)[0];
+            this.dates.selectedDate.from = moment(openPeriod.startDate).local().format(AppConstant.DEFAULT_DATETIME_FORMAT);
+            this.dates.selectedDate.fromTime = moment(openPeriod.startDate).local().format(AppConstant.DEFAULT_TIME_FORMAT);;
+
+            //now get expenses
+            await this._getExpenses();
+          });
+        }
+      break;
+    }
+  }
+
+  async onMemberAddClicked() {
+    await this.groupSvc.presentMemberModal(this.group.id, (data) => {
+      //always grab the latest info on close i.e to get any updated status on member aproval
+      //TODO: need to grab the gorup from web and keep it local...
+    });
+  }
+
   async doRefresh(ev) {
     //pull latest. Important as other members need to have lastest information
     this.pubsubSvc.publishEvent(SyncConstant.EVENT_SYNC_DATA_PULL, SyncEntity.Expense);
@@ -152,7 +224,7 @@ export class ExpenseListingPage extends BasePage implements OnInit, AfterViewIni
 
   onIonScrolling(ev: CustomEvent) {
     const { scrollTop } = ev.detail;
-    const top = 120;
+    const top = this.group ? 180 : 120;
     if(scrollTop > top) {
       this.displayHeaderbar = false;
     } else if(scrollTop <= 0) {
@@ -173,6 +245,7 @@ export class ExpenseListingPage extends BasePage implements OnInit, AfterViewIni
     if(this._syncDataPushCompleteSub) {
       this._syncDataPushCompleteSub.unsubscribe();
     }
+    window.et.headers = undefined;
   }
 
   private async _getExpenses(args?: { term? }) {
@@ -185,13 +258,8 @@ export class ExpenseListingPage extends BasePage implements OnInit, AfterViewIni
       toDate: this.dates.selectedDate.to,
       fromTime: this.dates.selectedDate.fromTime,
       toTime: this.dates.selectedDate.toTime,
-      groupId: undefined  //by default show grouped and non-grouped
+      groupId: this.group.id
     };
-
-    if(this._viewNonGrouped) {
-      //passing null means non-grouped only
-      filters.groupId = null;
-    }
  
     if(args && args.term) {
       filters.term = args.term;
@@ -209,10 +277,28 @@ export class ExpenseListingPage extends BasePage implements OnInit, AfterViewIni
         } else {
           this.expenses = await this.expenseSvc.getExpenseListLocal(filters);
         }
+
+        //calculate actualPaidAmount and totalPerMember
+        if(this.group) {
+          const email = await this.userSettingSvc.getCurrentUser();
+
+          const cuTransactions = this.expenses.map(e => e.transactions.filter(t => t.email == email)[0])
+            .filter(e => e != null);
+          if(cuTransactions.length) {
+            this.groupTotals.actualPaidAmount = cuTransactions.reduce((a, b) => a + b.actualPaidAmount, 0);
+          }
+        }
       } catch(e) {
         this.expenses = [];
       } finally {
         this.sum = this.expenses.reduce((a, b) => a + (+b.amount), 0);
+        if(this.group) {
+          const perMember = this.sum / this.group.members.length;
+          this.groupTotals.owe = this.groupTotals.actualPaidAmount - perMember;
+          if(this.sum > 0) {
+            this.groupTotals.totalPerMember = this.sum / this.group.members.length;
+          }
+        }
         if(AppConstant.DEBUG) {
           console.log('ExpenseListingPage: _getExpenses: expenses', this.expenses);
         }
