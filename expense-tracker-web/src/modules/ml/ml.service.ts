@@ -42,7 +42,8 @@ export class MlService {
             iterations: 20000,
             log: false,
             logPeriod: 50,
-            layers: [10]
+            layers: [10],
+            learningRate: 0.6 //https://stackoverflow.com/a/27596780/859968
         };
         
         const data = await this.buildExpensesTrainingSet();
@@ -65,14 +66,6 @@ export class MlService {
             
         const flattenedArray = [].concat.apply([], tokenisedArray)
         return flattenedArray.filter((item, pos, self) => self.indexOf(item) == pos);
-    }
-
-    
-    private _encode(dictionary, phrase) {
-        const phraseTokens = phrase.split(' ');
-        const encodedPhrase = dictionary.map(word => phraseTokens.includes(word) ? 1 : 0);
-
-        return encodedPhrase
     }
 
     private async _prepare(exp: Expense) {
