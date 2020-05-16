@@ -125,7 +125,7 @@ export class GroupExpenseListingPage extends BasePage implements OnInit, AfterVi
 
   async onAddClicked() {
     //unsynced group, you can't add item into it
-    if(this.group && (this.group.markedForAdd || this.group.markedForUpdate || this.group.markedForDelete)) {
+    if(this.group.markedForAdd || this.group.markedForUpdate || this.group.markedForDelete) {
       return;
     }
 
@@ -210,8 +210,8 @@ export class GroupExpenseListingPage extends BasePage implements OnInit, AfterVi
     });
   }
 
-  async doRefresh(ev) {
-    //pull latest. Important as other members need to have lastest information
+  async doRefresh(ev) {    
+    //pull latest. Important as 'other members' in group need to have lastest information
     this.pubsubSvc.publishEvent(SyncConstant.EVENT_SYNC_DATA_PULL, SyncEntity.Expense);
 
     //now push
@@ -252,6 +252,7 @@ export class GroupExpenseListingPage extends BasePage implements OnInit, AfterVi
     //reset
     await this.epListingContent.scrollToTop();
     this.dataLoaded = false;
+    window.et ? window.et.headers = undefined : '';
 
     let filters:any = {
       fromDate: this.dates.selectedDate.from,
@@ -279,26 +280,23 @@ export class GroupExpenseListingPage extends BasePage implements OnInit, AfterVi
         }
 
         //calculate actualPaidAmount and totalPerMember
-        if(this.group) {
-          const email = await this.userSettingSvc.getCurrentUser();
+        const email = await this.userSettingSvc.getCurrentUser();
 
-          const cuTransactions = this.expenses.map(e => e.transactions.filter(t => t.email == email)[0])
-            .filter(e => e != null);
-          if(cuTransactions.length) {
-            this.groupTotals.actualPaidAmount = cuTransactions.reduce((a, b) => a + b.actualPaidAmount, 0);
-          }
+        const cuTransactions = this.expenses.map(e => e.transactions.filter(t => t.email == email)[0])
+          .filter(e => e != null);
+        if(cuTransactions.length) {
+          this.groupTotals.actualPaidAmount = cuTransactions.reduce((a, b) => a + b.actualPaidAmount, 0);
         }
       } catch(e) {
         this.expenses = [];
       } finally {
         this.sum = this.expenses.reduce((a, b) => a + (+b.amount), 0);
-        if(this.group) {
-          const perMember = this.sum / this.group.members.length;
-          this.groupTotals.owe = this.groupTotals.actualPaidAmount - perMember;
-          if(this.sum > 0) {
-            this.groupTotals.totalPerMember = this.sum / this.group.members.length;
-          }
+        const perMember = this.sum / this.group.members.length;
+        this.groupTotals.owe = this.groupTotals.actualPaidAmount - perMember;
+        if(this.sum > 0) {
+          this.groupTotals.totalPerMember = this.sum / this.group.members.length;
         }
+
         if(AppConstant.DEBUG) {
           console.log('ExpenseListingPage: _getExpenses: expenses', this.expenses);
         }
