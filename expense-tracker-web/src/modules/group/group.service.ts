@@ -1,7 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, getRepository, SelectQueryBuilder } from 'typeorm';
+import { Repository, getRepository, SelectQueryBuilder, getManager } from 'typeorm';
 import * as moment from 'moment';
 import { Request } from 'express';
 
@@ -61,10 +61,15 @@ export class GroupService {
     }
 
     const user = <ICurrentUser>this.request.user;
-    // qb = qb.andWhere("grp.createdBy IN (:...userIds)", { userIds: args.userIds });
-    qb = qb.andWhere("(grp.createdBy = :currentUserId", { currentUserId: user.userId })
-      .orWhere("(usr.id = :currentUserId", { currentUserId: user.userId })
-      .andWhere("grpMbr.status IN (:...memberStatuses)))", { 
+    const cUserGroups = await getRepository(Group)
+      .createQueryBuilder('grp')
+      .leftJoinAndSelect("grp.members", "grpMbr")
+      .where('grpMbr.userId = :gCurrentUserId', { gCurrentUserId: user.userId })
+      .getMany();
+    const cUserGroupIds = cUserGroups.map(g => g.id);
+
+    qb = qb.andWhere('grp.id IN (:...gropIds)', { gropIds: cUserGroupIds })
+      .andWhere("grpMbr.status IN (:...memberStatuses)", { 
         memberStatuses: [GroupMemberStatus.Aproved, GroupMemberStatus.Pending]
       });
 
