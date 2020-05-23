@@ -40,8 +40,8 @@ export class GroupExpenseListingPage extends BasePage implements OnInit, AfterVi
   group: IGroup;
   groupTotals = {
     actualPaidAmount: 0,
-    totalPerMember: 0,
-    owe: 0
+    totalBalance: 0,
+    debits: 0
   };
 
   private _syncInitSub: Subscription;
@@ -278,24 +278,33 @@ export class GroupExpenseListingPage extends BasePage implements OnInit, AfterVi
         } else {
           this.expenses = await this.expenseSvc.getExpenseListLocal(filters);
         }
-
-        //calculate actualPaidAmount and totalPerMember
+      } catch(e) {
+        this.expenses = [];
+      } finally {
+        //calculate actualPaidAmount and totalBalance
         const email = await this.userSettingSvc.getCurrentUser();
-
         const cuTransactions = this.expenses.map(e => e.transactions.filter(t => t.email == email)[0])
           .filter(e => e != null);
         if(cuTransactions.length) {
           this.groupTotals.actualPaidAmount = cuTransactions.reduce((a, b) => a + b.actualPaidAmount, 0);
         }
-      } catch(e) {
-        this.expenses = [];
-      } finally {
+
         this.sum = this.expenses.reduce((a, b) => a + (+b.amount), 0);
-        const perMember = this.sum / this.group.members.length;
-        this.groupTotals.owe = this.groupTotals.actualPaidAmount - perMember;
+        const amountForCurrentMbr = 0;
+        this.groupTotals.debits = 0;
         if(this.sum > 0) {
-          this.groupTotals.totalPerMember = this.sum / this.group.members.length;
+          const credits = cuTransactions.reduce((a, b) => a + (+b.credit), 0);
+          const debits =  cuTransactions.reduce((a, b) => a + (+b.debit), 0);
+          
+          // this.groupTotals.totalBalance = credits - debits;
+          this.groupTotals.totalBalance = this.groupTotals.actualPaidAmount - debits;
+          this.groupTotals.debits = debits;
         }
+        // const perMember = this.sum / this.group.members.length;
+        // this.groupTotals.debits = this.groupTotals.actualPaidAmount - perMember;
+        // if(this.sum > 0) {
+        //   this.groupTotals.totalBalance = this.sum / this.group.members.length;
+        // }
 
         if(AppConstant.DEBUG) {
           console.log('ExpenseListingPage: _getExpenses: expenses', this.expenses);
