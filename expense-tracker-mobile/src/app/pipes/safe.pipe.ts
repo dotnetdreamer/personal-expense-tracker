@@ -9,18 +9,22 @@ export class SafePipe implements PipeTransform {
 
   }
 
-  transform(url, type: any) {
-    if(!url) {
+  transform(data, type: any) {
+    if(!data) {
       return;
     }
+    
     let result;
     const context = <SecurityContext>type;
     switch(context) {
         case SecurityContext.URL:
-            result = this.sanitizer.bypassSecurityTrustResourceUrl(url);
+            result = this.sanitizer.bypassSecurityTrustResourceUrl(data);
         break;
         case SecurityContext.STYLE:
-            result = this.sanitizer.bypassSecurityTrustStyle(url);
+            result = this.sanitizer.bypassSecurityTrustStyle(data);
+        break;
+        case SecurityContext.HTML:
+            result = this.sanitizer.bypassSecurityTrustHtml(data);
         break;
         default:
         break;

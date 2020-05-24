@@ -31,31 +31,39 @@
         </div>
       </div>
     </div>
+    <ion-list class="description" *ngIf="expense?.description">
+      <ion-item-divider>
+        {{'expense.description' | localizedresource | async}}
+      </ion-item-divider>
+      <ion-item>
+        <ion-label class="ion-text-wrap">{{ expense.description }}</ion-label>
+      </ion-item>
+    </ion-list>
     <ion-list class="transactions-detail" *ngIf="expense?.transactions.length">
       <ion-item-divider>
         {{'expense.detail' | localizedresource | async}}
       </ion-item-divider>
       <ion-item *ngFor="let tran of expense.transactions">
         <ion-icon slot="start" name="person"></ion-icon>
-        <ion-label class="ion-text-wrap">{{tran['text']}}</ion-label>
+        <ion-label class="ion-text-wrap" [innerHtml]="tran['text'] | safe: 'html'"></ion-label>
       </ion-item>
     </ion-list>
-    <ion-list class="description" *ngIf="expense?.description">
+    <ion-list class="notes" *ngIf="expense?.notes">
       <ion-item-divider>
-        {{'expense.description' | localizedresource | async}}
+        {{'expense.notes' | localizedresource | async}}
       </ion-item-divider>
       <ion-item>
-        <ion-label class="ion-text-wrap">{{ expense?.description }}</ion-label>
+        <ion-label class="ion-text-wrap">{{ expense.notes }}</ion-label>
       </ion-item>
     </ion-list>
-    <div class="attachment" *ngIf="expense && expense.attachment">
+    <ion-list class="attachment" *ngIf="expense?.attachment">
+      <ion-item-divider>
+        {{'expense.attachment' | localizedresource | async}}
+      </ion-item-divider>
       <ion-button fill="clear" (click)="onAttachmentClicked(expense)">
         <ion-icon name="document-outline" *ngIf="!expense.attachment.contentType.startsWith('image')"></ion-icon>
         <ion-icon name="image-outline" *ngIf="expense.attachment.contentType.startsWith('image')"></ion-icon>
       </ion-button>
-    </div>
-    <div class="notes">
-      {{ expense?.notes }}
-    </div>
+    </ion-list>
   </div>
 </ion-content>

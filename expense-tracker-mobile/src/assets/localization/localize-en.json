@@ -39,6 +39,7 @@
         "notes": "Notes",
         "today": "Today",
         "total": "Total",
+        "attachment": "Attachment",
         "split": "How was this expense split?",
         "amount_sum_must_same": "Entered amount must be same as total amount",
         "debit": "Debit",
@@ -49,8 +50,8 @@
         "added_on": "Added on",
         "updated_by": "Updated by",
         "updated_on": "Updated on",
-        "transaction_text_paidby": "{0} paid {1} and owes {2}",
-        "transaction_text_owes": "{0} owes {1}",
+        "transaction_text_paidby": "<strong>{0}</strong> paid <strong>{1}</strong> and owes <strong>{2}</strong>",
+        "transaction_text_owes": "<strong>{0}</strong> owes <strong>{1}</strong>",
         "transaction_type": {
             "10": "Paid by you and split equally",
             "20": "You owe full amount",

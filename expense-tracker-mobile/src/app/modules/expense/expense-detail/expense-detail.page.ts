@@ -16,6 +16,7 @@ import { ExpenseDetailOption } from './expense-option.popover';
 import { SyncConstant } from '../../shared/sync/sync-constant';
 import { SyncEntity } from '../../shared/sync/sync.model';
 import { GroupService } from '../../group/group.service';
+import { FormateCurrencyPipe } from 'src/app/pipes/formateCurrency.pipe';
 
 @Component({
   selector: 'page-expense-detail',
@@ -32,7 +33,8 @@ export class ExpenseDetailPage extends BasePage implements OnInit, OnDestroy {
 
   constructor(private activatedRoute: ActivatedRoute
     , private popoverCtrl: PopoverController, private location: Location
-    , private expenseSvc: ExpenseService, private groupSvc: GroupService) {
+    , private expenseSvc: ExpenseService, private groupSvc: GroupService
+    , private formateCurrencyPipe: FormateCurrencyPipe) {
     super();
   }
 
@@ -115,12 +117,14 @@ export class ExpenseDetailPage extends BasePage implements OnInit, OnDestroy {
       this.expense.transactions.sort((a, b) => b.actualPaidAmount - a.actualPaidAmount);
       //add text
       this.expense.transactions.map(async (t) => {
+        const formattedDebit = await this.formateCurrencyPipe.transform(t.debit);
         if(t.actualPaidAmount) {
+          const formattedActualPaidAmount = await this.formateCurrencyPipe.transform(t.actualPaidAmount);
           const res = await this.localizationSvc.getResource('expense.transaction_text_paidby');
-          t['text'] = res.format(t.name, t.actualPaidAmount, t.credit);
+          t['text'] = res.format(t.name, formattedActualPaidAmount, formattedDebit);
         } else {
           const res2 = await this.localizationSvc.getResource('expense.transaction_text_owes');
-          t['text'] = res2.format(t.name, t.credit);
+          t['text'] = res2.format(t.name, formattedDebit);
         }
         return t;
       });
