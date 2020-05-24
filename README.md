@@ -24,7 +24,8 @@ Pretty simple, why not?. I wanted to log my expenses under my control! so I crea
 # <a name="quick-start"></a>Quick Start
 1. Clone this repository
 2. Switch to master branch
-3. Navigate to i.e **expense-tracker-mobile** directory and run `npm i`
+3. Navigate to i.e **expense-tracker-mobile** directory and run `npm i`.
+  * For Google SignIn, go to **expense-tracker-mobile/src/app/modules/shared/app-constant.ts** and change the value of `GOOGLE_SIGNIN_CLIENT_ID` constant.
 4. Now navigate to **expense-tracker-web** and run `npm i`
 5. Navigate to **expense-tracker-web** directory (if not already) and run `npm run start:dev`
 6. Open another command line and navigate to **expense-tracker-mobile** and run ionic serve
