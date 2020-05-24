@@ -21,7 +21,7 @@
     "@angular/router": "~9.0.5",
     "@angular/service-worker": "~9.0.5",
     "@capacitor/android": "^2.0.0",
-    "@capacitor/core": "^2.0.0",
+    "@capacitor/core": "^2.1.0",
     "@codetrix-studio/capacitor-google-auth": "^2.0.1",
     "@ionic-native/camera": "^5.22.0",
     "@ionic-native/core": "^5.0.0",
