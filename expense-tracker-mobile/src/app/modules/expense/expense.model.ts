@@ -14,7 +14,9 @@ export interface IExpense {
     createdOn?: string;
     updatedOn?: string;
     createdBy?: string;
+    createdByName?: string;
     updatedBy?: string;
+    updatedByName?: string;
     markedForAdd?: boolean;
     markedForUpdate?: boolean;
     markedForDelete?: boolean;
@@ -26,6 +28,7 @@ export interface IExpenseTransaction {
     credit: number;
     actualPaidAmount: number;
     email: string;
+    name?: string;
 }
 
 export interface IExpenseDashboardReport {

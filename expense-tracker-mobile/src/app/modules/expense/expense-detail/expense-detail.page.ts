@@ -8,13 +8,14 @@ import { BasePage } from '../../shared/base.page';
 import { ActivatedRoute } from '@angular/router';
 import { AppConstant } from '../../shared/app-constant';
 import { ExpenseService } from '../expense.service';
-import { IExpense } from '../expense.model';
+import { IExpense, IExpenseTransaction } from '../expense.model';
 import { IAttachment } from '../../attachment/attachment.model';
 import { Subscription } from 'rxjs';
 import { PopoverController } from '@ionic/angular';
 import { ExpenseDetailOption } from './expense-option.popover';
 import { SyncConstant } from '../../shared/sync/sync-constant';
 import { SyncEntity } from '../../shared/sync/sync.model';
+import { GroupService } from '../../group/group.service';
 
 @Component({
   selector: 'page-expense-detail',
@@ -28,9 +29,10 @@ export class ExpenseDetailPage extends BasePage implements OnInit, OnDestroy {
   expense: IExpense;
 
   private _routeParamsSub: Subscription;
+
   constructor(private activatedRoute: ActivatedRoute
     , private popoverCtrl: PopoverController, private location: Location
-    , private expenseSvc: ExpenseService) {
+    , private expenseSvc: ExpenseService, private groupSvc: GroupService) {
     super();
   }
 
@@ -106,6 +108,22 @@ export class ExpenseDetailPage extends BasePage implements OnInit, OnDestroy {
     this.expense = await this.expenseSvc.getByIdLocal(id);
     if(AppConstant.DEBUG) {
       console.log('ExpenseDetailPage: ngOnInit: expense', this.expense);
+    }
+
+    if(this.expense.transactions && this.expense.transactions.length) {
+      //sort by who paid
+      this.expense.transactions.sort((a, b) => b.actualPaidAmount - a.actualPaidAmount);
+      //add text
+      this.expense.transactions.map(async (t) => {
+        if(t.actualPaidAmount) {
+          const res = await this.localizationSvc.getResource('expense.transaction_text_paidby');
+          t['text'] = res.format(t.name, t.actualPaidAmount, t.credit);
+        } else {
+          const res2 = await this.localizationSvc.getResource('expense.transaction_text_owes');
+          t['text'] = res2.format(t.name, t.credit);
+        }
+        return t;
+      });
     }
 
     //read attachment

@@ -195,7 +195,7 @@ export class ExpenseService {
       newOrUpdated.createdBy = user.userId;
     }
 
-    if(typeof newOrUpdated.updatedBy == 'undefined') {
+    if(newOrUpdated.updatedOn && typeof newOrUpdated.updatedBy == 'undefined') {
       newOrUpdated.updatedBy = user.userId;
     }
 
@@ -249,6 +249,7 @@ export class ExpenseService {
       mExp.transactions = exp.transactions.map(t => {
         const it: IExpenseTransaction = {
           email: t.user.email,
+          name: t.user.name,
           credit: t.credit,
           debit: t.debit,
           transactionType: t.transactionType,
@@ -266,6 +267,21 @@ export class ExpenseService {
           ...attachment,
           attachment: `${AppConstant.UPLOADED_PATH_FILES}/${attachment.guid}.${attachment.extension}`
         };
+      }
+    }
+
+    //user
+    if(exp.createdBy) {
+      const cBy = await this.userRepo.findOne({ id: exp.createdBy });
+      if(cBy) {
+        mExp['createdByName'] = cBy.name;
+      }
+    }
+
+    if(exp.updatedBy) {
+      const uBy = await this.userRepo.findOne({ id: exp.updatedBy });
+      if(uBy) {
+        mExp['updatedByName'] = uBy.name;
       }
     }
 

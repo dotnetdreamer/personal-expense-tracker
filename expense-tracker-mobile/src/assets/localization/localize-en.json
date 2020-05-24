@@ -30,6 +30,7 @@
     "expense": {
         "title": "Expense",
         "title_listing": "Expenses",
+        "detail": "Details",
         "non_group": "Non-group expenses",
         "add": "Add expense",
         "description": "Description",
@@ -48,6 +49,8 @@
         "added_on": "Added on",
         "updated_by": "Updated by",
         "updated_on": "Updated on",
+        "transaction_text_paidby": "{0} paid {1} and owes {2}",
+        "transaction_text_owes": "{0} owes {1}",
         "transaction_type": {
             "10": "Paid by you and split equally",
             "20": "You owe full amount",

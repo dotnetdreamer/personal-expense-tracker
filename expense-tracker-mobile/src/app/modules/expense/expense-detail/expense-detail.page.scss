@@ -11,6 +11,7 @@ page-expense-detail {
                 display: flex;
                 align-items: center;
                 justify-content: space-between;
+                padding: var(--ion-padding, 16px);
 
                 .category {
                     width: 80px;
@@ -22,11 +23,11 @@ page-expense-detail {
                         justify-content: center;
 
                         .category-icon {
-                            font-size: 30px;
+                            font-size: 28px;
                         }
 
                         .category-name {
-                            font-size: 0.7em;
+                            font-size: 0.6em;
                         }
                     }
                 }
@@ -45,6 +46,15 @@ page-expense-detail {
                     }
                 }
             }
+
+            .transactions-detail {
+
+            }
+
+            .description {
+                margin-top: 10px;
+            }
+
             .attachment {
                 ion-button {
                     font-size: 80px;

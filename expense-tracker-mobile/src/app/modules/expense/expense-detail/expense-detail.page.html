@@ -13,7 +13,7 @@
 </ion-header>
 
 <ion-content>
-  <div class="container ion-padding">
+  <div class="container">
     <div class="info">
       <div class="category" *ngIf="expense?.category">
         <div class="category-icon-name">
@@ -24,14 +24,30 @@
       <div class="amount-info">
         <div class="amount" [innerHTML]="expense?.amount | formateCurrency | async"></div>
         <div class="by">
-          {{'expense.added_by' | localizedresource | async}}&nbsp;{{'common.on' | localizedresource | async}}&nbsp;<strong>{{expense?.createdOn | formateDate | async}}</strong>
+          {{'expense.added_by' | localizedresource | async}}&nbsp;{{ expense?.createdByName }}&nbsp;{{'common.on' | localizedresource | async}}&nbsp;<strong>{{expense?.createdOn | formateDate | async}}</strong>
         </div>
-        <div class="by">
-          {{'expense.updated_by' | localizedresource | async}}&nbsp;{{'common.on' | localizedresource | async}}&nbsp;<strong>{{expense?.createdOn | formateDate | async}}</strong>
+        <div class="by" *ngIf="expense?.updatedOn">
+          {{'expense.updated_by' | localizedresource | async}}&nbsp;{{ expense?.updatedByName }}&nbsp;{{'common.on' | localizedresource | async}}&nbsp;<strong>{{expense?.updatedOn | formateDate | async}}</strong>
         </div>
       </div>
     </div>
-    <div class="description">{{ expense?.description }}</div>
+    <ion-list class="transactions-detail" *ngIf="expense?.transactions.length">
+      <ion-item-divider>
+        {{'expense.detail' | localizedresource | async}}
+      </ion-item-divider>
+      <ion-item *ngFor="let tran of expense.transactions">
+        <ion-icon slot="start" name="person"></ion-icon>
+        <ion-label class="ion-text-wrap">{{tran['text']}}</ion-label>
+      </ion-item>
+    </ion-list>
+    <ion-list class="description" *ngIf="expense?.description">
+      <ion-item-divider>
+        {{'expense.description' | localizedresource | async}}
+      </ion-item-divider>
+      <ion-item>
+        <ion-label class="ion-text-wrap">{{ expense?.description }}</ion-label>
+      </ion-item>
+    </ion-list>
     <div class="attachment" *ngIf="expense && expense.attachment">
       <ion-button fill="clear" (click)="onAttachmentClicked(expense)">
         <ion-icon name="document-outline" *ngIf="!expense.attachment.contentType.startsWith('image')"></ion-icon>

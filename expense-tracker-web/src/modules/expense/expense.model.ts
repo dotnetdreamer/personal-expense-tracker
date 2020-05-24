@@ -24,6 +24,7 @@ export interface IExpenseTransaction {
     debit: number;
     credit: number;
     email: string;
+    name?: string;
     actualPaidAmount: number;
 }
 
