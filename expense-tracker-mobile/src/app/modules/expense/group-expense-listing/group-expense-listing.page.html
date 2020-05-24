@@ -53,7 +53,7 @@
     <ion-item-divider *virtualHeader="let header">
       {{ header }}
     </ion-item-divider>
-    <ion-item lines="none" *virtualItem="let item;let index=index;" 
+    <ion-item class="no-padding" lines="none" *virtualItem="let item;let index=index;" 
       (click)="onExpenseItemClicked($event, item, 'detail')">
       <div class="expense-item" [class.expense-item-even]="index % 2">
         <div class="icon-container">

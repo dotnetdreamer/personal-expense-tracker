@@ -41,7 +41,7 @@ calendar-swiper {
                     ion-button {
                         transform: scale(1.3);
                         font-size: 1.1em;
-                        --background: #f7f7f7;
+                        --background: var(--ion-color-light);
                     }
                 }
             }
