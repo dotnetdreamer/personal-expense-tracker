@@ -41,7 +41,7 @@ export class ExpenseDetailPage extends BasePage implements OnInit, OnDestroy {
       }
 
       const { id } = params;
-      await this._getExpese(+id);
+      await this._getExpense(+id);
     });
   }
 
@@ -102,7 +102,7 @@ export class ExpenseDetailPage extends BasePage implements OnInit, OnDestroy {
     }
   }
 
-  private async _getExpese(id) {
+  private async _getExpense(id) {
     this.expense = await this.expenseSvc.getByIdLocal(id);
     if(AppConstant.DEBUG) {
       console.log('ExpenseDetailPage: ngOnInit: expense', this.expense);

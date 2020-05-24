@@ -3,27 +3,29 @@ import { IAttachment } from '../attachment/attachment.model';
 import { IGroup } from '../group/group.model';
 
 export interface IExpense {
-    id?: number
-    category?: ICategory
-    group?: IGroup
-    transactions?: IExpenseTransaction[]
-    description: string
-    amount: string
-    notes?: string
-    attachment?: IAttachment
-    createdOn?: string
-    updatedOn?: string
-    markedForAdd?: boolean
-    markedForUpdate?: boolean
-    markedForDelete?: boolean
+    id?: number;
+    category?: ICategory;
+    group?: IGroup;
+    transactions?: IExpenseTransaction[];
+    description: string;
+    amount: string;
+    notes?: string;
+    attachment?: IAttachment;
+    createdOn?: string;
+    updatedOn?: string;
+    createdBy?: string;
+    updatedBy?: string;
+    markedForAdd?: boolean;
+    markedForUpdate?: boolean;
+    markedForDelete?: boolean;
 }
 
 export interface IExpenseTransaction {
-    transactionType: TransactionType
-    debit: number
-    credit: number
-    actualPaidAmount: number
-    email: string
+    transactionType: TransactionType;
+    debit: number;
+    credit: number;
+    actualPaidAmount: number;
+    email: string;
 }
 
 export interface IExpenseDashboardReport {

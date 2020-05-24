@@ -1,4 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
+import { REQUEST } from '@nestjs/core';
+import { Request } from 'express';
 
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, getRepository, SelectQueryBuilder } from 'typeorm';
@@ -15,6 +17,7 @@ import { ExpenseTransaction } from './expense.transaction.entity';
 import { User } from '../user/user.entity';
 import { Group } from '../group/group.entity';
 import { AttachmentService } from '../attachment/attachment.service';
+import { ICurrentUser } from '../shared/shared.model';
 
 @Injectable()
 export class ExpenseService {
@@ -23,6 +26,7 @@ export class ExpenseService {
     , @InjectRepository(User) private userRepo: Repository<User>
     , @InjectRepository(Group) private groupRepo: Repository<Group>
     , @InjectRepository(Category) private categoryRepo: Repository<Category>
+    , @Inject(REQUEST) private readonly request: Request
     , private helperSvc: HelperService, private attachmentSvc: AttachmentService
   ) {}
 
@@ -184,6 +188,15 @@ export class ExpenseService {
         gId = expense.group;
       }
       group = await this.groupRepo.findOne({ id: gId });
+    }
+
+    const user = <ICurrentUser>this.request.user;
+    if(typeof newOrUpdated.createdBy == 'undefined') {
+      newOrUpdated.createdBy = user.userId;
+    }
+
+    if(typeof newOrUpdated.updatedBy == 'undefined') {
+      newOrUpdated.updatedBy = user.userId;
     }
 
     //now save

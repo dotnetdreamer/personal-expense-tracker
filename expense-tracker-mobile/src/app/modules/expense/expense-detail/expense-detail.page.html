@@ -13,14 +13,25 @@
 </ion-header>
 
 <ion-content>
-  <div class="container">
+  <div class="container ion-padding">
     <div class="info">
-      <div class="category">{{ expense?.category?.name }}</div>
-      <div class="description-date">
-        <div class="description">{{ expense?.description }}</div>
-        <div class="date">{{ expense?.createdOn }}</div>
+      <div class="category" *ngIf="expense?.category">
+        <div class="category-icon-name">
+          <div class="category-icon"><ion-icon [attr.ios]="expense.category.icon" [attr.md]="expense.category.icon"></ion-icon></div>
+          <div class="category-name">{{ expense.category.name }}</div>
+        </div>
+      </div>
+      <div class="amount-info">
+        <div class="amount" [innerHTML]="expense?.amount | formateCurrency | async"></div>
+        <div class="by">
+          {{'expense.added_by' | localizedresource | async}}&nbsp;{{'common.on' | localizedresource | async}}&nbsp;<strong>{{expense?.createdOn | formateDate | async}}</strong>
+        </div>
+        <div class="by">
+          {{'expense.updated_by' | localizedresource | async}}&nbsp;{{'common.on' | localizedresource | async}}&nbsp;<strong>{{expense?.createdOn | formateDate | async}}</strong>
+        </div>
       </div>
     </div>
+    <div class="description">{{ expense?.description }}</div>
     <div class="attachment" *ngIf="expense && expense.attachment">
       <ion-button fill="clear" (click)="onAttachmentClicked(expense)">
         <ion-icon name="document-outline" *ngIf="!expense.attachment.contentType.startsWith('image')"></ion-icon>

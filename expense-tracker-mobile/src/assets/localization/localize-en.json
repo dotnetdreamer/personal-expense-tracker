@@ -18,7 +18,8 @@
         "version": "Version",
         "nodata": "No data found",
         "viewall": "View all",
-        "you": "You"
+        "you": "You",
+        "on": "on"
     },
     "category": {
         "title": "Category",
@@ -43,6 +44,10 @@
         "credit": "Credit",
         "total_owe": "Total you owe",
         "total_theyowe": "Total they owe",
+        "added_by": "Added by",
+        "added_on": "Added on",
+        "updated_by": "Updated by",
+        "updated_on": "Updated on",
         "transaction_type": {
             "10": "Paid by you and split equally",
             "20": "You owe full amount",

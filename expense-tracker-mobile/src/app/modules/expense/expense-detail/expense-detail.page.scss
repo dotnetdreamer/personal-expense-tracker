@@ -7,6 +7,44 @@ page-expense-detail {
 
     ion-content {
         .container {
+            .info {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+
+                .category {
+                    width: 80px;
+                    text-align: center;
+
+                    .category-icon-name {
+                        flex-direction: column;
+                        align-items: center;
+                        justify-content: center;
+
+                        .category-icon {
+                            font-size: 30px;
+                        }
+
+                        .category-name {
+                            font-size: 0.7em;
+                        }
+                    }
+                }
+
+                .amount-info {
+                    width: calc(100% - 80px);
+
+                    .amount {
+                        font-size: 1.3em;
+                        font-weight: bold;
+                    }
+
+                    .date, .by {
+                        margin-top: 2px;
+                        font-size: 0.7em;
+                    }
+                }
+            }
             .attachment {
                 ion-button {
                     font-size: 80px;
