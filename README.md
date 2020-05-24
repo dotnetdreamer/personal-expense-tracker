@@ -6,6 +6,7 @@ This is an open source personal expense tracker that lets you log your expenses.
 Pretty simple, why not?. I wanted to log my expenses under my control! so I created this. It runs everywhere (as a PWA) but you can run it as Hybrid app📱 also as it is built on top of [Capacitor](https://capacitor.ionicframework.com/), interact with [NestJs](https://nestjs.com/) APIs and is tested on Sqlite. Since NestJs usues TypeORM, it might work on other DBs as well.
 - [Features](#features)
 - [Quick Start](#quick-start)
+- [Publishing](#publishing)
 - [Contributing](#contributing)
 - [Licensing](#licensing)
 
@@ -28,6 +29,17 @@ Pretty simple, why not?. I wanted to log my expenses under my control! so I crea
 5. Navigate to **expense-tracker-web** directory (if not already) and run `npm run start:dev`
 6. Open another command line and navigate to **expense-tracker-mobile** and run ionic serve
 7. Mobile and Web projects are good to go!
+
+# <a name="publishing"></a>Publishing
+## Web
+1. Navigate to **expense-tracker-mobile** and run `ionic build`. It will copy everything to `www` folder.
+2. Copy `www` folder and upload it to server
+3. Navigate to **expense-tracker-web** and run `npm run build`. It will generate build in `dist` folder.
+4. Copy `package.json` from **expense-tracker-web** to `dist` folder and upload everything. Run on server `npm i` and make environment to **production**.
+
+## Android (Coming Soon)
+
+## iOS (Coming Soon)
 
 # <a name="contributing"></a>Contributing
 Any type of contribution is welcome!
