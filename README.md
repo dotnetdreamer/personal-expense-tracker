@@ -32,7 +32,7 @@ Pretty simple, why not?. I wanted to log my expenses under my control! so I crea
 8. Mobile and Web projects are good to go!
 
 # <a name="publishing"></a>Publishing
-## Web
+## Web/PWA
 1. Navigate to **expense-tracker-mobile** and run `ionic build`. It will copy everything to `www` folder.
 2. Copy `www` folder and upload it to server
 3. Navigate to **expense-tracker-web** and run `npm run build`. It will generate build in `dist` folder.
