@@ -70,7 +70,7 @@ export class GroupService {
 
     qb = qb.andWhere('grp.id IN (:...gropIds)', { gropIds: cUserGroupIds })
       .andWhere("grpMbr.status IN (:...memberStatuses)", { 
-        memberStatuses: [GroupMemberStatus.Aproved, GroupMemberStatus.Pending]
+        memberStatuses: [GroupMemberStatus.Approved, GroupMemberStatus.Pending]
       });
 
     qb = qb.andWhere('grp.isDeleted <= :isDeleted', { isDeleted: args && args.showHidden ? true : false });

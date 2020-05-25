@@ -26,7 +26,7 @@ export interface IGroupMemberParams {
 
 export enum GroupMemberStatus {
     Pending = 'pending',
-    Aproved = 'aproved',
+    Approved = 'approved',
     Rejected = 'rejected'
 }
 

@@ -67,7 +67,7 @@ export class AppComponent {
       msg = msg.format(group.name);
 
       const res = await this.helperSvc.presentConfirmDialog(this.workingLanguage, msg);
-      const status = res ? GroupMemberStatus.Aproved : GroupMemberStatus.Rejected;
+      const status = res ? GroupMemberStatus.Approved : GroupMemberStatus.Rejected;
 
       const existingMbr = group.members.filter(m => this.currentUser.email)[0];
       const result = await this.groupSvc.addOrUpdateMember({

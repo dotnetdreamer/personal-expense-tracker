@@ -79,7 +79,7 @@
         "your_expenses": "Your expenses",
         "expenses_must_sync": "All expenses must be synced before settling up",
         "status": {
-            "aproved": "Aproved",
+            "approved": "Approved",
             "pending": "Pending",
             "rejected": "Rejected"
         }

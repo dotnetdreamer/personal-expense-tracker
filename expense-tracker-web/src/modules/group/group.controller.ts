@@ -48,7 +48,7 @@ export class GroupController {
         await this.groupSvc.addOrUpdateMember({
           email: user.username,
           groupId: (<any>item).id,
-          status: GroupMemberStatus.Aproved
+          status: GroupMemberStatus.Approved
         });
 
         //get the group with related data i.e members

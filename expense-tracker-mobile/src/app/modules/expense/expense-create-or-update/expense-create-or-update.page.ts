@@ -385,7 +385,7 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit, OnDes
     , tranType: { type: TransactionType, membersWithAmount?: Array<any> }) {
     const total = +expense.amount;
     let members = this.group.members
-      .filter(m => m.status == GroupMemberStatus.Aproved);
+      .filter(m => m.status == GroupMemberStatus.Approved);
     let membersWithoutCurrentUser = members.filter(m => m.user.email != this.currentUser.email);
 
     let transactions: IExpenseTransaction[] = [];
