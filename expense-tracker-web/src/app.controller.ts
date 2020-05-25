@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards, Post, Request, UseInterceptors, ClassSerializerInterceptor, Body } from '@nestjs/common';
+import { Controller, Get, UseGuards, Post, Request, UseInterceptors, ClassSerializerInterceptor, Body, UnauthorizedException } from '@nestjs/common';
 
 import { AppService } from './app.service';
 import { CategoryService } from './modules/category/category.service';
@@ -21,11 +21,15 @@ export class AppController {
     this._populate();
   }
 
-  @UseGuards(LocalAuthGuard)
   @UseInterceptors(ClassSerializerInterceptor)
   @Post('authenticate')
-  async authenticate(@Request() req) {
-    return this.authSvc.login(req.user);
+  async authenticate(@Body() args: { email, password }) {
+    const user = await this.authSvc.validateUser(args.email, args.password);
+    if (!user) {
+      throw new UnauthorizedException();
+    }
+
+    return this.authSvc.login(user);
   }
   
   @UseInterceptors(ClassSerializerInterceptor)

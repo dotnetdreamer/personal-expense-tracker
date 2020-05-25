@@ -90,10 +90,10 @@ export class UserService {
         if(!user.externalAuth) {
             if(existingUser) {
                 result.alreadyExist = true;
-            }
-
-            if(existingUser.status != UserStatus.Approved) {
-                result.userStatus = existingUser.status;
+                
+                if(existingUser.status != UserStatus.Approved) {
+                    result.userStatus = existingUser.status;
+                }
             }
         }
 
