@@ -6,6 +6,9 @@ import { UserSettingService } from './user-setting.service';
 import { BaseService } from '../shared/base.service';
 import { AuthenticationGoogleService } from './authentication-google.service';
 import { UserConstant } from './user-constant';
+import { ExpenseService } from '../expense/expense.service';
+import { GroupService } from '../group/group.service';
+import { AttachmentService } from '../attachment/attachment.service';
 
 @Injectable({
     providedIn: 'root'
@@ -13,7 +16,9 @@ import { UserConstant } from './user-constant';
 export class UserService extends BaseService {
   private readonly BASE_URL = "user";
 
-  constructor(private googleAuthSvc: AuthenticationGoogleService) {
+  constructor(private googleAuthSvc: AuthenticationGoogleService
+    , private expenseSvc: ExpenseService, private groupSvc: GroupService
+    , private attachmentSvc: AttachmentService) {
       super();
   }
 
@@ -153,6 +158,13 @@ export class UserService extends BaseService {
               this.userSettingSvc.removeCurrentUser(), 
               this.userSettingSvc.removeLoggedInMethod(),
               this.userSettingSvc.removeCurrentUserPassword()
+          ]);
+
+          //clear dbs
+          await Promise.all([
+            this.groupSvc.removeAll(), 
+            this.expenseSvc.removeAll(),
+            this.attachmentSvc.removeAll()
           ]);
 
           this.pubsubSvc.publishEvent(UserConstant.EVENT_USER_LOGGEDOUT);
