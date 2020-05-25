@@ -190,6 +190,12 @@ export class GroupExpenseListingPage extends BasePage implements OnInit, AfterVi
           //refresh
           setTimeout(async () => {
             this.group = updatedGroup;
+            this.groupTotals = {
+              actualPaidAmount: 0,
+              totalBalance: 0,
+              debits: 0
+            };
+
             //get the new period
             const openPeriod = this.group.periods.filter(p => p.status == GroupPeriodStatus.Open)[0];
             this.dates.selectedDate.from = moment(openPeriod.startDate).local().format(AppConstant.DEFAULT_DATETIME_FORMAT);
@@ -245,7 +251,7 @@ export class GroupExpenseListingPage extends BasePage implements OnInit, AfterVi
     if(this._syncDataPushCompleteSub) {
       this._syncDataPushCompleteSub.unsubscribe();
     }
-    window.et.headers = undefined;
+    window.et ? window.et.headers = undefined : '';
   }
 
   private async _getExpenses(args?: { term? }) {

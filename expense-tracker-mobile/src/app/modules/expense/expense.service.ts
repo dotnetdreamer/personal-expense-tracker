@@ -252,9 +252,11 @@ export class ExpenseService extends BaseService {
                                     .format(AppConstant.DEFAULT_TIME_FORMAT)
                                     .split(':')
                                     .map(t => +t);
-                                fromDateCreatedOnUtc = moment.utc(args.fromDate)
+                                fromDateCreatedOnUtc = moment(args.fromDate)
                                     .set('hour', fromTime[0])
                                     .set('minute', fromTime[1])
+                                    // .set('second', 0)
+                                    .utc()
                                     .format(AppConstant.DEFAULT_DATETIME_FORMAT);
                                 createdOnUtc = moment.utc(v.createdOn).format(AppConstant.DEFAULT_DATETIME_FORMAT);
                             } else {
@@ -476,7 +478,7 @@ export class ExpenseService extends BaseService {
         //if there is no time, add it...
         const crOnTime = moment(item.createdOn).format(AppConstant.DEFAULT_TIME_FORMAT) != '00:00';
         if(!crOnTime) {
-            createdOn = `${item.createdOn} ${moment().format(AppConstant.DEFAULT_TIME_FORMAT)}`;
+            createdOn = `${item.createdOn} ${moment().format(AppConstant.DEFAULT_TIME_FORMAT + ":ss")}`;
         } else {
             createdOn = item.createdOn;
         }
