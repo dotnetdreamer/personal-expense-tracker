@@ -68,7 +68,7 @@ export class GroupService {
       .getMany();
     const cUserGroupIds = cUserGroups.map(g => g.id);
 
-    qb = qb.andWhere('grp.id IN (:...gropIds)', { gropIds: cUserGroupIds })
+    qb = qb.andWhere('grp.id IN (:...groupIds)', { groupIds: cUserGroupIds })
       .andWhere("grpMbr.status IN (:...memberStatuses)", { 
         memberStatuses: [GroupMemberStatus.Approved, GroupMemberStatus.Pending]
       });
