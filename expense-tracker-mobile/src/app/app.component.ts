@@ -243,7 +243,7 @@ export class AppComponent {
       this.currentUser = null;
 
       //redirect to login...
-      await this._navigateTo('/authentication/login', null, true);
+      await this._navigateTo('/user/login', null, true);
     });
 
     //EVENT_SYNC_DATA_PUSH_COMPLETE is fired by multiple sources, we debounce subscription to execute this once
@@ -338,7 +338,7 @@ export class AppComponent {
       }
       this.pubsubSvc.publishEvent(SyncConstant.EVENT_SYNC_DATA_PULL);
     } else {
-      await this._navigateTo('/authentication/login');
+      await this._navigateTo('/user/login');
     }
     // await this._navigateTo('/expense/expense-create-or-update');
     // await this._navigateTo('/expense/expense-listing');

@@ -24,7 +24,7 @@ const routes: Routes = [
     loadChildren: () => import('./modules/general/general.common.module').then( m => m.GeneralCommonModule)
   },
   {
-    path: 'authentication',
+    path: 'user',
     loadChildren: () => import('./modules/authentication/authentication.common.module').then( m => m.AuthenticationCommonModule)
   },
   {

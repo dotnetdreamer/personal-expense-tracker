@@ -62,7 +62,7 @@ export class LoginPage extends BasePage implements OnInit, OnDestroy {
 
   async onRegisterClicked() { 
     this.canDeactivate = true;
-    await this.navigate({ path: '/authentication/register' });
+    await this.navigate({ path: '/user/register' });
 
     this._resetDeactivate();
   }
