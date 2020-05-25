@@ -26,19 +26,33 @@ export class ExpenseService extends BaseService {
                 //by default fetch 90 days records only
                 const fromDate = moment().add(-90, 'days').format(AppConstant.DEFAULT_DATE_FORMAT);
                 const items = await this.getExpenses({ fromDate: fromDate, sync: true });
+                let allItems;
 
-                if(items.length) {
-                    //local item marked for local changes i.e (delete, update or add) should be ignored...
-                    for(let i of items) {
-                        const localItem = await this.getByIdLocal(i.id);
-                        if(localItem 
-                            && !(localItem && (localItem.markedForAdd || localItem.markedForUpdate || localItem.markedForDelete))) {
-                            await this.remove(localItem.id);
-                        }
-                    }
-                    //now add
-                    await this.putAllLocal(items, true, true);
+                if(!items.length) {
+                    //no items found or don't have access on server, get local items and delete it!
+                    allItems = await this.getExpenseListLocal();
+                } else {
+                    allItems = items;
                 }
+
+                //local item marked for local changes i.e (delete, update or add) should be ignored...
+                for(let i of allItems) {
+                    const localItem = await this.getByIdLocal(i.id);
+                    if(localItem 
+                        && !(localItem && (localItem.markedForAdd || localItem.markedForUpdate || localItem.markedForDelete))) {
+                        await this.remove(localItem.id);
+                    }
+                }
+
+                //no items found ons server? don't proceed!
+                if(!items.length) {
+                    resolve();
+                    return;
+                }
+
+                //now add
+                await this.putAllLocal(items, true, true);
+
                 resolve();
             } catch(e) {
                 reject(e);
