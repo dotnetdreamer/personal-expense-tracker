@@ -26,27 +26,41 @@ export class GroupService extends BaseService {
         return new Promise(async (resolve, reject) => {
             try {
                 const items = await this.getGroupList();
-                if(items.length) {
-                    //local item marked for local changes i.e (delete, update or add) should be ignored...
-                    for(let i of items) {
-                        const localItem = await this.getByIdLocal(i.id);
-                        if(localItem 
-                            && !(localItem && (localItem.markedForAdd || localItem.markedForUpdate || localItem.markedForDelete))) {
-                            await this.remove(localItem.id);
-                        }
-                    }
-                    //now add
-                    await this.putAllLocal(items, true, true);
+                let allItems;
 
-                    //find the difference and delete what's not in server (e.g deleted on server)
-                    const localItems = await this.getGroupListLocal();
-                    const differItems = localItems.filter(li => !items.find(i => {
-                        const dItem = li.id == i.id || (li.markedForAdd || li.markedForUpdate || li.markedForDelete)
-                        return dItem;
-                    }));
-                    for(let d of differItems) {
-                        await this.remove(d.id);
+                if(!items.length) {
+                    //no items found or don't have access on server, get local items and delete it!
+                    allItems = await this.getGroupListLocal();
+                } else {
+                    allItems = items;
+                }
+
+                //local item marked for local changes i.e (delete, update or add) should be ignored...
+                for(let i of allItems) {
+                    const localItem = await this.getByIdLocal(i.id);
+                    if(localItem 
+                        && !(localItem && (localItem.markedForAdd || localItem.markedForUpdate || localItem.markedForDelete))) {
+                        await this.remove(localItem.id);
                     }
+                }
+
+                //no items found ons server? don't proceed!
+                if(!items.length) {
+                    resolve();
+                    return;
+                }
+
+                //now add
+                await this.putAllLocal(items, true, true);
+
+                //find the difference and delete what's not in server (e.g deleted on server)
+                const localItems = await this.getGroupListLocal();
+                const differItems = localItems.filter(li => !items.find(i => {
+                    const dItem = li.id == i.id || (li.markedForAdd || li.markedForUpdate || li.markedForDelete)
+                    return dItem;
+                }));
+                for(let d of differItems) {
+                    await this.remove(d.id);
                 }
                 resolve();
             } catch (e) {

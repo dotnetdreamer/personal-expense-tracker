@@ -241,6 +241,7 @@ export class AppComponent {
         console.log('AppComponent: EVENT_USER_LOGGEDOUT: args', args);
       }
       this.currentUser = null;
+      this.groups = null;
 
       //redirect to login...
       await this._navigateTo('/user/login', null, true);
@@ -283,6 +284,7 @@ export class AppComponent {
   private async _getGroups() {
     const groups = await this.groupSvc.getGroupListLocal();
     if(!groups.length) {
+      this.groups = null;
       return;
     }
 
