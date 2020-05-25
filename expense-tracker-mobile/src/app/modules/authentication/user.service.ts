@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 
 
-import { IUser, IUserProfile, LoginType, ILoginParams, IGoogleAuthResponse, IExternalAuth, IRegistrationResponse } from './authentication.model';
+import { IUser, IUserProfile, LoginType, ILoginParams, IGoogleAuthResponse, IExternalAuth, IRegistrationResponse } from './user.model';
 import { UserSettingService } from './user-setting.service';
 import { BaseService } from '../shared/base.service';
 import { AuthenticationGoogleService } from './authentication-google.service';
@@ -10,11 +10,18 @@ import { UserConstant } from './user-constant';
 @Injectable({
     providedIn: 'root'
 })
-export class AuthenticationService extends BaseService {
+export class UserService extends BaseService {
   private readonly BASE_URL = "user";
 
   constructor(private googleAuthSvc: AuthenticationGoogleService) {
       super();
+  }
+
+  getAll(args?: { email?, name? }) {
+    return this.getData<IUser[]>({ 
+      url: `${this.BASE_URL}/getAll`, 
+      body: args
+    }); 
   }
 
   getByEmail(email) {

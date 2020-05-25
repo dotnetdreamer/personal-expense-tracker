@@ -5,7 +5,7 @@ import { BasePage } from '../../shared/base.page';
 import { ModalController } from '@ionic/angular';
 import { AppConstant } from '../../shared/app-constant';
 import { IGroupMember, GroupMemberStatus } from '../group.model';
-import { IUserProfile } from '../../authentication/authentication.model';
+import { IUserProfile } from '../../authentication/user.model';
 
 @Component({
   selector: 'group-member-modal',

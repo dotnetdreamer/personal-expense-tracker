@@ -18,8 +18,8 @@ import { CurrencySettingService } from './modules/currency/currency-setting.serv
 import { CurrencyConstant } from './modules/currency/currency-constant';
 import { CheckForUpdateService } from './modules/shared/update-service';
 import { UserConstant } from './modules/authentication/user-constant';
-import { IUser, IUserProfile, LoginType } from './modules/authentication/authentication.model';
-import { AuthenticationService } from './modules/authentication/authentication.service';
+import { IUser, IUserProfile, LoginType } from './modules/authentication/user.model';
+import { UserService } from './modules/authentication/user.service';
 import { UserSettingService } from './modules/authentication/user-setting.service';
 import { NgxPubSubService } from '@pscoped/ngx-pub-sub';
 import { GroupService } from './modules/group/group.service';
@@ -46,7 +46,7 @@ export class AppComponent {
     , protected currencySettingSvc: CurrencySettingService
     , private appSettingSvc: AppSettingService, private syncHelperSvc: SyncHelperService
     , private categorySvc: CategoryService, private helperSvc: HelperService
-    , private authSvc: AuthenticationService, private userSettingSvc: UserSettingService
+    , private authSvc: UserService, private userSettingSvc: UserSettingService
     , private groupSvc: GroupService, private localizationSvc: LocalizationService
   ) {
     this.initializeApp();

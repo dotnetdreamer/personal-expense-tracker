@@ -1,10 +1,10 @@
 import { Component, OnInit, ViewChild, ElementRef, AfterViewInit, ViewEncapsulation, OnDestroy } from '@angular/core';
 
-import { LoginType, ILoginParams, IUser, IUserProfile } from '../authentication.model';
+import { LoginType, ILoginParams, IUser, IUserProfile } from '../user.model';
 import { UserSettingService } from '../user-setting.service';
 import { UserConstant } from '../user-constant';
 import { BasePage } from '../../shared/base.page';
-import { AuthenticationService } from '../authentication.service';
+import { UserService } from '../user.service';
 import { FormGroup, Validators, FormBuilder } from '@angular/forms';
 
 @Component({
@@ -22,7 +22,7 @@ export class LoginPage extends BasePage implements OnInit, OnDestroy {
   // canDeactivate = false;
 
   constructor(private formBuilder: FormBuilder
-    , private authSvc: AuthenticationService) { 
+    , private authSvc: UserService) { 
       super();
 
       this.loginFormGroup = this.formBuilder.group({

@@ -1,4 +1,4 @@
-import { IUser } from '../authentication/authentication.model';
+import { IUser } from '../authentication/user.model';
 
 export interface IGroup {
     id?: number

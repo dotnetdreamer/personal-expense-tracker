@@ -1,9 +1,26 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>user-listing</ion-title>
+    <ion-title>{{'user.users' | localizedresource | async}}</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
-
+  <ion-list>
+    <ion-item *ngFor="let user of users">
+      <ion-icon name="person" slot="start"></ion-icon>
+      <ion-label>
+        <h2>{{user.name}}</h2>
+        <h3>{{user.role}}</h3>
+        <p>{{user.email}}</p>
+      </ion-label>
+      <ion-buttons slot="end">
+        <ion-button>
+          <ion-icon name="alert" *ngIf="user.status == UserStatus.Pending"></ion-icon>
+          <ion-icon name="checkmark" *ngIf="user.status == UserStatus.Approved"></ion-icon>
+          <ion-icon name="close" *ngIf="user.status == UserStatus.Rejected"></ion-icon>
+          <ion-icon name="remove-circle" *ngIf="user.status == UserStatus.Blocked"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+    </ion-item>
+  </ion-list>
 </ion-content>

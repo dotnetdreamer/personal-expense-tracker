@@ -6,7 +6,7 @@ import { TransactionType } from '../expense.model';
 import { IGroupMember } from '../../group/group.model';
 import { HelperService } from '../../shared/helper.service';
 import { LocalizationService } from '../../shared/localization.service';
-import { IUserProfile } from '../../authentication/authentication.model';
+import { IUserProfile } from '../../authentication/user.model';
 import { UserSettingService } from '../../authentication/user-setting.service';
 
 @Component({

@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core";
 
 import { UserConstant } from './user-constant';
 import { AppSettingService } from '../shared/app-setting.service';
-import { LoginType, IUserProfile, IUser } from './authentication.model';
+import { LoginType, IUserProfile, IUser } from './user.model';
 
 
 @Injectable({

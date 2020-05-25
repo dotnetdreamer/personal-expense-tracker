@@ -22,7 +22,7 @@ import { Subscription } from 'rxjs';
 import { IGroup, GroupMemberStatus } from '../../group/group.model';
 import { GroupService } from '../../group/group.service';
 import { TransactionTypeModal } from '../transaction-type/transaction-type.page';
-import { IUser, IUserProfile } from '../../authentication/authentication.model';
+import { IUser, IUserProfile } from '../../authentication/user.model';
 
 @Component({
   selector: 'page-expense-create-or-update',

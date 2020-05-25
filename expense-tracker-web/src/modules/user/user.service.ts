@@ -1,23 +1,60 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, Inject } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository, FindConditions } from "typeorm";
+import { Repository, FindConditions, getRepository } from "typeorm";
 
 import * as moment from 'moment';
 import * as bcrypt from 'bcrypt';
+import { REQUEST } from '@nestjs/core';
+import { Request } from "express";
 
 import { IRegistrationParams, UserRole, UserStatus } from "./user.model";
 import { User } from "./user.entity";
 import { AppConstant } from "../shared/app-constant";
 import { ExternalAuthService } from "./external-auth/external-auth.service";
 import { HelperService } from "../shared/helper.service";
+import { ICurrentUser } from "../shared/shared.model";
 
 @Injectable()
 export class UserService {
     constructor(
         @InjectRepository(User)
-        private userRepo: Repository<User>,
-        private externalAuthSvc: ExternalAuthService, private helperSvc: HelperService
+        private userRepo: Repository<User>
+        , @Inject(REQUEST) private readonly request: Request
+        , private externalAuthSvc: ExternalAuthService, private helperSvc: HelperService
     ) {}
+
+
+    async findAll(args?: { name?: string, email?: string, showHidden?: boolean })
+        : Promise<any[]> {
+        const user = <ICurrentUser>this.request.user;
+        if(!user) {
+            return [];
+        }
+
+        const toFind = await this._findByEmail(user.username);
+        if(!toFind || (toFind && toFind.role != UserRole.Admin)) {
+            return [];
+        }
+
+        let qb = await getRepository(User)
+            .createQueryBuilder('usr');
+        if(args && (args.name || args.email)) {
+            //  if(args.name) {
+            //     const name = args.name.trim().toLowerCase();
+            //     qb = qb.andWhere('usr.name = :entityName', { entityName: entityName });
+            // }
+        }
+
+        qb = qb.andWhere('usr.isDeleted <= :isDeleted', { isDeleted: args && args.showHidden ? true : false });
+        qb = qb.orderBy("usr.createdOn", 'DESC')
+          .addOrderBy('usr.id', 'DESC');
+    
+        const data = await qb.getMany();
+        
+        //map 
+        let result = data.map(g => this._prepareUser(g));
+        return result;
+    }
 
     async getUserByEmail(email, status = UserStatus.Approved, isDeleted = false) {
         const user = await this._findByEmail(email, status, isDeleted);
@@ -145,7 +182,7 @@ export class UserService {
     }
 
     private _prepareUser(user: User) {
-        const { password, isDeleted, createdOn, updatedOn, ...result } = user;
+        const { password, isDeleted, ...result } = user;
         return result;
     }
 }

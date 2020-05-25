@@ -4,7 +4,7 @@ import { Location } from '@angular/common';
 
 import { EtValidators } from '../../shared/et.validators';
 import { BasePage } from '../../shared/base.page';
-import { AuthenticationService } from '../authentication.service';
+import { UserService } from '../user.service';
 import { AppConstant } from '../../shared/app-constant';
 
 @Component({
@@ -17,7 +17,7 @@ export class RegisterPage extends BasePage implements OnInit {
   registratioFormGroup: FormGroup;
 
   constructor(private formBuilder: FormBuilder
-    , private authSvc: AuthenticationService, private location: Location) { 
+    , private authSvc: UserService, private location: Location) { 
     super();
     this.registratioFormGroup = this.formBuilder.group({
       name: ['', Validators.required],

@@ -1,15 +1,17 @@
 export interface IUser {
-    uuid?
-    name: string
-    email: string
-    photo?: string
-    mobile?: string
-    access_token?: string
-    externalAuth?: IExternalAuth
+    uuid?;
+    name: string;
+    role?: string;
+    email: string;
+    photo?: string;
+    mobile?: string;
+    access_token?: string;
+    status?: UserStatus;
+    externalAuth?: IExternalAuth;
 }
 
 export interface IUserProfile extends IUser {
-    photoStyle?: string
+    photoStyle?: string;
 }
 
 export enum LoginType {
@@ -47,4 +49,11 @@ export interface IExternalAuth {
 export interface IRegistrationResponse {
     data: any;
     status: {  userStatus: '', alreadyExist: false, alreadyRegisteredWwithNormalAuth: false };
+}
+
+export enum UserStatus {
+    Approved = "approved",
+    Pending = "pending",
+    Rejected = "rejected",
+    Blocked = "blocked"
 }

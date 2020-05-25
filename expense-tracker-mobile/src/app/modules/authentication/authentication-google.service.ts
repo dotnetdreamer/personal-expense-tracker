@@ -1,9 +1,9 @@
-import { AuthenticationService } from './authentication.service';
+import { UserService } from './user.service';
 import { Injectable, NgZone } from '@angular/core';
 
 import { Plugins } from '@capacitor/core';
 
-import { IUser, IGoogleAuthResponse, LoginType } from './authentication.model';
+import { IUser, IGoogleAuthResponse, LoginType } from './user.model';
 
 @Injectable({
     providedIn: 'root'
