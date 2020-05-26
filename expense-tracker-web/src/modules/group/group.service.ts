@@ -66,14 +66,14 @@ export class GroupService {
       .leftJoinAndSelect("grp.members", "grpMbr")
       .where('grpMbr.userId = :gCurrentUserId', { gCurrentUserId: user.userId })
       .getMany();
-    const cUserGroupIds = cUserGroups.map(g => g.id);
+    const cUserGroupIds = cUserGroups.map(g => +g.id);
 
     qb = qb.andWhere('grp.id IN (:...groupIds)', { groupIds: cUserGroupIds })
       .andWhere("grpMbr.status IN (:...memberStatuses)", { 
         memberStatuses: [GroupMemberStatus.Approved, GroupMemberStatus.Pending]
       });
 
-    qb = qb.andWhere('grp.isDeleted <= :isDeleted', { isDeleted: args && args.showHidden ? true : false });
+    qb = qb.andWhere('grp.isDeleted = :isDeleted', { isDeleted: args && args.showHidden ? true : false });
     qb = qb.orderBy("grp.createdOn", 'DESC')
       .addOrderBy('grp.id', 'DESC');
 
