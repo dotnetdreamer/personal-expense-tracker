@@ -18,6 +18,7 @@ import { User } from '../user/user.entity';
 import { Group } from '../group/group.entity';
 import { AttachmentService } from '../attachment/attachment.service';
 import { ICurrentUser } from '../shared/shared.model';
+import { GroupMemberStatus } from '../group/group.model';
 
 @Injectable()
 export class ExpenseService {
@@ -40,8 +41,26 @@ export class ExpenseService {
       .leftJoinAndSelect("exp.category", "cat")
       .leftJoinAndSelect("exp.transactions", "tran")      
       .leftJoinAndSelect("tran.user", "tranUsr")      
-      .leftJoinAndSelect("exp.group", "grp"); 
+      .leftJoinAndSelect("exp.group", "grp")
+      .leftJoinAndSelect("grp.members", "grpMbr"); 
       
+          
+    //current user expenses only...
+    const user = <ICurrentUser>this.request.user;
+    const cUserGroups = await getRepository(Group)
+      .createQueryBuilder('grp')
+      .leftJoinAndSelect("grp.members", "grpMbr")
+      .where('grpMbr.userId = :gCurrentUserId', { gCurrentUserId: user.userId })
+      .getMany();
+    const cUserGroupIds = cUserGroups.map(g => g.id);
+
+    const q = '((exp.groupId IS NOT NULL AND grp.id IN (:...groupIds) AND grpMbr.status IN (:...memberStatuses)) OR (exp.createdBy = :createdBy))';
+    qb = qb.andWhere(q, { 
+      groupIds: cUserGroupIds,
+      memberStatuses: [GroupMemberStatus.Approved, GroupMemberStatus.Pending],
+      createdBy: +user.userId
+    });
+
     if(args && (args.term || args.groupId || args.userIds || args.fromDate || args.toDate)) {
       if(args.term) {
         const term = args.term.trim().toLowerCase();
@@ -51,12 +70,9 @@ export class ExpenseService {
 
       args.groupId = +args.groupId;
       if(args.groupId > 0) {
-        //show non-grouped only if no grouped is passed
         qb = qb.andWhere("(grp.id = :groupId and grp.entityName = 'expense')", { groupId: args.groupId });
-      } else if(!args.sync) { //in case of sync, we show grouped and non-grouped i.e both
-        qb = qb.andWhere("exp.group is null");
       }
-      
+
       if(args.userIds && args.userIds.length) {
         qb = qb.andWhere("exp.createdBy IN (:...userIds)", { userIds: args.userIds })
       }
@@ -72,8 +88,7 @@ export class ExpenseService {
       }
       // console.log(qb.getQuery())
     }
-      
-    // .orWhere('user.email = :email', { email });
+
     qb = qb.andWhere('exp.isDeleted <= :isDeleted', { isDeleted: args && args.showHidden ? true : false });
     qb = qb.orderBy("exp.createdOn", 'DESC')
       .addOrderBy('exp.id', 'DESC');
