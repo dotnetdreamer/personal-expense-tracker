@@ -9,6 +9,7 @@ Pretty simple, why not?. I wanted to log my expenses under my control! so I crea
 - [Publishing](#publishing)
 - [Contributing](#contributing)
 - [Licensing](#licensing)
+- [Donation](#donation)
 
 ## <a name="features"></a>Features
 
@@ -44,6 +45,9 @@ Pretty simple, why not?. I wanted to log my expenses under my control! so I crea
 
 # <a name="contributing"></a>Contributing
 Any type of contribution is welcome!
+
+# <a name="donation"></a>Donation
+A donation will not make me rich, but your appreciation makes me happy😁
 
 # <a name="licensing"></a>License
 
