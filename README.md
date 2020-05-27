@@ -49,6 +49,8 @@ Any type of contribution is welcome!
 # <a name="donation"></a>Donation
 A donation will not make me rich, but your appreciation makes me happy😁
 
+[![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=GCL2WCBZKKWBC)
+
 # <a name="licensing"></a>License
 
 Personal Tracker is open-sourced software licensed under the [Apache 2.0 license](LICENSE).
