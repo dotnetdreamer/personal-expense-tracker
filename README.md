@@ -47,7 +47,7 @@ Pretty simple, why not?. I wanted to log my expenses under my control! so I crea
 Any type of contribution is welcome!
 
 # <a name="donation"></a>Donation
-A donation will not make me rich, but your appreciation makes me happy😁
+A donation will not make me rich, but your appreciation makes me happy 😁
 
 [![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=GCL2WCBZKKWBC)
 
