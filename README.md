@@ -1,4 +1,4 @@
-# Open Source Personal Expense💰 Tracker
+# Open Source Personal Expense💰 Tracker (In Actvie Development)
 
 This is an open source personal expense tracker that lets you log your expenses. You are the owner of your data!
 
