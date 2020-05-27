@@ -8,8 +8,8 @@ Pretty simple, why not?. I wanted to log my expenses under my control! so I crea
 - [Quick Start](#quick-start)
 - [Publishing](#publishing)
 - [Contributing](#contributing)
-- [Licensing](#licensing)
 - [Donation](#donation)
+- [Licensing](#licensing)
 
 ## <a name="features"></a>Features
 
