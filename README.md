@@ -2,6 +2,9 @@
 
 This is an open source personal expense tracker that lets you log your expenses. You are the owner of your data!
 
+## Screenshots
+![Screenshots](/_docs/screenshots/background.png?raw=true "Optional Title")
+
 ### Why?
 Pretty simple, why not?. I wanted to log my expenses under my control! so I created this. It runs everywhere (as a PWA) but you can run it as Hybrid app📱 also as it is built on top of [Capacitor](https://capacitor.ionicframework.com/), interact with [NestJs](https://nestjs.com/) APIs and is tested on Sqlite. Since NestJs usues TypeORM, it might work on other DBs as well.
 - [Features](#features)
