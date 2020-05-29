@@ -30,7 +30,7 @@ export class UserService extends BaseService {
   }
 
   getByEmail(email) {
-    return this.getData({ 
+    return this.getData<IUser>({ 
       url: `${this.BASE_URL}/getByEmail`, 
       body: {
         email: email

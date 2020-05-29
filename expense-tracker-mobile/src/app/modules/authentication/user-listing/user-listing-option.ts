@@ -7,8 +7,8 @@ import { IUser, UserStatus } from '../user.model';
     selector: 'user-listing-option',
     template: `
         <ion-list>
-            <ion-item detail="false" button (click)="dismiss('update_status')">
-                <ion-label>{{'user.update_status' | localizedresource | async}}</ion-label>
+            <ion-item detail="false" button (click)="dismiss('update')">
+                <ion-label>{{'user.update' | localizedresource | async}}</ion-label>
             </ion-item>
         </ion-list>
     `

@@ -43,7 +43,10 @@ export class UserListingPage extends BasePage implements OnInit {
     const { data } = await popOver.onDidDismiss();
     if(data) {
       switch(data) {
-        case 'update_status':
+        case 'update':
+          await this.router.navigate(['/user/user-edit', {
+            email: user.email
+          }]);
         break;
       }
     }
