@@ -119,6 +119,18 @@
         },
         "register": {
             "title": "Register"
+        },
+        "status": {
+            "title": "Status",
+            "approved": "Approved",
+            "pending": "Pending",
+            "rejected": "Rejected",
+            "blocked": "Blocked"
+        },
+        "role": {
+            "title": "Role",
+            "admin": "Admin",
+            "user": "User"
         }
     },
     "currency": {

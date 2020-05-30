@@ -136,6 +136,13 @@ export class UserService extends BaseService {
     });
   }
 
+  update(args: { email?, name?, mobile?, status, role }) {
+    return this.postData<IUser>({ 
+      url: `${this.BASE_URL}/update`, 
+      body: args
+    });
+  }
+
   logout(username?) {
       return new Promise(async (resolve, reject) => {
           const loginType = await this.userSettingSvc.getLoggedInMethod();

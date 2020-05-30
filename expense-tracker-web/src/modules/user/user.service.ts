@@ -7,7 +7,7 @@ import * as bcrypt from 'bcrypt';
 import { REQUEST } from '@nestjs/core';
 import { Request } from "express";
 
-import { IRegistrationParams, UserRole, UserStatus } from "./user.model";
+import { IRegistrationParams, UserRole, UserStatus, IUserUpdateParams } from "./user.model";
 import { User } from "./user.entity";
 import { AppConstant } from "../shared/app-constant";
 import { ExternalAuthService } from "./external-auth/external-auth.service";
@@ -165,6 +165,31 @@ export class UserService {
 
         const pareparedUser = this._prepareUser(<any>existingUser);
         return { data: pareparedUser };
+    }
+
+    async update(args: IUserUpdateParams) {
+        args.email = args.email.toLowerCase();
+
+        const user = await this.getUserByEmail(args.email);
+        if(!user) {
+            return null;
+        }
+
+        if(args.name) {
+            user.name = args.name;
+        }
+        if(args.mobile) {
+            user.mobile = args.mobile;
+        }
+        if(args.status) {
+            user.status = args.status;
+        }
+        if(args.role) {
+            user.role = args.role;
+        }
+
+        const result = await this.userRepo.save(user);
+        return this._prepareUser(result);
     }
 
     private _findByEmail(email, status: UserStatus | null = UserStatus.Approved

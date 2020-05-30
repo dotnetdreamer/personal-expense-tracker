@@ -14,12 +14,12 @@ import { AppConstant } from '../../shared/app-constant';
   encapsulation: ViewEncapsulation.None
 })
 export class RegisterPage extends BasePage implements OnInit {
-  registratioFormGroup: FormGroup;
+  registrationFormGroup: FormGroup;
 
   constructor(private formBuilder: FormBuilder
     , private authSvc: UserService, private location: Location) { 
     super();
-    this.registratioFormGroup = this.formBuilder.group({
+    this.registrationFormGroup = this.formBuilder.group({
       name: ['', Validators.required],
       email: ['', Validators.compose([Validators.required, Validators.email])],
       password: ['', Validators.required],
@@ -27,7 +27,7 @@ export class RegisterPage extends BasePage implements OnInit {
       mobile:['']
     });
 
-    this.registratioFormGroup.setValidators([EtValidators.ValidateConfirmPassword]);
+    this.registrationFormGroup.setValidators([EtValidators.ValidateConfirmPassword]);
   }
 
   ngOnInit() {
@@ -36,7 +36,7 @@ export class RegisterPage extends BasePage implements OnInit {
     }
   }
 
-  get f() { return this.registratioFormGroup.controls; }
+  get f() { return this.registrationFormGroup.controls; }
 
   async onRegisterationFormSubmit(args) {
     const loader = await this.helperSvc.loader;

@@ -6,6 +6,13 @@ export interface IRegistrationParams {
     externalAuth?: any
 }
 
+export interface IUserUpdateParams {
+    email?: string
+    name?: string
+    mobile?: string
+    status?: UserStatus,
+    role?: UserRole
+}
 
 export interface ILoginParams {
     email: string

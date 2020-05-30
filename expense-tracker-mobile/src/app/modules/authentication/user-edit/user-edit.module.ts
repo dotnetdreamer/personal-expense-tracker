@@ -1,18 +1,15 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-
-import { IonicModule } from '@ionic/angular';
 
 import { UserEditPageRoutingModule } from './user-edit-routing.module';
 
 import { UserEditPage } from './user-edit.page';
+import { PipesModule } from 'src/app/pipes/pipes.module';
+import { ComponentsWithFormsModule } from 'src/app/components/components-with-forms.module';
 
 @NgModule({
   imports: [
-    CommonModule,
-    FormsModule,
-    IonicModule,
+    PipesModule,
+    ComponentsWithFormsModule,
     UserEditPageRoutingModule
   ],
   declarations: [UserEditPage]

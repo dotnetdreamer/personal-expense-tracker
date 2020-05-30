@@ -1,7 +1,7 @@
 export interface IUser {
     uuid?;
     name: string;
-    role?: string;
+    role?: UserRole;
     email: string;
     photo?: string;
     mobile?: string;
@@ -56,4 +56,9 @@ export enum UserStatus {
     Pending = "pending",
     Rejected = "rejected",
     Blocked = "blocked"
+}
+
+export enum UserRole {
+    Admin = "admin",
+    User = "user"
 }

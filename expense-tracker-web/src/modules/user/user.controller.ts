@@ -42,4 +42,26 @@ export class UserController {
     args.email = args.email.toLowerCase();
     return this.userSvc.getUserByEmail(args.email);
   }
+
+  @UseInterceptors(ClassSerializerInterceptor)
+  @UseGuards(JwtAuthGuard)
+  @Post('update')
+  async update(@Req() req: Request, @Body() args: { name, email, mobile, status }) {
+    if(!args.email) {
+      return null;
+    }
+
+    const currentUser = <ICurrentUser>req.user;
+    if(!currentUser) {
+      return null;
+    }
+    
+    //only admin can update
+    const toFind = await this.userSvc.getUserByEmail(currentUser.username);
+    if(!toFind || (toFind && toFind.role != UserRole.Admin)) {
+      return null;
+    }
+
+    return this.userSvc.update(args);
+  }
 }
