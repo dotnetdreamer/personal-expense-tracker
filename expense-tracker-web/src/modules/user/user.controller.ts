@@ -34,6 +34,7 @@ export class UserController {
       return null;
     }
     
+    //only admin can change
     const toFind = await this.userSvc.getUserByEmail(user.username);
     if(!toFind || (toFind && toFind.role != UserRole.Admin)) {
       return null;
@@ -63,5 +64,28 @@ export class UserController {
     }
 
     return this.userSvc.update(args);
+  }
+
+  @UseInterceptors(ClassSerializerInterceptor)
+  @UseGuards(JwtAuthGuard)
+  @Post('changePassword')
+  async changePassword(@Req() req: Request, @Body() args: { email: string, newPassword: string }) {
+    if(!args.email) {
+      return null;
+    }
+
+    const user = <ICurrentUser>req.user;
+    if(!user) {
+      return null;
+    }
+    
+    //only admin can change
+    const toFind = await this.userSvc.getUserByEmail(user.username);
+    if(!toFind || (toFind && toFind.role != UserRole.Admin)) {
+      return null;
+    }
+
+    args.email = args.email.toLowerCase();
+    return this.userSvc.changePassword(args.email, args.newPassword);
   }
 }

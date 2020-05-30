@@ -177,6 +177,23 @@ export class UserService {
         return { data: preparedUser };
     }
 
+    async changePassword(email, newPassword): Promise<boolean> {
+        let toFind = await this._findByEmail(email, null, false);
+        if(!toFind) {
+            return false;
+        }
+
+        //Fix: Error: data must be a string and salt must either be a salt string or a number of rounds
+        newPassword = newPassword.toString();
+
+        //password
+        const hasPassword = await bcrypt.hash(newPassword, AppConstant.DEFAULT_PASSWORD_SALT_ROUNDS);
+        toFind.password = hasPassword;
+
+        await this.userRepo.save(toFind);
+        return true;
+    }
+
     async update(args: IUserUpdateParams) {
         args.email = args.email.toLowerCase();
 

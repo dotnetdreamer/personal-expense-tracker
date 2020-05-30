@@ -38,6 +38,16 @@ export class UserService extends BaseService {
     });
   }
 
+  changePassword(email, newPassword) {
+    return this.postData<boolean>({ 
+      url: `${this.BASE_URL}/changePassword`, 
+      body: {
+        email: email,
+        newPassword: newPassword
+      }
+    });
+  }
+
   authenticate(args: { email, password }) {
     return this.postData<any>({ 
       url: `app/authenticate`,

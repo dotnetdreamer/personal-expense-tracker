@@ -20,6 +20,9 @@
         <p>{{user.email}}</p>
       </ion-label>
       <ion-buttons slot="end">
+        <ion-button *ngIf="user.externalAuth && user.externalAuth.providerSystemName == LoginType.GOOGLE">
+          <ion-icon name="logo-google"></ion-icon>
+        </ion-button>
         <ion-button color="primary" (click)="onMoreOptionsClicked($event, user)">
           <ion-icon name="ellipsis-vertical"></ion-icon>
         </ion-button>
