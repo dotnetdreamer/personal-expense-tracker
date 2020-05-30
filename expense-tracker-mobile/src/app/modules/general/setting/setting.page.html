@@ -14,7 +14,7 @@
 </ion-header>
 
 <ion-content>
-  <ion-list *ngIf="currentUser?.role == UserRole.Admin">
+  <ion-list [userRole]="currentUser?.role">
     <ion-item (click)="onItemClicked('/category')" detail="true">
       <ion-label>{{'category.title' | localizedresource | async}}</ion-label>
     </ion-item>
