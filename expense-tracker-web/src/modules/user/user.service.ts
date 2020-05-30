@@ -52,8 +52,8 @@ export class UserService {
         const data = await qb.getMany();
         
         //map 
-        let result = data.map(g => this._prepareUser(g));
-        return result;
+        let result = data.map(g => this._prepareUser(g, true));
+        return await Promise.all(result);
     }
 
     async getUserByEmail(email, status = UserStatus.Approved, isDeleted = false) {
@@ -63,6 +63,16 @@ export class UserService {
         }
 
         return this._prepareUser(user);
+    }
+
+    async getUserByEmailWithExternalAuth(email) {
+        const user = await this._findByEmail(email);
+        if(!user) {
+            return null;
+        }
+
+        const mapped = await this._prepareUser(user, true);
+        return mapped;
     }
 
     async validateUser(args: { email, password }): Promise<any> {
@@ -163,8 +173,8 @@ export class UserService {
             await this.externalAuthSvc.save(eAuth);
         }
 
-        const pareparedUser = this._prepareUser(<any>existingUser);
-        return { data: pareparedUser };
+        const preparedUser = await this._prepareUser(<any>existingUser);
+        return { data: preparedUser };
     }
 
     async update(args: IUserUpdateParams) {
@@ -206,8 +216,14 @@ export class UserService {
         return this.userRepo.findOne(conditions);
     }
 
-    private _prepareUser(user: User) {
+    private async _prepareUser(user: User, fetchExternalAuth = false) {
         const { password, isDeleted, ...result } = user;
+        if(fetchExternalAuth) {
+            const eAuth = await this.externalAuthSvc.findByEmail(user.email);
+            if(eAuth) {
+                result['externalAuth'] = eAuth;
+            }
+        }
         return result;
     }
 }

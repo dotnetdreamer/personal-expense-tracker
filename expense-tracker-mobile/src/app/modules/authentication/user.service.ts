@@ -29,9 +29,9 @@ export class UserService extends BaseService {
     }); 
   }
 
-  getByEmail(email) {
+  getUserByEmailWithExternalAuth(email) {
     return this.getData<IUser>({ 
-      url: `${this.BASE_URL}/getByEmail`, 
+      url: `${this.BASE_URL}/getUserByEmailWithExternalAuth`, 
       body: {
         email: email
       }

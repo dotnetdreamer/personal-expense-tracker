@@ -23,8 +23,8 @@ export class UserController {
   
   @UseInterceptors(ClassSerializerInterceptor)
   @UseGuards(JwtAuthGuard)
-  @Get('getByEmail')
-  async getByEmail(@Req() req: Request, @Query() args: { email: string }) {
+  @Get('getUserByEmailWithExternalAuth')
+  async getUserByEmailWithExternalAuth(@Req() req: Request, @Query() args: { email: string }) {
     if(!args.email) {
       return null;
     }
@@ -40,7 +40,7 @@ export class UserController {
     }
 
     args.email = args.email.toLowerCase();
-    return this.userSvc.getUserByEmail(args.email);
+    return this.userSvc.getUserByEmailWithExternalAuth(args.email);
   }
 
   @UseInterceptors(ClassSerializerInterceptor)

@@ -46,7 +46,7 @@ export class UserEditPage extends BasePage implements OnInit, OnDestroy {
       const { email } = params;
       
       try {
-        this.user = await this.userSvc.getByEmail(email);
+        this.user = await this.userSvc.getUserByEmailWithExternalAuth(email);
         if(AppConstant.DEBUG) {
           console.log('UserEditPage: ngOnInit: user', this.user);
         }
@@ -64,6 +64,12 @@ export class UserEditPage extends BasePage implements OnInit, OnDestroy {
         }
         this.f.status.setValue(this.user.status);
         this.f.role.setValue(this.user.role);
+
+        //disable in case of external auth
+        if(this.user.externalAuth) {
+          this.f.name.disable();
+          this.f.mobile.disable();
+        }
       } catch(e) {
         //
       }

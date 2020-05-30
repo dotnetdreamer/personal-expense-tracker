@@ -10,8 +10,7 @@
 <ion-content class="ion-padding">
   <div class="container">
     <ion-icon name="person-add"></ion-icon>
-    <form class="custom-form" [formGroup]="formGroup" 
-      (ngSubmit)="onFormSubmit(formGroup.value)">
+    <form class="custom-form" [formGroup]="formGroup">
       <ion-list>
         <ion-item>
           <ion-label position="floating">{{'user.email' | localizedresource | async}}*</ion-label>
@@ -42,11 +41,22 @@
           </ion-select>
         </ion-item>
       </ion-list>
-      <div class="buttons-container">
-        <ion-button type="submit" [disabled]="!formGroup.valid">
-          {{'common.update' | localizedresource | async}}
-        </ion-button>
-      </div>
+      <ion-list *ngIf="user?.externalAuth">
+        <ion-list-header>
+          <ion-label>{{'user.external_auth' | localizedresource | async}}</ion-label>
+        </ion-list-header>
+        <ion-item>
+          <ion-label>
+            <h2>{{user.externalAuth.providerSystemName}}</h2>
+            <p>{{user.externalAuth.externalIdentifier}}</p>
+          </ion-label>
+        </ion-item>
+      </ion-list>
     </form>
   </div>
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button (click)="onFormSubmit(formGroup.value)" [disabled]="!formGroup.valid">
+      <ion-icon name="checkmark"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
 </ion-content>

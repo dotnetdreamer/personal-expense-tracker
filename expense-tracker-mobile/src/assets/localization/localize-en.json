@@ -113,6 +113,7 @@
         "already_registered_normal_auth": "You are alredy registered using normal authentication",
         "cannot_register": "We cannot register your account. Your account status is \"{0}\"",
         "users": "Users",
+        "external_auth": "External Authentication",
         "login": {
             "title": "Login",
             "continue_with": "Or continue with"
