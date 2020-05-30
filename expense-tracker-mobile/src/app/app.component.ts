@@ -42,7 +42,7 @@ export class AppComponent {
 
   constructor( private router: Router, @Inject(DOCUMENT) private document: Document
   , private renderer: Renderer2, private platform: Platform
-    , private pubsubSvc: NgxPubSubService, private checkforUpdateSvc: CheckForUpdateService
+    , private pubsubSvc: NgxPubSubService, private checkForUpdateSvc: CheckForUpdateService
     , protected currencySettingSvc: CurrencySettingService
     , private appSettingSvc: AppSettingService, private syncHelperSvc: SyncHelperService
     , private categorySvc: CategoryService, private helperSvc: HelperService
