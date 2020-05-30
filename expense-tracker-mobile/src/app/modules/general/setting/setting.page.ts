@@ -14,6 +14,8 @@ import { AppConstant } from '../../shared/app-constant';
 import { SchemaService } from '../../shared/db/schema.service';
 import { CurrencyService } from '../../currency/currency.service';
 import { CurrencySettingService } from '../../currency/currency-setting.service';
+import { IUser, UserRole } from '../../authentication/user.model';
+import { UserService } from '../../authentication/user.service';
 
 @Component({
   selector: 'page-general-setting',
@@ -31,13 +33,17 @@ export class SettingPage extends BasePage implements OnInit, OnDestroy {
   selectedTable;
   tables: string[] = [];
 
+  currentUser: IUser;
+  UserRole = UserRole;
+  
   currencies = [];
   workingCurrency;
   selectedCurrency;
 
   private _syncDataPushCompleteSub: Subscription;
   constructor(private platform: Platform, @Inject(DOCUMENT) private document: Document
-    , private currencySettingSvc: CurrencySettingService, private currencySvc: CurrencyService) { 
+    , private currencySettingSvc: CurrencySettingService, private currencySvc: CurrencyService
+    , private userSvc: UserService) { 
     super();
 
     this._subscribeToEvents();
@@ -60,6 +66,8 @@ export class SettingPage extends BasePage implements OnInit, OnDestroy {
     ]);
     this.currencies = all[0];
     this.workingCurrency = all[1];
+
+    this.currentUser = await this.userSettingSvc.getUserProfileLocal();
   }
 
   //#region Currency
