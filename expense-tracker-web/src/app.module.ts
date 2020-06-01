@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ScheduleModule } from '@nestjs/schedule';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -30,6 +31,7 @@ const CONNECTION_NAME = "default";
 
 @Module({
   imports: [
+    ScheduleModule.forRoot(),
     TypeOrmModule.forRoot({
       name: CONNECTION_NAME,
       type: 'sqlite',
