@@ -1,6 +1,11 @@
-# Open Source Personal Expense💰 Tracker (In Actvie Development)
+# Xpensive - In Actvie Development
 
-This is an open source personal expense tracker that lets you log your expenses. You are the owner of your data!
+<p align="center">
+  <a href="#" target="blank"><img src="/_docs/logo.png" width="120" alt="Xpensive Logo" /></a>
+</p>
+<p align="center">
+An open source personal expense💰 tracker that lets you log your expenses.
+</p>
 
 ## Screenshots
 ![Screenshots](/_docs/screenshots/background.png?raw=true "Optional Title")
