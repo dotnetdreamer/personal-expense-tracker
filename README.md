@@ -1,5 +1,6 @@
+<p align="center">
 # Xpensive - In Actvie Development
-
+</p>
 <p align="center">
   <a href="#" target="blank"><img src="/_docs/logo.png" width="120" alt="Xpensive Logo" /></a>
 </p>
