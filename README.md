@@ -3,6 +3,7 @@
   <h1>Xpensive</h1>
   <p><strong>An open source personal expense/money tracker that lets you log your expenses</strong></p>
 </div>
+
 ## Screenshots
 ![Screenshots](/_docs/screenshots/background.png?raw=true "Optional Title")
 
