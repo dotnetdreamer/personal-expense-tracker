@@ -1,11 +1,8 @@
-<p align="center">
-  <a href="#" target="blank"><img src="/_docs/logo.png" width="120" alt="Xpensive Logo" /></a>
+<div align="center">
+  <img src="/_docs/logo.png" width="120" alt="Xpensive Logo" />
+  <h1>Xpensive</h1>
+  <p><strong>An open source personal expense/money tracker that lets you log your expenses</strong></p>
 </p>
-<p align="center">
-An open source personal expense/money tracker that lets you log your expenses
-</p>
-
-# Xpensive - In Actvie Development
 
 ## Screenshots
 ![Screenshots](/_docs/screenshots/background.png?raw=true "Optional Title")
