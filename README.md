@@ -2,7 +2,7 @@
   <a href="#" target="blank"><img src="/_docs/logo.png" width="120" alt="Xpensive Logo" /></a>
 </p>
 <p align="center">
-An open source personal expense/money tracker that lets you log your expenses.
+An open source personal expense/money tracker that lets you log your expenses
 </p>
 
 # Xpensive - In Actvie Development
