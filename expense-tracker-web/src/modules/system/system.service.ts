@@ -11,12 +11,13 @@ import { UserService } from '../user/user.service';
 import { ICurrentUser } from '../shared/shared.model';
 import { EmailAccount } from './email-account';
 import { IEmailAccountParams } from './system.model';
+import { QueuedMessage } from './queued-message.entity';
 
 @Injectable()
 export class SystemService {
   constructor(
     @InjectRepository(EmailAccount) private emailAccountRepo: Repository<EmailAccount>
-    , private schedulerRegistry: SchedulerRegistry
+    , @InjectRepository(QueuedMessage) private queuedMessageRepo: Repository<QueuedMessage>
   ) {}
 
 
@@ -60,8 +61,21 @@ export class SystemService {
   //#endregion
 
 
-  //#region 
+  //#region Messages
 
+  async findAllQueuedMessages(): Promise<any[]> {
+    let qb = await getRepository(QueuedMessage)
+      .createQueryBuilder('qm')
+
+    qb = qb.orderBy("qm.createdOn", 'DESC')
+      .addOrderBy('qm.id', 'DESC');
+
+    const data = await qb.getMany();
+
+    //map 
+    const result = data.map(qm => this._prepareQueuedMessage(qm));
+    return result;
+  }
 
   //#endregion
 
@@ -69,6 +83,11 @@ export class SystemService {
 
   private _prepareEmailAccount(ec: EmailAccount) {
     const { ...result } = ec;
+    return result;
+  }
+  
+  private _prepareQueuedMessage(qm: QueuedMessage) {
+    const { ...result } = qm;
     return result;
   }
 

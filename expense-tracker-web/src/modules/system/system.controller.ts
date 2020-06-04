@@ -5,7 +5,7 @@ import { Request } from "express";
 import { JwtAuthGuard } from "../user/auth/jwt-auth.guard";
 import { ICurrentUser } from "../shared/shared.model";
 
-@Controller('message')
+@Controller('system')
 export class SystemController {
   constructor() {}
 

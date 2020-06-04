@@ -26,6 +26,9 @@ import { GroupMember } from './modules/group/group-member.entity';
 import { ExpenseTransaction } from './modules/expense/expense.transaction.entity';
 import { GroupPeriod } from './modules/group/group-period.entity';
 import { Connection, createConnection, getConnection } from 'typeorm';
+import { SystemModule } from './modules/system/system.module';
+import { EmailAccount } from './modules/system/email-account';
+import { QueuedMessage } from './modules/system/queued-message.entity';
 
 const CONNECTION_NAME = "default";
 
@@ -40,9 +43,10 @@ const CONNECTION_NAME = "default";
         Category, Expense, ExpenseTransaction
         , Attachment, User
         , AccessToken, ExternalAuth
-        , Group, GroupMember, GroupPeriod
+        , Group, GroupMember, GroupPeriod,
+        , EmailAccount, QueuedMessage
       ],
-      synchronize: false,
+      synchronize: true,
     }),
     SharedModule,
     CategoryModule,
@@ -53,7 +57,8 @@ const CONNECTION_NAME = "default";
     AuthModule,
     TokenModule,
     ExternalAuthModule,
-    GroupModule
+    GroupModule,
+    SystemModule,
   ],
   controllers: [AppController],
   providers: [AppService],
