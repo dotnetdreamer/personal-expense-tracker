@@ -70,7 +70,7 @@ export class BaseService {
                         } else {
                             newUrl += '?';
                         }
-                        newUrl += `${prop}=${args.body[prop] || ''}`;
+                        newUrl += `${prop}=${typeof args.body[prop] === 'undefined' ? '' :  args.body[prop]}`;
                     }
                 }   
                 args.url = newUrl;

@@ -214,7 +214,7 @@ export class ExpenseService extends BaseService {
         });
     }
 
-    getExpenses(args?: { term?, fromDate?, toDate?, sync? }) {
+    getExpenses(args?: { term?, fromDate?, toDate?, groupId?, sync? }) {
         let body;
 
         if(args && (args.fromDate || args.toDate )) {
@@ -323,19 +323,22 @@ export class ExpenseService extends BaseService {
                     }
 
                     if(item) {
-                        //either show grouped or non-grouped or explicilty set groupId to null (e.g in dashboard)
-                        if(args.groupId) {
-                            if(!item.group) {
-                                item = null;
-                            } else if(item.group.id != args.groupId) {
-                                item = null;
+                        //either show grouped or non-grouped or explicitly set groupId to 0 (e.g in dashboard)
+                        //view non-group or all i.e mix. groupId = 0 ? non-group only : all including group ones
+                        if(typeof args.groupId !== 'undefined') {
+                            if(args.groupId === 0) {
+                                //do not show grouped items if 0 is passed
+                                if(item.group) {
+                                    item = null;
+                                }
+                            } else if(args.groupId > 0) {
+                                if(!item.group) {
+                                    item = null;
+                                } else if(item.group.id != args.groupId) {
+                                    item = null;
+                                }
                             }
-                        } else if(args.groupId === null) {
-                            //do not show goruped items if null is passed
-                            if(item.group) {
-                                item = null;
-                            }
-                        }
+                        } 
                     }
                 } else {
                     item = v;

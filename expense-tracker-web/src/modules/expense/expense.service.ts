@@ -47,11 +47,11 @@ export class ExpenseService {
           
     //current user expenses only...
     const user = <ICurrentUser>this.request.user;
-    const cUserGroups = await getRepository(Group)
+    let qUserGroups = getRepository(Group)
       .createQueryBuilder('grp')
       .leftJoinAndSelect("grp.members", "grpMbr")
-      .where('grpMbr.userId = :gCurrentUserId', { gCurrentUserId: user.userId })
-      .getMany();
+      .where('grpMbr.userId = :gCurrentUserId', { gCurrentUserId: user.userId });
+    const cUserGroups = await qUserGroups.getMany();
     const cUserGroupIds = cUserGroups.map(g => g.id);
 
     const q = '((exp.groupId IS NOT NULL AND grp.id IN (:...groupIds) AND grpMbr.status IN (:...memberStatuses)) OR (exp.createdBy = :createdBy))';
@@ -68,9 +68,21 @@ export class ExpenseService {
           .orWhere('cat.name like :categoryTerm)', { categoryTerm: `%${term}%`});
       }
 
-      args.groupId = +args.groupId;
-      if(args.groupId > 0) {
-        qb = qb.andWhere("(grp.id = :groupId and grp.entityName = 'expense')", { groupId: args.groupId });
+      // args.groupId = +args.groupId;
+      // if(args.groupId > 0) {
+      //   qb = qb.andWhere("(grp.id = :groupId and grp.entityName = 'expense')", { groupId: args.groupId });
+      // }
+      
+      //groupId = 0 ? non-group only, groupId == -1 ? all including group ones
+      if(args.groupId) {
+        args.groupId = parseInt(args.groupId.toString());
+      }
+      if(args.groupId >= 0) {
+        if(args.groupId == 0) {
+          qb = qb.where('exp.group is null');
+        } else {
+          qb = qb.where('grp.id = :groupId', { groupId: args.groupId });
+        }
       }
 
       if(args.userIds && args.userIds.length) {

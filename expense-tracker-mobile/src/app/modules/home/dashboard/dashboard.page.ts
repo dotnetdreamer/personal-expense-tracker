@@ -130,7 +130,7 @@ export class DashboardPage extends BasePage implements AfterViewInit, OnDestroy 
   }
 
   async onViewAllExpensesClicked() {
-    await this.navigate({ path: '/expense/expense-listing' });
+    await this.navigate({ path: '/expense/expense-listing', params: { groupId: -1 } });
   }
 
   ngOnDestroy() {

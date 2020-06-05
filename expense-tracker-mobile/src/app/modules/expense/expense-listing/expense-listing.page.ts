@@ -36,7 +36,7 @@ export class ExpenseListingPage extends BasePage implements OnInit, AfterViewIni
   dataLoaded = false;
   workingCurrency = ''; //fix for undefined showing in title
 
-  private _viewNonGrouped;
+  private _groupId;
   private _syncInitSub: Subscription;
   private _expenseCreatedOrUpdatedSub: Subscription;
   private _syncDataPushCompleteSub: Subscription;
@@ -53,10 +53,10 @@ export class ExpenseListingPage extends BasePage implements OnInit, AfterViewIni
 
   async ngOnInit() {    
     this._routeParamsSub = this.activatedRoute.params.subscribe(async (params) => {
-      let { viewNonGrouped } = params;
-
-      if(viewNonGrouped) {
-        this._viewNonGrouped = Boolean(viewNonGrouped);
+      //view non-group or all i.e mix. groupId = 0 ? non-group only : all including group ones
+      let { groupId } = params;
+      if(typeof groupId !== 'undefined') {
+        this._groupId = parseInt(groupId);
       }
 
       this.dates.todayDate = moment().format(AppConstant.DEFAULT_DATE_FORMAT);
@@ -185,13 +185,8 @@ export class ExpenseListingPage extends BasePage implements OnInit, AfterViewIni
       toDate: this.dates.selectedDate.to,
       fromTime: this.dates.selectedDate.fromTime,
       toTime: this.dates.selectedDate.toTime,
-      groupId: undefined  //by default show grouped and non-grouped
+      groupId: this._groupId
     };
-
-    if(this._viewNonGrouped) {
-      //passing null means non-grouped only
-      filters.groupId = null;
-    }
  
     if(args && args.term) {
       filters.term = args.term;
