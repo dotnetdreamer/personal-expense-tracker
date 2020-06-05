@@ -19,7 +19,7 @@ import { IAttachment } from '../../attachment/attachment.model';
 import { MlService } from '../../shared/ml/ml.service';
 import { AttachmentService } from '../../attachment/attachment.service';
 import { Subscription } from 'rxjs';
-import { IGroup, GroupMemberStatus } from '../../group/group.model';
+import { IGroup, GroupMemberStatus, GroupPeriodStatus } from '../../group/group.model';
 import { GroupService } from '../../group/group.service';
 import { TransactionTypeModal } from '../transaction-type/transaction-type.page';
 import { IUser, IUserProfile } from '../../authentication/user.model';
@@ -40,6 +40,7 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit, OnDes
   todayDate;
   attachment: IAttachment;
   group: IGroup;
+  groupMinDate;
   selectedTransactionType: {type:TransactionType,membersWithAmount?:Array<{email,amount }>} = {
     type: TransactionType.PaidByYouAndSplitEqually,
   };
@@ -83,6 +84,11 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit, OnDes
         if(AppConstant.DEBUG) {
           console.log('ExpenseCreateOrUpdatePage: ngOnInit: group', this.group);
         }
+
+        //in group, expense date can't be less than current period start date
+        const openPeriod = this.group.periods.filter(p => p.status == GroupPeriodStatus.Open)[0];
+        const groupMin =  moment(openPeriod.startDate).local();
+        this.groupMinDate =  groupMin.format(AppConstant.DEFAULT_DATE_FORMAT);
       }
       
       if(!id) {

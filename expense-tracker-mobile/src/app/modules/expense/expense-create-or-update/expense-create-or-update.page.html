@@ -60,8 +60,10 @@
     <ion-list>
       <ion-item lines="none">
         <ion-icon name="calendar-outline"></ion-icon>
-        <ion-datetime [value]="todayDate" display-format="YYYY-MM-DD" 
-          (ionChange)="onCreatedDateChanged($event)"></ion-datetime>
+        <ion-datetime [value]="todayDate" display-format="YYYY-MM-DD" [attr.min]="groupMinDate" 
+          (ionChange)="onCreatedDateChanged($event)" *ngIf="group"></ion-datetime>
+          <ion-datetime [value]="todayDate" display-format="YYYY-MM-DD" 
+          (ionChange)="onCreatedDateChanged($event)" *ngIf="!group"></ion-datetime>
       </ion-item>
     </ion-list>
     <ion-list>
