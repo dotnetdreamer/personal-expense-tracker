@@ -153,10 +153,6 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit, OnDes
       }
     }
 
-    if(AppConstant.DEBUG) {
-      console.log('ExpenseCreateOrUpdatePage: onSaveClick: exp', exp)
-    }
-
     if(this.attachment) {
       const added = await this.attachmentSvc.putLocal(this.attachment);
       this.attachment.id = +added.insertId;
@@ -166,7 +162,28 @@ export class ExpenseCreateOrUpdatePage extends BasePage implements OnInit, OnDes
     //group
     if(this.group) {
       exp.group = this.group;
-      exp.transactions = await this._distributeTransaction(exp, this.selectedTransactionType);;
+      exp.transactions = await this._distributeTransaction(exp, this.selectedTransactionType);
+
+      /*
+      // if expense date is prev then today 
+        then make sure expense time is greater than time of group period start date
+      */
+      const crOn = moment(exp.createdOn);
+      const today = moment();
+      if(crOn.isBefore(today)) {
+        const crOnTime = crOn.format(AppConstant.DEFAULT_TIME_FORMAT) != '00:00';
+        if(!crOnTime) {
+          let groupPeriodStart = (this.group.periods.filter(p => p.status == GroupPeriodStatus.Open)[0]).startDate;
+          let groupPeriodStartMoment = moment(groupPeriodStart).local();
+          //add at least 5min more to it...
+          groupPeriodStartMoment = groupPeriodStartMoment.add(5, 'minute');
+          exp.createdOn = `${exp.createdOn} ${groupPeriodStartMoment.format(AppConstant.DEFAULT_TIME_FORMAT + ":ss")}`;
+        }
+      }
+    }
+    
+    if(AppConstant.DEBUG) {
+      console.log('ExpenseCreateOrUpdatePage: onSaveClick: exp', exp)
     }
 
     await this.expenseSvc.putLocal(exp);
