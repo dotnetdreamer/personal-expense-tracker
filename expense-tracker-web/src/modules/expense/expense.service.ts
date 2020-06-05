@@ -129,18 +129,22 @@ export class ExpenseService {
     let qb = await getRepository(Expense)
       .createQueryBuilder("exp")
       .leftJoinAndSelect("exp.category", "cat")
-      .leftJoinAndSelect("exp.group", "grp");
+      .leftJoinAndSelect("exp.group", "grp"); 
 
     qb = qb.andWhere('date(exp.createdOn) >= :createdOnFrom', { createdOnFrom: args.fromDate });
     qb = qb.andWhere('date(exp.createdOn) <= :createdOnToDate', { createdOnToDate: args.toDate });
     qb = qb.andWhere('exp.isDeleted <= :isDeleted', { isDeleted: args.showHidden });
     
-    args.groupId = +args.groupId;
-    if(args.groupId > 0) {
-      //show non-grouped only if no grouped is passed
-      qb = qb.andWhere("exp.groupId = :groupId", { groupId: args.groupId });
-    } else {
-      qb = qb.andWhere("(exp.groupId is null OR exp.groupId = 0)");
+    //groupId = 0 ? non-group only, groupId == -1 ? all including group ones
+    if(args.groupId) {
+      args.groupId = parseInt(args.groupId.toString());
+    }
+    if(args.groupId >= 0) {
+      if(args.groupId == 0) {
+        qb = qb.where('exp.group is null');
+      } else {
+        qb = qb.where('grp.id = :groupId', { groupId: args.groupId });
+      }
     }
     
     if(args.userIds && args.userIds.length) {
