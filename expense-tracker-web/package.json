@@ -29,7 +29,7 @@
     "@nestjs/typeorm": "^7.0.0",
     "bcrypt": "^4.0.1",
     "brain.js": "^2.0.0-alpha.12",
-    "class-transformer": "^0.2.3",
+    "class-transformer": "^0.3.1",
     "moment": "^2.24.0",
     "natural": "^0.6.3",
     "passport": "^0.4.1",
